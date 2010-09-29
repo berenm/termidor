@@ -199,6 +199,16 @@ struct file_base_impl;
 struct file_base;
 class file;
 
+}
+}
+
+namespace boost {
+  template < >
+  struct is_POD< pbe::rxml::element > : public true_type {};
+}
+
+namespace pbe {
+namespace rxml {
 
 struct UnexpectedEndOfDocument {}; // Exception thrown when the document's terminating 
                                    // NULL byte is encountered.

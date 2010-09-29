@@ -22,6 +22,7 @@
 #include "strto.hh"
 #include "format.hh"
 
+#include <boost/integer.hpp>
 #include <algorithm>
 
 using namespace std;
@@ -74,7 +75,7 @@ string uri_escape(const string unesc)
     if (*q == ' ') {
       esc += '+';
     } else {
-      esc += format("%%%02x",static_cast<uint8_t>(*q));
+      esc += format("%%%02x",static_cast< boost::uint8_t>(*q));
     }      
     p = q+1;
   }

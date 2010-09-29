@@ -19,6 +19,7 @@
 #ifndef libpbe_strto_hh
 #define libpbe_strto_hh
 
+#include <stdio.h>
 #include <string>
 #include <cctype>
 #include <algorithm>
