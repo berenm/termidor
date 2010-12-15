@@ -24,17 +24,14 @@
 
 #include "compiler_magic.hh"
 
-
 class NullAuthenticator: public HttpAuthenticator {
 
-public:
+  public:
 
-  void basic_auth(PBE_UNUSED_ARG(std::string username),
-                  PBE_UNUSED_ARG(std::string password)) const {
-    return;
-  }
+    void basic_auth(PBE_UNUSED_ARG(std::string username), PBE_UNUSED_ARG(std::string password)) const {
+      return;
+    }
 
 };
-
 
 #endif

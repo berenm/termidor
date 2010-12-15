@@ -22,5 +22,4 @@
 
 #define ANYTERM_TIMEOUT 30
 
-
 #endif

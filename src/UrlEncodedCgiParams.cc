@@ -21,7 +21,6 @@
 
 #include "Exception.hh"
 
-
 #include <string>
 #include <list>
 #include <boost/algorithm/string.hpp>
@@ -30,7 +29,6 @@
 using namespace std;
 using namespace pbe;
 using namespace boost::lambda;
-
 
 // Parse x-www-form-urlencoded parameters as defined in HTML 4.01
 // section 17.13.4:
@@ -47,59 +45,57 @@ using namespace boost::lambda;
 // name/value pairs are separated from each other by `&'.
 
 
-
-
-static int hexchar(char c)
-{
-  if (c>='0' && c<='9') {
-    return c-'0';
-  } else if (c>='a' && c<='f') {
-    return c-'a'+10;
-  } else if (c>='A' && c<='F') {
-    return c-'A'+10;
+static int hexchar(char c) {
+  if (c >= '0' && c <= '9') {
+    return c - '0';
+  } else if (c >= 'a' && c <= 'f') {
+    return c - 'a' + 10;
+  } else if (c >= 'A' && c <= 'F') {
+    return c - 'A' + 10;
   } else {
-    throw StrException(string("Invalid hex character '")+c+"'");
+    throw StrException(string("Invalid hex character '") + c + "'");
   }
 }
 
-static char decode_percent_escape(string s)
-{
-  return hexchar(s[1])*16 + hexchar(s[2]); 
+static char decode_percent_escape(string s) {
+  return hexchar(s[1]) * 16 + hexchar(s[2]);
 }
 
-
-static string decode_uri_escapes(string s)
-{
+static string decode_uri_escapes(string s) {
   string t;
-  for (string::size_type i=0; i<s.length(); ++i) {
+  for (string::size_type i = 0; i < s.length(); ++i) {
     switch (s[i]) {
-    case '+': t+=' '; break;
-    case '%': t+=decode_percent_escape(s.substr(i,3)); i+=2; break;
-    default:  t+=s[i]; break;
+      case '+':
+        t += ' ';
+        break;
+      case '%':
+        t += decode_percent_escape(s.substr(i, 3));
+        i += 2;
+        break;
+      default:
+        t += s[i];
+        break;
     }
   }
   return t;
 }
 
-
-UrlEncodedCgiParams::UrlEncodedCgiParams(string query)
-{
-  typedef list<string> name_value_pairs_t;
+UrlEncodedCgiParams::UrlEncodedCgiParams(string query) {
+  typedef list< string > name_value_pairs_t;
   name_value_pairs_t name_value_pairs;
-  boost::split(name_value_pairs, query, _1=='&');
+  boost::split(name_value_pairs, query, _1 == '&');
 
-  for(name_value_pairs_t::const_iterator i = name_value_pairs.begin();
-      i != name_value_pairs.end(); ++i) {
+  for (name_value_pairs_t::const_iterator i = name_value_pairs.begin(); i != name_value_pairs.end(); ++i) {
 
     string name_value_pair = *i;
     string::size_type equals_pos = name_value_pair.find('=');
-    if (equals_pos==name_value_pair.npos) {
-      throw StrException("Misformatted URL-encoded query string component '"
-			 +name_value_pair+"' does not contain an '='");
+    if (equals_pos == name_value_pair.npos) {
+      throw StrException("Misformatted URL-encoded query string component '" + name_value_pair
+          + "' does not contain an '='");
     }
-    string name = name_value_pair.substr(0,equals_pos);
-    string value = name_value_pair.substr(equals_pos+1);
+    string name = name_value_pair.substr(0, equals_pos);
+    string value = name_value_pair.substr(equals_pos + 1);
 
-    insert(make_pair(decode_uri_escapes(name),decode_uri_escapes(value)));
+    insert(make_pair(decode_uri_escapes(name), decode_uri_escapes(value)));
   }
 }

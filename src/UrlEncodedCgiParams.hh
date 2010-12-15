@@ -24,13 +24,9 @@
 
 #include <string>
 
-
 class UrlEncodedCgiParams: public CgiParams {
-
-public:
-  UrlEncodedCgiParams(std::string query);
-
+  public:
+    UrlEncodedCgiParams(std::string query);
 };
-
 
 #endif

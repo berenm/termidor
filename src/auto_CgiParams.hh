@@ -23,8 +23,6 @@
 #include "CgiParams.hh"
 #include "HttpRequest.hh"
 
-
 CgiParams auto_CgiParams(pbe::HttpRequest request);
-
 
 #endif

@@ -32,10 +32,9 @@
 
 typedef wchar_t char32_t;
 typedef char32_t ucs4_char;
-typedef std::basic_string<ucs4_char> ucs4_string;
+typedef std::basic_string< ucs4_char > ucs4_string;
 
 typedef char utf8_char;
-typedef std::basic_string<utf8_char> utf8_string;
-
+typedef std::basic_string< utf8_char > utf8_string;
 
 #endif

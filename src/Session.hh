@@ -33,67 +33,72 @@
 #include <boost/scoped_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
-
 #include "Screen.hh"
 #include "Terminal.hh"
 #include "Activity.hh"
 #include "Iconver.hh"
 
-
 class Session: boost::noncopyable {
-public:
+  public:
 
-  const SessionId id;
-  const int rows;
-  const int cols;
-  const int scrollback;
-  const int time_out;
-  const std::string charset;
-  const bool diff;
+    const SessionId id;
+    const int rows;
+    const int cols;
+    const int scrollback;
+    const int time_out;
+    const std::string charset;
+    const bool diff;
 
-private:
-  pbe::Iconver<pbe::permissive,utf8_char,char> utf8_to_charset;
-  pbe::Iconver<pbe::permissive,char,ucs4_char> charset_to_ucs4;
-  pbe::Iconver<pbe::valid,ucs4_char,utf8_char> ucs4_to_utf8;
+  private:
+    pbe::Iconver< pbe::permissive, utf8_char, char > utf8_to_charset;
+    pbe::Iconver< pbe::permissive, char, ucs4_char > charset_to_ucs4;
+    pbe::Iconver< pbe::valid, ucs4_char, utf8_char > ucs4_to_utf8;
 
-public:
-  Screen screen;
-  typedef pbe::Mutex<> screen_lock_t;
-  screen_lock_t screen_lock;
-  volatile bool dirty;
-  typedef pbe::Condition dirty_condition_t;
-  dirty_condition_t dirty_condition;
-  /*volatile*/ std::string error_msg;
-  volatile bool error;
-  ucs4_string old_html_screen;
-  volatile time_t last_access;
+  public:
+    Screen screen;
+    typedef pbe::Mutex< > screen_lock_t;
+    screen_lock_t screen_lock;
+    volatile bool dirty;
+    typedef pbe::Condition dirty_condition_t;
+    dirty_condition_t dirty_condition;
+    /*volatile*/
+    std::string error_msg;
+    volatile bool error;
+    ucs4_string old_html_screen;
+    volatile time_t last_access;
 
-  Terminal term;
-  boost::scoped_ptr<Activity> activity;
+    Terminal term;
+    boost::scoped_ptr< Activity > activity;
 
-  typedef boost::function<Activity*(Activity::onOutput_t,
-                                    Activity::onError_t,
-                                    std::string, std::string,
-                                    std::string, int, int)> activityfactory_t;
-  Session(int r, int c, int sb,
-          std::string host, std::string user, std::string param,
-          int t,
-          activityfactory_t activityfactory,
-          std::string charset_,
-          bool diff_);
-  ~Session();
+    typedef boost::function< Activity*(Activity::onOutput_t,
+                                       Activity::onError_t,
+                                       std::string,
+                                       std::string,
+                                       std::string,
+                                       int,
+                                       int) > activityfactory_t;
+    Session(int r,
+            int c,
+            int sb,
+            std::string host,
+            std::string user,
+            std::string param,
+            int t,
+            activityfactory_t activityfactory,
+            std::string charset_,
+            bool diff_);
+    ~Session();
 
-  void touch(void);
-  void report_any_backend_error(void);
-  void send(std::string k);
-  std::string rcv(void);
+    void touch(void);
+    void report_any_backend_error(void);
+    void send(std::string k);
+    std::string rcv(void);
 
-  bool timed_out(void);
+    bool timed_out(void);
 
-private:
-  void process_output(std::string s);
-  void process_error(std::string s);
+  private:
+    void process_output(std::string s);
+    void process_error(std::string s);
 };
-
 
 #endif

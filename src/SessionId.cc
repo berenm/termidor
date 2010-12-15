@@ -26,15 +26,12 @@
 
 using namespace std;
 
-
-SessionId::SessionId()
-{
+SessionId::SessionId() {
   ifstream devurandom("/dev/urandom");
-  devurandom.read(reinterpret_cast<char*>(&n),sizeof(n));
+  devurandom.read(reinterpret_cast< char* > (&n), sizeof(n));
 }
 
-uint64_t SessionId::hexstr_to_uint64(string s) const
-{
+uint64_t SessionId::hexstr_to_uint64(string s) const {
   stringstream ss;
   ss << s;
   uint64_t i;
@@ -42,12 +39,9 @@ uint64_t SessionId::hexstr_to_uint64(string s) const
   return i;
 }
 
-
-string SessionId::uint64_to_hexstr(uint64_t i) const
-{
+string SessionId::uint64_to_hexstr(uint64_t i) const {
   stringstream ss;
   ss << setbase(16) << i;
   return ss.str();
 }
-
 

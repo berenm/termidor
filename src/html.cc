@@ -23,32 +23,30 @@
 
 using namespace std;
 
-
 // Screen to HTML conversion:
 
-static bool gen_style(ucs4_string& h, Attributes attrs)
-{
-  if (attrs!=Attributes()) {
-    unsigned int fg = attrs.fg;
-    unsigned int bg = attrs.bg;
+static bool gen_style(ucs4_string& h, attributes attrs) {
+  if (attrs != attributes()) {
+    unsigned int fg = attrs.foreground;
+    unsigned int bg = attrs.background;
     if (attrs.inverse) {
-      swap(fg,bg);
+      swap(fg, bg);
     }
     ucs4_string classes;
     if (attrs.bold) {
       classes += L'z';
     }
-    if (bg!=Attributes().bg) {
+    if (bg != attributes().background) {
       if (!classes.empty()) {
         classes += L' ';
       }
-      classes += L'a'+bg;
+      classes += L'a' + bg;
     }
-    if (fg!=Attributes().fg) {
+    if (fg != attributes().foreground) {
       if (!classes.empty()) {
         classes += L' ';
       }
-      classes += L'i'+fg;
+      classes += L'i' + fg;
     }
     h += L"<span class=\"" + classes + L"\">";
     return true;
@@ -56,65 +54,72 @@ static bool gen_style(ucs4_string& h, Attributes attrs)
   return false;
 }
 
-static const ucs4_char* attr_end    = L"</span>";
+static const ucs4_char* attr_end = L"</span>";
 
 static const ucs4_char* cursor_start = L"<span class=\"cursor\">";
-static const ucs4_char* cursor_end   = L"</span>";
+static const ucs4_char* cursor_end = L"</span>";
 
-
-ucs4_string htmlify_screen(const Screen& screen)
-{
+ucs4_string htmlify_screen(const Screen& screen) {
   // Convert screen into HTML.
   // Slightly optimised to reduce spaces at right end of lines.
 
   ucs4_string h;
 
-  for (int r=-screen.scrollback(); r<screen.rows(); r++) {
-    int sp=0;
-    bool styled=false;
-    Attributes prev_attrs;
-    for (int c=0; c<screen.cols(); c++) {
-      bool cursor = (r==screen.cursor_row && c==screen.cursor_col) && screen.cursor_visible;
-      Cell cell = screen(r,c);
+  for (int r = -screen.scrollback(); r < screen.rows(); r++) {
+    int sp = 0;
+    bool styled = false;
+    attributes prev_attrs;
+    for (int c = 0; c < screen.cols(); c++) {
+      bool cursor = (r == screen.cursor_row && c == screen.cursor_col) && screen.cursor_visible;
+      cell cell = screen(r, c);
       ucs4_char ch = cell.c;
-      Attributes attrs = cell.attrs;
+      attributes attrs = cell.attributes_;
 
-      if (ch==' ' && attrs==Attributes() && !styled && c>0 && r>0 && !cursor) {
+      if (ch == ' ' && attrs == attributes() && !styled && c > 0 && r > 0 && !cursor) {
         sp++;
       } else {
-	while (sp>0) {
-	  h+=L'\u00A0';
-	  sp--;
-	}
-	if (styled && attrs!=prev_attrs) {
-	  h+=attr_end;
-	}
-	if (c==0 || attrs!=prev_attrs) {
-	  styled = gen_style(h,attrs);
-	  prev_attrs=attrs;
-	}
-	if (cursor) {
-	  h+=cursor_start;
-	}
-        switch (ch) {
-          case '<':  h+=L"&lt;"; break;
-          case '>':  h+=L"&gt;"; break;
-          case '&':  h+=L"&amp;"; break;
-          case ' ':  h+=L'\u00A0'; break;
-          default:   h+=ch; break;
+        while (sp > 0) {
+          h += L'\u00A0';
+          sp--;
         }
-	if (cursor) {
-	  h+=cursor_end;
-	}
+        if (styled && attrs != prev_attrs) {
+          h += attr_end;
+        }
+        if (c == 0 || attrs != prev_attrs) {
+          styled = gen_style(h, attrs);
+          prev_attrs = attrs;
+        }
+        if (cursor) {
+          h += cursor_start;
+        }
+        switch (ch) {
+          case '<':
+            h += L"&lt;";
+            break;
+          case '>':
+            h += L"&gt;";
+            break;
+          case '&':
+            h += L"&amp;";
+            break;
+          case ' ':
+            h += L'\u00A0';
+            break;
+          default:
+            h += ch;
+            break;
+        }
+        if (cursor) {
+          h += cursor_end;
+        }
       }
     }
     if (styled) {
-      h+=attr_end;
+      h += attr_end;
     }
-    h+=L"<br>";
+    h += L"<br>";
   }
 
   return h;
 }
-
 

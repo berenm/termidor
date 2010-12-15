@@ -28,25 +28,32 @@
 #include <string>
 #include <iostream>
 
-
 class SessionId {
-public:
-  SessionId(void);
-  SessionId(uint64_t i): n(i) {}
-  SessionId(std::string s): n(hexstr_to_uint64(s)) {}
-  std::string str(void) const { return uint64_to_hexstr(n); }
-  bool operator==(SessionId rhs) const { return n==rhs.n; }
-  bool operator<(SessionId rhs) const { return n<rhs.n; }
-  
-private:
-  uint64_t n;
-  uint64_t hexstr_to_uint64(std::string s) const;
-  std::string uint64_to_hexstr(uint64_t i) const;
+  public:
+    SessionId(void);
+    SessionId(uint64_t i) :
+      n(i) {
+    }
+    SessionId(std::string s) :
+      n(hexstr_to_uint64(s)) {
+    }
+    std::string str(void) const {
+      return uint64_to_hexstr(n);
+    }
+    bool operator==(SessionId rhs) const {
+      return n == rhs.n;
+    }
+    bool operator<(SessionId rhs) const {
+      return n < rhs.n;
+    }
+
+  private:
+    uint64_t n;
+    uint64_t hexstr_to_uint64(std::string s) const;
+    std::string uint64_to_hexstr(uint64_t i) const;
 };
 
-
-inline std::ostream& operator<<(std::ostream& strm, SessionId sid)
-{
+inline std::ostream& operator<<(std::ostream& strm, SessionId sid) {
   strm << sid.str();
   return strm;
 }

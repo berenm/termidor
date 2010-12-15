@@ -22,119 +22,110 @@
 #include <vector>
 #include <algorithm>
 
-#include "Cell.hh"
-
+#include "cell.hpp"
 
 class Screen {
-  int rows_;
-  int cols_;
-  int scrollback_;
-  typedef std::vector<Cell> row_t;
-  typedef std::vector<row_t*> cells_t;
-  cells_t cells;
-  unsigned int wrap;
+    int rows_;
+    int cols_;
+    int scrollback_;
+    typedef std::vector< cell > row_t;
+    typedef std::vector< row_t* > cells_t;
+    cells_t cells;
+    unsigned int wrap;
 
-public:
-  Screen(int rows, int cols, int scrollback=0):
-    rows_(rows), cols_(cols), scrollback_(scrollback),
-    wrap(0),
-    cursor_row(0), cursor_col(0), cursor_visible(true)
-  {
-    for (int r=0; r<scrollback; ++r) {
-      cells.push_back(new row_t(cols));  // leaks if it throws
+  public:
+    Screen(int rows, int cols, int scrollback = 0) :
+      rows_(rows), cols_(cols), scrollback_(scrollback), wrap(0), cursor_row(0), cursor_col(0),
+          cursor_visible(true) {
+      for (int r = 0; r < scrollback; ++r) {
+        cells.push_back(new row_t(cols)); // leaks if it throws
+      }
+      for (int r = 0; r < rows; ++r) {
+        cells.push_back(new row_t(cols)); // leaks if it throws
+      }
     }
-    for (int r=0; r<rows; ++r) {
-      cells.push_back(new row_t(cols));  // leaks if it throws
+
+    ~Screen() {
+      for (cells_t::iterator i = cells.begin(); i != cells.end(); ++i) {
+        delete *i;
+      }
     }
-  }
 
-  ~Screen() {
-    for (cells_t::iterator i = cells.begin();
-         i != cells.end(); ++i) {
-      delete *i;
+    int rows() const {
+      return rows_;
     }
-  }
 
-  int rows() const {
-    return rows_;
-  }
-
-  int cols() const {
-    return cols_;
-  }
-
-  int scrollback() const {
-    return scrollback_;
-  }
-
-  Cell& operator()(int r, int c)
-  {
-    return (*cells[row_idx(r)])[c];
-  }
-
-  const Cell& operator()(int r, int c) const
-  {
-    return (*cells[row_idx(r)])[c];
-  }
-
-  void scroll_down(int top, int bottom, int n=1)
-  {
-    // If we're asked to scroll the whole visible screen down, we scroll
-    // into the scrollback region.  Otherwise, the scrollback region is
-    // not changed.
-    if (top==0 && bottom==rows()-1) {
-      wrap = (wrap+n)%(rows()+scrollback());
-    } else {
-      normalise_wrap();
-      std::rotate(cells.begin()+scrollback()+top, cells.begin()+scrollback()+top+n, 
-                  cells.begin()+scrollback()+bottom+1);
+    int cols() const {
+      return cols_;
     }
-    for (int r=bottom+1-n; r<=bottom; ++r) {
-      clear_row(r);
+
+    int scrollback() const {
+      return scrollback_;
     }
-  }
 
-  void scroll_up(int top, int bottom, int n=1)
-  {
-    // Never touch the scrollback region.
-    if (scrollback()==0 && top==0 && bottom==rows()-1) {
-      wrap = (wrap-n)%(rows()+scrollback());
-    } else {
-      normalise_wrap();
-      std::rotate(cells.begin()+scrollback()+top, cells.begin()+scrollback()+bottom+1-n,
-                  cells.begin()+scrollback()+bottom+1);
+    cell& operator()(int r, int c) {
+      return (*cells[row_idx(r)])[c];
     }
-    for (int r=top; r<top+n; ++r) {
-      clear_row(r);
+
+    const cell& operator()(int r, int c) const {
+      return (*cells[row_idx(r)])[c];
     }
-  }
 
-  int cursor_row;
-  int cursor_col;
-  bool cursor_visible;
-
-
-private:
-  int row_idx(int r) const {
-    return (r+scrollback()+wrap)%(rows()+scrollback());
-  }
-
-  void clear_row(int r) {
-    row_t& row = *(cells[row_idx(r)]);
-    for (int c=0; c<cols(); ++c) {
-      row[c] = Cell();   // FIXME this should probably use the terminal's current attributes 
-                         // (e.g. background colour)
+    void scroll_down(int top, int bottom, int n = 1) {
+      // If we're asked to scroll the whole visible screen down, we scroll
+      // into the scrollback region.  Otherwise, the scrollback region is
+      // not changed.
+      if (top == 0 && bottom == rows() - 1) {
+        wrap = (wrap + n) % (rows() + scrollback());
+      } else {
+        normalise_wrap();
+        std::rotate(cells.begin() + scrollback() + top, cells.begin() + scrollback() + top + n, cells.begin()
+            + scrollback() + bottom + 1);
+      }
+      for (int r = bottom + 1 - n; r <= bottom; ++r) {
+        clear_row(r);
+      }
     }
-  }
 
-  void normalise_wrap() {
-    if (wrap==0) {
-      return;
+    void scroll_up(int top, int bottom, int n = 1) {
+      // Never touch the scrollback region.
+      if (scrollback() == 0 && top == 0 && bottom == rows() - 1) {
+        wrap = (wrap - n) % (rows() + scrollback());
+      } else {
+        normalise_wrap();
+        std::rotate(cells.begin() + scrollback() + top,
+                    cells.begin() + scrollback() + bottom + 1 - n,
+                    cells.begin() + scrollback() + bottom + 1);
+      }
+      for (int r = top; r < top + n; ++r) {
+        clear_row(r);
+      }
     }
-    std::rotate(cells.begin(), cells.begin()+wrap, cells.end());
-    wrap=0;
-  }
+
+    int cursor_row;
+    int cursor_col;
+    bool cursor_visible;
+
+  private:
+    int row_idx(int r) const {
+      return (r + scrollback() + wrap) % (rows() + scrollback());
+    }
+
+    void clear_row(int r) {
+      row_t& row = *(cells[row_idx(r)]);
+      for (int c = 0; c < cols(); ++c) {
+        row[c] = cell(); // FIXME this should probably use the terminal's current attributes
+        // (e.g. background colour)
+      }
+    }
+
+    void normalise_wrap() {
+      if (wrap == 0) {
+        return;
+      }
+      std::rotate(cells.begin(), cells.begin() + wrap, cells.end());
+      wrap = 0;
+    }
 };
-
 
 #endif

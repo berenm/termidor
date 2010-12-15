@@ -25,7 +25,6 @@
 
 #include "unicode.hh"
 
-
 namespace DiffAlgo {
 
   // "Diff Algorithm" i.e. the algorithm used by the diff program.
@@ -58,32 +57,29 @@ namespace DiffAlgo {
   // Here are the types that define this return format:
 
 
-  enum fragment_tag { from_a, from_b, common };
-
-  template <typename SEQ>
-  struct fragment_seq {
-    typedef std::list<std::pair<fragment_tag,SEQ> > Type;
+  enum fragment_tag {
+    from_a, from_b, common
   };
 
+  template< typename SEQ >
+  struct fragment_seq {
+      typedef std::list< std::pair< fragment_tag, SEQ > > Type;
+  };
 
   // String diffs:
 
-  typedef fragment_seq<std::string>::Type string_fragment_seq;
+  typedef fragment_seq< std::string >::Type string_fragment_seq;
 
-  typedef fragment_seq<ucs4_string>::Type ucs4_string_fragment_seq;
+  typedef fragment_seq< ucs4_string >::Type ucs4_string_fragment_seq;
 
   // Here is the prototype for the diff function.  It returns its
   // result via an "out" parameter:
-  
-  void string_diff ( const std::string& A, const std::string& B,
-		     string_fragment_seq& result );
 
-  void ucs4_string_diff ( const ucs4_string& A, const ucs4_string& B,
-	                  ucs4_string_fragment_seq& result );
+  void string_diff(const std::string& A, const std::string& B, string_fragment_seq& result);
 
+  void ucs4_string_diff(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result);
 
-};
+}
+;
 
-
-  
 #endif

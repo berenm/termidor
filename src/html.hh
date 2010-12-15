@@ -31,8 +31,6 @@
 
 #include "unicode.hh"
 
-
 ucs4_string htmlify_screen(const Screen& screen);
-
 
 #endif

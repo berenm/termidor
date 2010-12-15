@@ -46,48 +46,44 @@
 #include "select.hh"
 #include "Exception.hh"
 
-
 using namespace std;
 using namespace pbe;
 
-
-static std::pair<int,::pid_t> open_subprocess(string command, int pty_rows, int pty_cols)
-{
+static std::pair< int, ::pid_t > open_subprocess(string command, int pty_rows, int pty_cols) {
   struct winsize ws;
-  ws.ws_row=pty_rows;
-  ws.ws_col=pty_cols;
-  ws.ws_xpixel=0;
-  ws.ws_ypixel=0;
+  ws.ws_row = pty_rows;
+  ws.ws_col = pty_cols;
+  ws.ws_xpixel = 0;
+  ws.ws_ypixel = 0;
 
   int fd;
   int pid = forkpty(&fd, NULL, NULL, &ws);
-  if (pid==-1) {
+  if (pid == -1) {
     throw_ErrnoException("forkpty()");
   }
-  if (pid==0) {
-    setenv("TERM","linux",1);
+  if (pid == 0) {
+    setenv("TERM", "linux", 1);
     struct termios t;
-    tcgetattr(0,&t);  // Could fail, but where would we send the error?
-    t.c_cc[VERASE]=8; // Make ctrl-H (backspace) the erase character.
-    tcsetattr(0,TCSANOW,&t); // ditto.
-    execl("/bin/sh","/bin/sh","-c",command.c_str(),NULL);
-    throw_ErrnoException("execl(/bin/sh -c "+command+")");  // pointless.
+    tcgetattr(0, &t); // Could fail, but where would we send the error?
+    t.c_cc[VERASE] = 8; // Make ctrl-H (backspace) the erase character.
+    tcsetattr(0, TCSANOW, &t); // ditto.
+    execl("/bin/sh", "/bin/sh", "-c", command.c_str(), NULL);
+    throw_ErrnoException("execl(/bin/sh -c " + command + ")"); // pointless.
   }
-  return make_pair(fd,pid);
+  return make_pair(fd, pid);
 }
-
 
 SubProcess::SubProcess(Activity::onOutput_t onOutput,
                        Activity::onError_t onError,
-		       string command,
-		       int pty_rows, int pty_cols):
-  SubProcess_base(open_subprocess(command, pty_rows, pty_cols)),
-  Activity(onOutput, onError, SubProcess_base::fd)
-{}
+                       string command,
+                       int pty_rows,
+                       int pty_cols) :
+  SubProcess_base(open_subprocess(command, pty_rows, pty_cols)), Activity(onOutput,
+                                                                          onError,
+                                                                          SubProcess_base::fd) {
+}
 
-
-SubProcess::~SubProcess()
-{
+SubProcess::~SubProcess() {
   // We do two things to try to kill the subprocess: we close the fd,
   // which really ought to kill it, and we SIGHUP it.  The SIGHUP
   // by itself may not be sufficient if the process is nohup or
@@ -108,8 +104,8 @@ SubProcess::~SubProcess()
   try {
     SubProcess_base::fd.close();
     // fd.close() can throw.
-  } catch (...) {}
-  kill(pid,SIGHUP);
+  } catch (...) {
+  }
+  kill(pid, SIGHUP);
 }
-
 

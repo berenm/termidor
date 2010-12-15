@@ -20,30 +20,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-int main(int argc, char* argv[])
-{
-  if (argc!=2) {
-    fprintf(stderr,"usage: mk_blob fn\n");
+int main(int argc, char* argv[]) {
+  if (argc != 2) {
+    fprintf(stderr, "usage: mk_blob fn\n");
     exit(1);
   }
   const char* fn = argv[1];
 
-  printf("const char _binary_%s_start[] = {\n",fn);
-  int l=0;
+  printf("const char _binary_%s_start[] = {\n", fn);
+  int l = 0;
   while (1) {
     int c = getchar();
-    if (c==EOF) {
+    if (c == EOF) {
       break;
     }
-    printf("0x%02x, ",c);
+    printf("0x%02x, ", c);
     ++l;
-    if (l%32==0) {
+    if (l % 32 == 0) {
       printf("\n");
     }
   }
   printf("\n};\n");
-  printf("const char _binary_%s_end[] = {};\n",fn);
+  printf("const char _binary_%s_end[] = {};\n", fn);
   exit(0);
 }
 

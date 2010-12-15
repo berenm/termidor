@@ -33,18 +33,13 @@
 #include "select.hh"
 #include "Exception.hh"
 
-
 using namespace std;
 using namespace pbe;
 
-
 SerialPortActivity::SerialPortActivity(Activity::onOutput_t onOutput,
                                        Activity::onError_t onError,
-                                       string fn, int baudrate):
-  SerialPortActivity_base(fn,FileDescriptor::read_write,baudrate),
-  Activity(onOutput, onError, sp)
-{}
-
-
-
+                                       string fn,
+                                       int baudrate) :
+  SerialPortActivity_base(fn, FileDescriptor::read_write, baudrate), Activity(onOutput, onError, sp) {
+}
 

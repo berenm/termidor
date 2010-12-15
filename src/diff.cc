@@ -23,7 +23,6 @@
 #include <vector>
 using namespace std;
 
-
 namespace DiffAlgo {
 
   // The algorithm used is the one described in
@@ -71,7 +70,7 @@ namespace DiffAlgo {
   //   a . * . .
   //   b . . * .
   //   a . * . .
-  
+
   // The points where the labels on the rows and columns match are
   // marked specially.
 
@@ -119,7 +118,7 @@ namespace DiffAlgo {
 
   // Points can also be referred to using one or other of x and y (x
   // by convention) and the "diagonal index", k, defined by k=x-y.
-  
+
   // The point about the diagonal index is that the frontier will
   // always expand in such a way that it cuts each diagonal exactly
   // once:
@@ -154,7 +153,6 @@ namespace DiffAlgo {
   // their size.
 
 
-
   // The Differ class is template-parameterised by the sequence type
   // that it operates on.  This is normally string, but if you want to
   // use a different type, you should just be able to create a Differ
@@ -162,256 +160,238 @@ namespace DiffAlgo {
   // work, as long as operator= is defined on 'something'.  See the
   // end of the file for how Differ is used.
 
-  template <typename SEQ>
+  template< typename SEQ >
   class Differ {
 
-  private:
-    const SEQ& A;    // Input sequences
-    const SEQ& B;
-    const int N;     // length of A
-    const int M;     // length of B
-    const int max_D;
-    bool store;
+    private:
+      const SEQ& A; // Input sequences
+      const SEQ& B;
+      const int N; // length of A
+      const int M; // length of B
+      const int max_D;
+      bool store;
 
-    // Output
-    typename fragment_seq<SEQ>::Type& result;
+      // Output
+      typename fragment_seq< SEQ >::Type& result;
 
-    // Ideally V would be an array indexed from -(M+N) to (M+N)
-    // inclusive, but we only have zero-indexed arrays.  So we use a
-    // zero-indexed array and apply an offset.
+      // Ideally V would be an array indexed from -(M+N) to (M+N)
+      // inclusive, but we only have zero-indexed arrays.  So we use a
+      // zero-indexed array and apply an offset.
 
-    const int V_size;
-    const int V_offset;
-    
-    typedef vector<int> V_impl_t;
-    V_impl_t V_impl;
-    int& V ( int k ) { return V_impl[V_offset+k]; }
-    
+      const int V_size;
+      const int V_offset;
 
-    typedef vector<V_impl_t> stored_V_impls_t;
-    stored_V_impls_t stored_V_impls;
-    int stored_V ( int d, int k ) const { return (stored_V_impls[d])[V_offset+k]; }
-    
-    // This is filled in when solve() finishes.  If all that is wanted
-    // is to know the distance between the two inputs, there is no
-    // need to call find_trace() at all; just read this using
-    // get_edit_distance().
-    int edit_distance;
-
-
-    // Append an item to the result, with a tag.
-    // If the tag matches the tag of the current end of the result, it
-    // is merged with it.
-    void append_result ( fragment_tag tag, typename SEQ::value_type datum )
-    {	
-      if (!result.empty() && (result.back().first == tag)) {
-	result.back().second.push_back(datum);
-      } else {
-	result.push_back(make_pair(tag,SEQ(1,datum)));
+      typedef vector< int > V_impl_t;
+      V_impl_t V_impl;
+      int& V(int k) {
+        return V_impl[V_offset + k];
       }
-    }
-    
-    // Follow any snake from (k,x) to its end, and return the x
-    // coordinate at the end.
-    int follow_snake ( int k, int x )
-    {
-      int y = x - k;
-      while ( (x>=0) && (x<N) && (y>=0) && (y<M) && (A[x]==B[y]) ) {
-	++x;
-	++y;
+
+      typedef vector< V_impl_t > stored_V_impls_t;
+      stored_V_impls_t stored_V_impls;
+      int stored_V(int d, int k) const {
+        return (stored_V_impls[d])[V_offset + k];
       }
-      return x;
-    }
-    
-    // Follow any snake from (k,x) to its end, recording the data in
-    // the result with tag "common".
-    void get_snake ( int k, int x )
-    {
-      int y = x - k;
-      while ( (x>=0) && (x<N) && (y>=0) && (y<M) && (A[x]==B[y]) ) {
-	append_result(common,A[x]);
-	++x;
-	++y;
+
+      // This is filled in when solve() finishes.  If all that is wanted
+      // is to know the distance between the two inputs, there is no
+      // need to call find_trace() at all; just read this using
+      // get_edit_distance().
+      int edit_distance;
+
+      // Append an item to the result, with a tag.
+      // If the tag matches the tag of the current end of the result, it
+      // is merged with it.
+      void append_result(fragment_tag tag, typename SEQ::value_type datum) {
+        if (!result.empty() && (result.back().first == tag)) {
+          result.back().second.push_back(datum);
+        } else {
+          result.push_back(make_pair(tag, SEQ(1, datum)));
+        }
       }
-    }
 
-    
-    // Find and record a trace from (0,0) to the point on diagonal k
-    // with cost d.  (Recursive)
-    void find_trace_r ( int d, int k )
-    {
-      if (d==0) {
-	get_snake(0,0);
-	return;
-	
-      } else {
-
-	// Look up x coordinate in saved V for cost=d in diagonal k.
-	int x = stored_V(d,k);
-
-	// How did we get to (k,x)?
-	// Either:
-	//   - A vertical move from (k+1,something), possibly followed by a
-	//   "snake" along diagonal k.
-	//   - A horizontal move from (k-1,something), possibly
-	//   followed by a "snake" along diagonal k.
-
-	// To find out which, we look up V(k) for d-1 in diagonals k+1
-	// and k-1, and see if snake-slides from either of those
-	// points would get to to (k,x).  (One or other must do, so we
-        // now only do one check.)
-
-	// Notation: R = point before H or V move;
-	//           S = point after H or V move;
-	//           T = point after subsequent snake.
-
-	// Start by checking for a vertical move
-	int Rx = stored_V(d-1,k+1);
-	int Sx = Rx;
-	int Tx = follow_snake(k,Sx);
-	
-	if (Tx == x) {
-	  // OK, did a vertical move.  Find how we got to that point.
-	  find_trace_r ( d-1, k+1 );
-	  // Find the data at the end of that move
-	  int Ry = Rx - (k+1);
-	  int Sy = Ry +1;
-	  typename SEQ::value_type d = B[Sy-1];
-	  // Record vertical move plus data.
-	  append_result(from_b,d);
-	  // Record any snake that followed it.
-	  get_snake(k,Sx);
-	  
-	} else {
-
-	  // It must have been a horizontal move.
-	  int Rx = stored_V(d-1,k-1);
-	  int Sx = Rx + 1;
-	
-	  // Find how we got to that point.
-	  find_trace_r ( d-1, k-1 );
-	  // Find the data at the end of that move
-	  typename SEQ::value_type d = A[Sx-1];
-	  // Record horizontal move plus data.
-	  append_result(from_a,d);
-	  // Record any snake that followed it.
-	  get_snake(k,Sx);
-	    
-	}
+      // Follow any snake from (k,x) to its end, and return the x
+      // coordinate at the end.
+      int follow_snake(int k, int x) {
+        int y = x - k;
+        while ((x >= 0) && (x < N) && (y >= 0) && (y < M) && (A[x] == B[y])) {
+          ++x;
+          ++y;
+        }
+        return x;
       }
-    }
 
-    
-  public:
-
-    // Constructor, takes input sequences and reference to output.
-    // Optionally takes store flag and max_D.
-    Differ ( const SEQ& a, const SEQ& b, typename fragment_seq<SEQ>::Type& r,
-	     bool s = true, int md = -1):
-      A(a),
-      B(b),
-      N(A.size()),
-      M(B.size()),
-      max_D((md==-1)?(M+N):(min(md,M+N))),
-      store(s),
-      result(r),
-      V_size(max(2*(max_D)+1,2)),  // 2 allows for d=0 V(1) special case
-      V_offset(max_D),
-      V_impl(V_size)
-    {}
-
-    class max_D_exceeded {};  // Exception thrown if solution has not
-			      // been found after max_D
-			      // frontier-expansion iterations.
-
-    // Perform the first phase of the algorithm, expanding the
-    // frontier.
-    // This function is essentially what is described in Figure 2 of
-    // Myers' paper.
-    void solve ( void )
-    {
-      // The normal operation is (H or V) then any diagonal then repeat.
-      // But this is broken if the first diagonal starts from the origin (e.g. for equal strings).
-      // The following is a hack that works around that:
-      V(1) = 0;
-      // But this requires that V is large enough for this extra element.
-
-      // Loop for increasing values of D until target reached
-      int D = -1;
-      bool done=false;
-      while (!done) {
-	++D;
-	if (D>max_D) {
-	  throw max_D_exceeded();
-	}
-
-	// Scan across the width of the frontier
-	for ( int k = -D; k <= D; k += 2 ) {
-
-	  // Find a new x value for this point on the frontier.
-	  // Special cases for either end.
-	  // Otherwise, move horizontally or vertically from a neighbour.
-	  int x;
-	  if ( (k==-D) || ((k!=D) && (V(k-1)<V(k+1))) ) {
-	    // vertical move
-	    x = V(k+1);
-	  } else {
-	    // horizontal move
-	    x = V(k-1)+1;
-	  }
-
-	  // Having made the horizontal or vertical move, follow any
-	  // diagonal "snakes" from this point.
-	  int y = x - k;
-	  while ( (x<N) && (y<M) && (A[x]==B[y]) ) {
-	    ++x;
-	    ++y;
-	  }
-
-	  // Store the new x value for this point on the frontier.
-	  V(k) = x;
-
-	  // Test for reaching target
-	  if ( (x>=N) && (y>=M) ) {
-	    done = true;
-	    // We could probably leave the inner loop at this point,
-	    // but I'm not certain it's safe, and it certainly makes
-	    // debugging harder when only some of the points have been
-	    // updated, so don't bother.
-	    //break;
-	  }
-	}
-
-	// Save a copy of V for use during the second phase.
-	if (store) {
-	  stored_V_impls.push_back(V_impl);
-	}
+      // Follow any snake from (k,x) to its end, recording the data in
+      // the result with tag "common".
+      void get_snake(int k, int x) {
+        int y = x - k;
+        while ((x >= 0) && (x < N) && (y >= 0) && (y < M) && (A[x] == B[y])) {
+          append_result(common, A[x]);
+          ++x;
+          ++y;
+        }
       }
-      
-      edit_distance = D;
-    }
 
+      // Find and record a trace from (0,0) to the point on diagonal k
+      // with cost d.  (Recursive)
+      void find_trace_r(int d, int k) {
+        if (d == 0) {
+          get_snake(0, 0);
+          return;
 
-    void find_trace ( void )
-    {
-      find_trace_r ( edit_distance, N-M );
-    }
-    
-    
-    int get_edit_distance(void) { return edit_distance; }
+        } else {
+
+          // Look up x coordinate in saved V for cost=d in diagonal k.
+          int x = stored_V(d, k);
+
+          // How did we get to (k,x)?
+          // Either:
+          //   - A vertical move from (k+1,something), possibly followed by a
+          //   "snake" along diagonal k.
+          //   - A horizontal move from (k-1,something), possibly
+          //   followed by a "snake" along diagonal k.
+
+          // To find out which, we look up V(k) for d-1 in diagonals k+1
+          // and k-1, and see if snake-slides from either of those
+          // points would get to to (k,x).  (One or other must do, so we
+          // now only do one check.)
+
+          // Notation: R = point before H or V move;
+          //           S = point after H or V move;
+          //           T = point after subsequent snake.
+
+          // Start by checking for a vertical move
+          int Rx = stored_V(d - 1, k + 1);
+          int Sx = Rx;
+          int Tx = follow_snake(k, Sx);
+
+          if (Tx == x) {
+            // OK, did a vertical move.  Find how we got to that point.
+            find_trace_r(d - 1, k + 1);
+            // Find the data at the end of that move
+            int Ry = Rx - (k + 1);
+            int Sy = Ry + 1;
+            typename SEQ::value_type d = B[Sy - 1];
+            // Record vertical move plus data.
+            append_result(from_b, d);
+            // Record any snake that followed it.
+            get_snake(k, Sx);
+
+          } else {
+
+            // It must have been a horizontal move.
+            int Rx = stored_V(d - 1, k - 1);
+            int Sx = Rx + 1;
+
+            // Find how we got to that point.
+            find_trace_r(d - 1, k - 1);
+            // Find the data at the end of that move
+            typename SEQ::value_type d = A[Sx - 1];
+            // Record horizontal move plus data.
+            append_result(from_a, d);
+            // Record any snake that followed it.
+            get_snake(k, Sx);
+
+          }
+        }
+      }
+
+    public:
+
+      // Constructor, takes input sequences and reference to output.
+      // Optionally takes store flag and max_D.
+      Differ(const SEQ& a, const SEQ& b, typename fragment_seq< SEQ >::Type& r, bool s = true, int md = -1) :
+        A(a), B(b), N(A.size()), M(B.size()), max_D((md == -1) ? (M + N) : (min(md, M + N))), store(s),
+            result(r), V_size(max(2 * (max_D) + 1, 2)), // 2 allows for d=0 V(1) special case
+            V_offset(max_D), V_impl(V_size) {
+      }
+
+      class max_D_exceeded {
+      }; // Exception thrown if solution has not
+      // been found after max_D
+      // frontier-expansion iterations.
+
+      // Perform the first phase of the algorithm, expanding the
+      // frontier.
+      // This function is essentially what is described in Figure 2 of
+      // Myers' paper.
+      void solve(void) {
+        // The normal operation is (H or V) then any diagonal then repeat.
+        // But this is broken if the first diagonal starts from the origin (e.g. for equal strings).
+        // The following is a hack that works around that:
+        V(1) = 0;
+        // But this requires that V is large enough for this extra element.
+
+        // Loop for increasing values of D until target reached
+        int D = -1;
+        bool done = false;
+        while (!done) {
+          ++D;
+          if (D > max_D) {
+            throw max_D_exceeded();
+          }
+
+          // Scan across the width of the frontier
+          for (int k = -D; k <= D; k += 2) {
+
+            // Find a new x value for this point on the frontier.
+            // Special cases for either end.
+            // Otherwise, move horizontally or vertically from a neighbour.
+            int x;
+            if ((k == -D) || ((k != D) && (V(k - 1) < V(k + 1)))) {
+              // vertical move
+              x = V(k + 1);
+            } else {
+              // horizontal move
+              x = V(k - 1) + 1;
+            }
+
+            // Having made the horizontal or vertical move, follow any
+            // diagonal "snakes" from this point.
+            int y = x - k;
+            while ((x < N) && (y < M) && (A[x] == B[y])) {
+              ++x;
+              ++y;
+            }
+
+            // Store the new x value for this point on the frontier.
+            V(k) = x;
+
+            // Test for reaching target
+            if ((x >= N) && (y >= M)) {
+              done = true;
+              // We could probably leave the inner loop at this point,
+              // but I'm not certain it's safe, and it certainly makes
+              // debugging harder when only some of the points have been
+              // updated, so don't bother.
+              //break;
+            }
+          }
+
+          // Save a copy of V for use during the second phase.
+          if (store) {
+            stored_V_impls.push_back(V_impl);
+          }
+        }
+
+        edit_distance = D;
+      }
+
+      void find_trace(void) {
+        find_trace_r(edit_distance, N - M);
+      }
+
+      int get_edit_distance(void) {
+        return edit_distance;
+      }
   };
 
-
-  
-  void make_trivial_solution ( const string& A, const string& B, string_fragment_seq& result )
-  {
-    result.push_back(make_pair(from_a,A));
-    result.push_back(make_pair(from_b,B));
+  void make_trivial_solution(const string& A, const string& B, string_fragment_seq& result) {
+    result.push_back(make_pair(from_a, A));
+    result.push_back(make_pair(from_b, B));
   }
 
-
-  void string_diff ( const string& A, const string& B, string_fragment_seq& result )
-  {
+  void string_diff(const string& A, const string& B, string_fragment_seq& result) {
     // Consider time efficiency.  Aim not to take more than this much
     // time (arbitary units).  Return a sub-optimal solution if this
     // time is exceeded.
@@ -439,48 +419,43 @@ namespace DiffAlgo {
       // If input is small, i.e. N^2 is acceptable, we don't worry about
       // space complexity.  (This will take O(ND) space, but D could
       // equal N.)
-      if ((sz*sz)<max_mem) {
-	Differ<string> d1(A,B,result,true,max_time);
-	d1.solve();
-	d1.find_trace();
-	return;
+      if ((sz * sz) < max_mem) {
+        Differ< string > d1(A, B, result, true, max_time);
+        d1.solve();
+        d1.find_trace();
+        return;
       }
-      
+
       // If input is larger, do a first pass to find the edit distance:
-      Differ<string> d2(A,B,result,false,max_time);
+      Differ< string > d2(A, B, result, false, max_time);
       d2.solve();
 
       // We could now solve this with space complexity O(ND), if that
       // were acceptable:
-      if (sz*d2.get_edit_distance()<max_mem) {
-	Differ<string> d3(A,B,result,true,d2.get_edit_distance());
-	d3.solve();
-	d3.find_trace();
-	return;
+      if (sz * d2.get_edit_distance() < max_mem) {
+        Differ< string > d3(A, B, result, true, d2.get_edit_distance());
+        d3.solve();
+        d3.find_trace();
+        return;
       }
-      
+
       // If even O(ND) is not acceptable, we give up and return a result
       // indicating no common subset:
 
-      make_trivial_solution(A,B,result);
+      make_trivial_solution(A, B, result);
     }
 
-    catch (Differ<string>::max_D_exceeded) {
-      make_trivial_solution(A,B,result);
+    catch (Differ< string >::max_D_exceeded) {
+      make_trivial_solution(A, B, result);
     }
   }
 
-
-
-  void make_trivial_solution ( const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result )
-  {
-    result.push_back(make_pair(from_a,A));
-    result.push_back(make_pair(from_b,B));
+  void make_trivial_solution(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result) {
+    result.push_back(make_pair(from_a, A));
+    result.push_back(make_pair(from_b, B));
   }
 
-
-  void ucs4_string_diff ( const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result )
-  {
+  void ucs4_string_diff(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result) {
     // Consider time efficiency.  Aim not to take more than this much
     // time (arbitary units).  Return a sub-optimal solution if this
     // time is exceeded.
@@ -508,37 +483,37 @@ namespace DiffAlgo {
       // If input is small, i.e. N^2 is acceptable, we don't worry about
       // space complexity.  (This will take O(ND) space, but D could
       // equal N.)
-      if ((sz*sz)<max_mem) {
-	Differ<ucs4_string> d1(A,B,result,true,max_time);
-	d1.solve();
-	d1.find_trace();
-	return;
+      if ((sz * sz) < max_mem) {
+        Differ< ucs4_string > d1(A, B, result, true, max_time);
+        d1.solve();
+        d1.find_trace();
+        return;
       }
-      
+
       // If input is larger, do a first pass to find the edit distance:
-      Differ<ucs4_string> d2(A,B,result,false,max_time);
+      Differ< ucs4_string > d2(A, B, result, false, max_time);
       d2.solve();
 
       // We could now solve this with space complexity O(ND), if that
       // were acceptable:
-      if (sz*d2.get_edit_distance()<max_mem) {
-	Differ<ucs4_string> d3(A,B,result,true,d2.get_edit_distance());
-	d3.solve();
-	d3.find_trace();
-	return;
+      if (sz * d2.get_edit_distance() < max_mem) {
+        Differ< ucs4_string > d3(A, B, result, true, d2.get_edit_distance());
+        d3.solve();
+        d3.find_trace();
+        return;
       }
-      
+
       // If even O(ND) is not acceptable, we give up and return a result
       // indicating no common subset:
 
-      make_trivial_solution(A,B,result);
+      make_trivial_solution(A, B, result);
     }
 
-    catch (Differ<ucs4_string>::max_D_exceeded) {
-      make_trivial_solution(A,B,result);
+    catch (Differ< ucs4_string >::max_D_exceeded) {
+      make_trivial_solution(A, B, result);
     }
   }
 
-};
-
+}
+;
 

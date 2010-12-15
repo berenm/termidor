@@ -20,28 +20,36 @@
 
 using namespace std;
 
-
 // Expand command string:
 // %h -> remote hostname
 // %u -> HTTP AUTH username
 // %p -> parameter supplied from the Javascript
 // %% -> %
 
-string expand_command(string templ, string host, string user, string param)
-{
+string expand_command(string templ, string host, string user, string param) {
   string::size_type p = templ.find('%');
-  if (p==templ.npos || p==templ.length()-1) {
+  if (p == templ.npos || p == templ.length() - 1) {
     return templ;
   }
   string v;
-  switch(templ[p+1]) {
-  case '%': v="%"; break;
-  case 'h': v=host; break;
-  case 'u': v=user; break;
-  case 'p': v=param; break;
-  default: v="?"; break;
+  switch (templ[p + 1]) {
+    case '%':
+      v = "%";
+      break;
+    case 'h':
+      v = host;
+      break;
+    case 'u':
+      v = user;
+      break;
+    case 'p':
+      v = param;
+      break;
+    default:
+      v = "?";
+      break;
   }
 
-  return templ.substr(0,p) + v + expand_command(templ.substr(p+2),host,user,param);
+  return templ.substr(0, p) + v + expand_command(templ.substr(p + 2), host, user, param);
 }
 

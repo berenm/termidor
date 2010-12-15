@@ -33,41 +33,31 @@
 using namespace std;
 using namespace pbe;
 
+Activity::Activity(onOutput_t onOutput_, onError_t onError_, pbe::FileDescriptor& fd_) :
+  fd(fd_), terminating(false), onOutput(onOutput_), onError(onError_),
+      output_processor(new Thread(boost::bind(&Activity::process_output, this))) {
+}
 
-Activity::Activity(onOutput_t onOutput_, onError_t onError_, pbe::FileDescriptor& fd_):
-  fd(fd_),
-  terminating(false),
-  onOutput(onOutput_),
-  onError(onError_),
-  output_processor(new Thread(boost::bind(&Activity::process_output,this)))
-{}
-
-
-Activity::~Activity()
-{
+Activity::~Activity() {
   output_processor->join();
 }
 
-
-void Activity::send(string s)
-{
+void Activity::send(string s) {
   fd.writeall(s);
 }
 
-
-void Activity::process_output(void)
-{
-  try { try {
-    while(!terminating) {
-      string s = fd.readsome();
-      onOutput(s);
-    }
-  } RETHROW_MISC_EXCEPTIONS }
-  catch (IOError) {
+void Activity::process_output(void) {
+  try {
+    try {
+      while (!terminating) {
+        string s = fd.readsome();
+        onOutput(s);
+      }
+    }RETHROW_MISC_EXCEPTIONS
+  } catch (IOError&) {
     onError("Subprocess terminated");
     return;
-  }
-  catch (Exception& e) {
+  } catch (Exception& e) {
     ostringstream s;
     s << "Exception: ";
     e.report(s);

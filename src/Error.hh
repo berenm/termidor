@@ -26,24 +26,26 @@
 
 #include <errno.h>
 
-
 class Error {
- private:
-  std::string msg;
+  private:
+    std::string msg;
 
- public:
-  Error(std::string m): msg(m) {};
-  std::string get_msg(void) const {return msg;}
+  public:
+    Error(std::string m) :
+      msg(m) {
+    }
+    ;
+    std::string get_msg(void) const {
+      return msg;
+    }
 };
-
 
 class SysError: public Error {
- public:
-  SysError(std::string m): Error(m+": "+strerror(errno)) {};
+  public:
+    SysError(std::string m) :
+      Error(m + ": " + strerror(errno)) {
+    }
+    ;
 };
-
-
-
-
 
 #endif

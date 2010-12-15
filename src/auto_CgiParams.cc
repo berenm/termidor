@@ -26,14 +26,11 @@
 using namespace std;
 using namespace pbe;
 
-
-CgiParams auto_CgiParams(HttpRequest request)
-{
-  if (request.method=="GET") {
+CgiParams auto_CgiParams(HttpRequest request) {
+  if (request.method == "GET") {
     return UrlEncodedCgiParams(request.query);
-  } else if (request.method=="POST") {
-    if (boost::algorithm::starts_with(request.headers["Content-Type"],
-                                      "application/x-www-form-urlencoded")) {
+  } else if (request.method == "POST") {
+    if (boost::algorithm::starts_with(request.headers["Content-Type"], "application/x-www-form-urlencoded")) {
       return UrlEncodedCgiParams(request.body);
     }
   }

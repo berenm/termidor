@@ -27,56 +27,60 @@
 #include "NullAuthenticator.hh"
 #include "TrivialAuthenticator.hh"
 
-
 static inline HttpAuthenticator* choose_authenticator(std::string authname) {
-  if (authname=="none") {
+  if (authname == "none") {
     return NULL;
-  } else if (authname=="null") {
+  } else if (authname == "null") {
     return new NullAuthenticator;
-  } else if (authname=="trivial") {
+  } else if (authname == "trivial") {
     return new TrivialAuthenticator;
   } else {
     throw "Unrecognised auth type";
   }
 }
 
-
 class AnytermDaemon_base {
-protected:
-  boost::scoped_ptr<HttpAuthenticator> auth_p;
+  protected:
+    boost::scoped_ptr< HttpAuthenticator > auth_p;
 
-public:
-  AnytermDaemon_base(std::string authname):
-    auth_p(choose_authenticator(authname))
-  {}
+  public:
+    AnytermDaemon_base(std::string authname) :
+      auth_p(choose_authenticator(authname)) {
+    }
 };
-
 
 class AnytermDaemon: public AnytermDaemon_base, public pbe::HttpDaemon {
-private:
-  Anyterm anyterm;
+  private:
+    Anyterm anyterm;
 
-public:
-  AnytermDaemon(short port=80, std::string user="",
-		std::string command="",
-		std::string device="",
-                std::string name="",
-                std::string authname="none",
-                std::string charset="ascii",
-                bool diff=true,
-                int max_sessions=20,
-                int max_http_connections=60,
-                bool accept_local_only=false):
-    AnytermDaemon_base(authname),
-    HttpDaemon(*auth_p.get(), port, (name=="") ? "anyterm" : name,
-               user, true, max_http_connections, accept_local_only),
-    anyterm(command, device, charset, diff, max_sessions)
-  {}
+  public:
+    AnytermDaemon(short port = 80,
+                  std::string user = "",
+                  std::string command = "",
+                  std::string device = "",
+                  std::string name = "",
+                  std::string authname = "none",
+                  std::string charset = "ascii",
+                  bool diff = true,
+                  int max_sessions = 20,
+                  int max_http_connections = 60,
+                  bool accept_local_only = false) :
+      AnytermDaemon_base(authname), HttpDaemon(*auth_p.get(),
+                                               port,
+                                               (name == "") ? "anyterm" : name,
+                                               user,
+                                               true,
+                                               max_http_connections,
+                                               accept_local_only), anyterm(command,
+                                                                           device,
+                                                                           charset,
+                                                                           diff,
+                                                                           max_sessions) {
+    }
 
-  void session_start();
-  void handle(const pbe::HttpRequest& req, pbe::HttpResponse& resp);
+    void session_start();
+    void handle(const pbe::HttpRequest& req, pbe::HttpResponse& resp);
 
 };
-
 
 #endif

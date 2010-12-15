@@ -23,7 +23,6 @@
 #include <string>
 #include "unicode.hh"
 
-
 // Create an edit script describing the difference between oc and
 // nc.  Storage for the result is allocated by this function using
 // malloc() and should be freed by the caller.  Syntax of edit

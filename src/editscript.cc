@@ -26,29 +26,23 @@
 
 #include <boost/lexical_cast.hpp>
 
-
 using namespace std;
 
-
-static ucs4_string ucs4_int(int i)
-{
+static ucs4_string ucs4_int(int i) {
   ucs4_string s;
   do {
-    s = ucs4_string(1,(i%10)+L'0') + s;
-    i = i/10;
+    s = ucs4_string(1, (i % 10) + L'0') + s;
+    i = i / 10;
   } while (i);
   return s;
 }
 
-
 void simplify_editscript(const DiffAlgo::ucs4_string_fragment_seq& in,
-                         DiffAlgo::ucs4_string_fragment_seq& out)
-{
-  ucs4_string a_cf;  // A data to carry forward
-  ucs4_string b_cf;  // B data to carry forward
+                         DiffAlgo::ucs4_string_fragment_seq& out) {
+  ucs4_string a_cf; // A data to carry forward
+  ucs4_string b_cf; // B data to carry forward
 
-  for ( DiffAlgo::ucs4_string_fragment_seq::const_iterator i = in.begin();
-	i != in.end(); ++i ) {
+  for (DiffAlgo::ucs4_string_fragment_seq::const_iterator i = in.begin(); i != in.end(); ++i) {
     switch (i->first) {
       case DiffAlgo::from_a:
         a_cf.append(i->second);
@@ -61,11 +55,11 @@ void simplify_editscript(const DiffAlgo::ucs4_string_fragment_seq& in,
       case DiffAlgo::common:
         if (i->second.size() > 4) {
           if (!a_cf.empty()) {
-            out.push_back(make_pair(DiffAlgo::from_a,a_cf));
+            out.push_back(make_pair(DiffAlgo::from_a, a_cf));
             a_cf.clear();
           }
           if (!b_cf.empty()) {
-            out.push_back(make_pair(DiffAlgo::from_b,b_cf));
+            out.push_back(make_pair(DiffAlgo::from_b, b_cf));
             b_cf.clear();
           }
           out.push_back(*i);
@@ -77,52 +71,49 @@ void simplify_editscript(const DiffAlgo::ucs4_string_fragment_seq& in,
     }
   }
   if (!a_cf.empty()) {
-    out.push_back(make_pair(DiffAlgo::from_a,a_cf));
+    out.push_back(make_pair(DiffAlgo::from_a, a_cf));
   }
   if (!b_cf.empty()) {
-    out.push_back(make_pair(DiffAlgo::from_b,b_cf));
+    out.push_back(make_pair(DiffAlgo::from_b, b_cf));
   }
 }
 
-
-ucs4_string make_editscript(ucs4_string o, ucs4_string n)
-{
+ucs4_string make_editscript(ucs4_string o, ucs4_string n) {
   DiffAlgo::ucs4_string_fragment_seq e;
 
-  DiffAlgo::ucs4_string_diff(o,n,e);
+  DiffAlgo::ucs4_string_diff(o, n, e);
 
   DiffAlgo::ucs4_string_fragment_seq simp_e;
-  simplify_editscript(e,simp_e);
+  simplify_editscript(e, simp_e);
 
   ucs4_string editscript;
   ucs4_string editscript_r = L"R";
   bool any_common = false;
   bool any_change = false;
 
-  for ( DiffAlgo::ucs4_string_fragment_seq::const_iterator i = simp_e.begin();
-	i != simp_e.end(); ++i ) {
+  for (DiffAlgo::ucs4_string_fragment_seq::const_iterator i = simp_e.begin(); i != simp_e.end(); ++i) {
     unsigned int len = i->second.length();
     switch (i->first) {
-    case DiffAlgo::from_a:
-      editscript += L'd';
-      editscript += ucs4_int(len);
-      editscript += ':';
-      any_change = true;
-      break;
-    case DiffAlgo::from_b:
-      editscript += L'i';
-      editscript += ucs4_int(len);
-      editscript += ':';
-      editscript += i->second;
-      editscript_r += i->second;
-      any_change = true;
-      break;
-    case DiffAlgo::common:
-      editscript += L'k';
-      editscript += ucs4_int(len);
-      editscript += ':';
-      any_common = true;
-      break;
+      case DiffAlgo::from_a:
+        editscript += L'd';
+        editscript += ucs4_int(len);
+        editscript += ':';
+        any_change = true;
+        break;
+      case DiffAlgo::from_b:
+        editscript += L'i';
+        editscript += ucs4_int(len);
+        editscript += ':';
+        editscript += i->second;
+        editscript_r += i->second;
+        any_change = true;
+        break;
+      case DiffAlgo::common:
+        editscript += L'k';
+        editscript += ucs4_int(len);
+        editscript += ':';
+        any_common = true;
+        break;
     }
   }
 

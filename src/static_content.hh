@@ -23,5 +23,4 @@
 
 #include <string>
 
-bool get_static_content(std::string fn,
-			std::string& mime_type, std::string& content);
+bool get_static_content(std::string fn, std::string& mime_type, std::string& content);

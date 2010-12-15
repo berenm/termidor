@@ -24,33 +24,31 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 
+class CgiParams: public std::map< std::string, std::string > {
 
-class CgiParams: public std::map<std::string, std::string> {
+  protected:
+    typedef std::map< std::string, std::string > basetype;
 
-protected:
-  typedef std::map<std::string, std::string> basetype;
-
-public:
-  std::string get(std::string name, std::string def="") const {
-    basetype::const_iterator i = find(name);
-    if (i==end()) {
-      return def;
-    } else {
-      return i->second;
+  public:
+    std::string get(std::string name, std::string def = "") const {
+      basetype::const_iterator i = find(name);
+      if (i == end()) {
+        return def;
+      } else {
+        return i->second;
+      }
     }
-  }
-  
-  template <typename T>
-  T get_as(std::string name, T def = T()) const {
-    basetype::const_iterator i = find(name);
-    if (i==end()) {
-      return def;
-    } else {
-      return boost::lexical_cast<T>(i->second);
+
+    template< typename T >
+    T get_as(std::string name, T def = T()) const {
+      basetype::const_iterator i = find(name);
+      if (i == end()) {
+        return def;
+      } else {
+        return boost::lexical_cast< T >(i->second);
+      }
     }
-  }
 
 };
-
 
 #endif

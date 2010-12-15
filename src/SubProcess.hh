@@ -25,35 +25,33 @@
 
 #include "FileDescriptor.hh"
 
-
 // This base class is just so that fd can be initialised before Activity.
 struct SubProcess_base {
-  pbe::FileDescriptor fd;
-  bool fd_open;
-  ::pid_t pid;
-  SubProcess_base(std::pair<int,::pid_t> fd_pid):
-    fd(fd_pid.first, false), fd_open(true), pid(fd_pid.second)
-  {}
-  ~SubProcess_base() {
-    if (fd_open) {
-      // Normally fd is closed by ~SubProcess; this is here in case
-      // e.g. Activity's ctor throws and ~SubProcess is not executed. 
-      fd.close();
+    pbe::FileDescriptor fd;
+    bool fd_open;
+    ::pid_t pid;
+    SubProcess_base(std::pair< int, ::pid_t > fd_pid) :
+      fd(fd_pid.first, false), fd_open(true), pid(fd_pid.second) {
     }
-  }
+    ~SubProcess_base() {
+      if (fd_open) {
+        // Normally fd is closed by ~SubProcess; this is here in case
+        // e.g. Activity's ctor throws and ~SubProcess is not executed.
+        fd.close();
+      }
+    }
 };
-
 
 class SubProcess: private SubProcess_base, public Activity {
 
-public:
-  SubProcess(Activity::onOutput_t onOutput_,
-             Activity::onError_t onError_,
-	     std::string command,
-	     int pty_rows=25, int pty_cols=80);
+  public:
+    SubProcess(Activity::onOutput_t onOutput_,
+               Activity::onError_t onError_,
+               std::string command,
+               int pty_rows = 25,
+               int pty_cols = 80);
 
-  ~SubProcess();
+    ~SubProcess();
 };
-
 
 #endif

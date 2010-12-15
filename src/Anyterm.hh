@@ -17,8 +17,6 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
 
-
-
 #ifndef Anyterm_hh
 #define Anyterm_hh
 
@@ -33,39 +31,37 @@
 #include "config.hh"
 #include "HttpRequest.hh"
 
-
 class Anyterm {
 
-private:
-  const std::string def_charset;
-  const bool diff;
-  const int max_sessions;
-  typedef boost::shared_ptr<Session> session_ptr_t;
-  typedef std::map<SessionId, session_ptr_t> sessions_t;
-  typedef pbe::Locked<sessions_t> locked_sessions_t;
-  locked_sessions_t sessions;
-  Session::activityfactory_t activityfactory;
-  bool reaper_running;
+  private:
+    const std::string def_charset;
+    const bool diff;
+    const int max_sessions;
+    typedef boost::shared_ptr< Session > session_ptr_t;
+    typedef std::map< SessionId, session_ptr_t > sessions_t;
+    typedef pbe::Locked< sessions_t > locked_sessions_t;
+    locked_sessions_t sessions;
+    Session::activityfactory_t activityfactory;
+    bool reaper_running;
 
-public:
+  public:
 
-  Anyterm(std::string command, std::string device, std::string charset, bool diff,
-          int max_sessions_);
+    Anyterm(std::string command, std::string device, std::string charset, bool diff, int max_sessions_);
 
-  struct response_t {
-    std::string type;
-    std::string body;
-    response_t(std::string t, std::string b): type(t), body(b) {};
-  };
+    struct response_t {
+        std::string type;
+        std::string body;
+        response_t(std::string t, std::string b) :
+          type(t), body(b) {
+        }
+        ;
+    };
 
-  response_t process_request(const pbe::HttpRequest& request);
+    response_t process_request(const pbe::HttpRequest& request);
 
-  void reap_timed_out_sessions(void);
-  void run_reaper_thread(void);
+    void reap_timed_out_sessions(void);
+    void run_reaper_thread(void);
 
 };
-
-
-
 
 #endif

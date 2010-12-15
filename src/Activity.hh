@@ -27,30 +27,28 @@
 #include "FileDescriptor.hh"
 #include "Thread.hh"
 
-
 class Activity {
 
-public:
-  typedef boost::function<void(std::string)> onOutput_t;
-  typedef boost::function<void(std::string)> onError_t;
+  public:
+    typedef boost::function< void(std::string) > onOutput_t;
+    typedef boost::function< void(std::string) > onError_t;
 
-protected:
-  pbe::FileDescriptor& fd;
-  volatile bool terminating;
+  protected:
+    pbe::FileDescriptor& fd;
+    volatile bool terminating;
 
-private:
-  const onOutput_t onOutput;
-  const onError_t onError;
-  boost::scoped_ptr<pbe::Thread> output_processor;
-  void process_output(void);
+  private:
+    const onOutput_t onOutput;
+    const onError_t onError;
+    boost::scoped_ptr< pbe::Thread > output_processor;
+    void process_output(void);
 
-public:
-  Activity(onOutput_t onOutput_, onError_t onError_, pbe::FileDescriptor& fd_);
+  public:
+    Activity(onOutput_t onOutput_, onError_t onError_, pbe::FileDescriptor& fd_);
 
-  virtual ~Activity();
+    virtual ~Activity();
 
-  void send(std::string s);
+    void send(std::string s);
 };
-
 
 #endif

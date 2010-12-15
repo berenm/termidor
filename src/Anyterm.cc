@@ -45,41 +45,46 @@
 
 #include <boost/bind.hpp>
 
-
 using namespace std;
 using namespace pbe;
 
-
 struct SubProcessFactory {
-  string command;
-  SubProcessFactory(string command_): command(command_) {}
-  Activity* operator()(Activity::onOutput_t onOutput,
-                       Activity::onError_t onError,
-                       string host, string user,
-                       string param, int rows=25, int cols=80) {
-    string exp_cmd = expand_command(command,host,user,param);
-    return new SubProcess(onOutput,onError,exp_cmd,rows,cols);
-  }
+    string command;
+    SubProcessFactory(string command_) :
+      command(command_) {
+    }
+    Activity* operator()(Activity::onOutput_t onOutput,
+                         Activity::onError_t onError,
+                         string host,
+                         string user,
+                         string param,
+                         int rows = 25,
+                         int cols = 80) {
+      string exp_cmd = expand_command(command, host, user, param);
+      return new SubProcess(onOutput, onError, exp_cmd, rows, cols);
+    }
 };
 
 struct SerialPortFactory {
-  string device;
-  int baudrate;
-  SerialPortFactory(string device_, int baudrate_):
-    device(device_), baudrate(baudrate_) {}
-  Activity* operator()(Activity::onOutput_t onOutput,
-                       Activity::onError_t onError,
-                       PBE_UNUSED_ARG(string host), PBE_UNUSED_ARG(string user),
-                       PBE_UNUSED_ARG(string param), PBE_UNUSED_ARG(int rows), PBE_UNUSED_ARG(int cols)) {
-    return new SerialPortActivity(onOutput,onError,device,baudrate);
-  }
+    string device;
+    int baudrate;
+    SerialPortFactory(string device_, int baudrate_) :
+      device(device_), baudrate(baudrate_) {
+    }
+    Activity* operator()(Activity::onOutput_t onOutput,
+                         Activity::onError_t onError,
+                         PBE_UNUSED_ARG(string host),
+                         PBE_UNUSED_ARG(string user),
+                         PBE_UNUSED_ARG(string param),
+                         PBE_UNUSED_ARG(int rows),
+                         PBE_UNUSED_ARG(int cols)) {
+      return new SerialPortActivity(onOutput, onError, device, baudrate);
+    }
 };
-
 
 static void install_sigchld_handler(void);
 
-static void reap_child(PBE_UNUSED_ARG(int sig))
-{
+static void reap_child(PBE_UNUSED_ARG(int sig)) {
   // Handler function for SIGCHLD.
   // Note that apparently you might get only one SIGCHLD for multiple
   // subprocesses if they terminate at about the same time.  So you
@@ -89,44 +94,36 @@ static void reap_child(PBE_UNUSED_ARG(int sig))
   ::pid_t rc;
   do {
     rc = ::waitpid(-1, NULL, WNOHANG);
-  } while (rc>0);
+  } while (rc > 0);
 
   install_sigchld_handler();
 }
 
-static void install_sigchld_handler(void)
-{
+static void install_sigchld_handler(void) {
   struct sigaction sa;
-  sa.sa_handler=&reap_child;
+  sa.sa_handler = &reap_child;
   ::sigemptyset(&sa.sa_mask);
-  sa.sa_flags=SA_NOCLDSTOP;
-  ::sigaction(SIGCHLD,&sa,NULL);  // should check return value
+  sa.sa_flags = SA_NOCLDSTOP;
+  ::sigaction(SIGCHLD, &sa, NULL); // should check return value
 }
 
-
-Anyterm::Anyterm(std::string command, std::string device, std::string charset, bool diff_,
-                 int max_sessions_):
-  def_charset(charset),
-  diff(diff_),
-  max_sessions(max_sessions_),
-  reaper_running(false)
-{
-  if (command!="") {
-    activityfactory=SubProcessFactory(command);
-  } else if (device!="") {
-    activityfactory=SerialPortFactory(device,9600);
+Anyterm::Anyterm(std::string command, std::string device, std::string charset, bool diff_, int max_sessions_) :
+  def_charset(charset), diff(diff_), max_sessions(max_sessions_), reaper_running(false) {
+  if (command != "") {
+    activityfactory = SubProcessFactory(command);
+  } else if (device != "") {
+    activityfactory = SerialPortFactory(device, 9600);
   } else {
     throw "Neither command nor device specified";
   }
 
   try {
-    Iconver<valid,char,char>      utf8_to_charset("UTF-8",def_charset);
-    Iconver<valid,char,ucs4_char> charset_to_ucs4(def_charset,UCS4_NATIVE);
-  }
-  catch(...) {
+    Iconver< valid, char, char > utf8_to_charset("UTF-8", def_charset);
+    Iconver< valid, char, ucs4_char > charset_to_ucs4(def_charset, UCS4_NATIVE);
+  } catch (...) {
     throw "Character set not supported by Iconv.  Try running iconv -l to find supported "
-          "character sets.  It must be possible to convert from UTF-8 to CHARSET and from "
-          "CHARSET to UCS-4.";
+      "character sets.  It must be possible to convert from UTF-8 to CHARSET and from "
+      "CHARSET to UCS-4.";
   }
 
   // We don't want child processes to become zombies when they terminate.
@@ -139,14 +136,11 @@ Anyterm::Anyterm(std::string command, std::string device, std::string charset, b
   install_sigchld_handler();
 }
 
-
-static Anyterm::response_t text_resp(string s)
-{
+static Anyterm::response_t text_resp(string s) {
   return Anyterm::response_t("text/plain; charset=\"UTF-8\"", s);
 }
 
-Anyterm::response_t Anyterm::process_request(const HttpRequest& request)
-{
+Anyterm::response_t Anyterm::process_request(const HttpRequest& request) {
   if (!reaper_running) {
     // We can't start the reaper thread from the constructor, because this Anyterm
     // object is constructed before the daemon forks itself into the background; child
@@ -154,8 +148,7 @@ Anyterm::response_t Anyterm::process_request(const HttpRequest& request)
     // There's a race condition here if the first two request processing threads start
     // simultaneously.
     reaper_running = true;
-    Thread timed_out_session_reaper 
-      (boost::bind(&Anyterm::run_reaper_thread,this));
+    Thread timed_out_session_reaper(boost::bind(&Anyterm::run_reaper_thread, this));
   }
 
   // Parse the arguments and call the appropriate function
@@ -166,30 +159,30 @@ Anyterm::response_t Anyterm::process_request(const HttpRequest& request)
 
     string action = params.get("a");
 
-    if (action=="open") {
+    if (action == "open") {
       reap_timed_out_sessions();
 
       {
         locked_sessions_t::reader sessions_rd(sessions);
-        int n_sessions = distance(sessions_rd->begin(),sessions_rd->end());
-        if (n_sessions>=max_sessions) {
+        int n_sessions = distance(sessions_rd->begin(), sessions_rd->end());
+        if (n_sessions >= max_sessions) {
           throw Error("The maximum number of concurrent sessions has been reached");
         }
       }
 
-      session_ptr_t ses(new Session(params.get_as<int>("rows",25),
-			  	    params.get_as<int>("cols",80),
-                                    params.get_as<int>("sb",0),
+      session_ptr_t ses(new Session(params.get_as< int > ("rows", 25),
+                                    params.get_as< int > ("cols", 80),
+                                    params.get_as< int > ("sb", 0),
                                     request.client_hostname,
                                     request.userinfo,
                                     params.get("p"),
-				    ANYTERM_TIMEOUT,
-				    activityfactory,
-                                    params.get("ch",def_charset),
+                                    ANYTERM_TIMEOUT,
+                                    activityfactory,
+                                    params.get("ch", def_charset),
                                     diff));
       {
         locked_sessions_t::writer sessions_wr(sessions);
-        (*sessions_wr)[ses->id]=ses;
+        (*sessions_wr)[ses->id] = ses;
       }
       return text_resp(ses->id.str());
     }
@@ -200,46 +193,44 @@ Anyterm::response_t Anyterm::process_request(const HttpRequest& request)
     {
       locked_sessions_t::reader sessions_rd(sessions);
       sessions_t::const_iterator s = sessions_rd->find(id);
-      if (s==sessions_rd->end()) {
-        throw Error("no such session '"+idstr+"'");
+      if (s == sessions_rd->end()) {
+        throw Error("no such session '" + idstr + "'");
       }
       ses = s->second;
     }
-    
-    if (action=="rcv") {
+
+    if (action == "rcv") {
       return text_resp(ses->rcv());
-      
-    } else if (action=="send") {
+
+    } else if (action == "send") {
       string k = params.get("k");
       ses->send(k);
       return text_resp("");
-      
-    } else if (action=="close") {
+
+    } else if (action == "close") {
       {
         locked_sessions_t::writer sessions_wr(sessions);
         sessions_wr->erase(id);
       }
       return text_resp("");
-      
+
     } else {
-      throw Error("invalid query string '"+request.query+"'");
+      throw Error("invalid query string '" + request.query + "'");
     }
   }
-  
+
   catch (Error& E) {
-    return text_resp("E"+E.get_msg());
+    return text_resp("E" + E.get_msg());
   }
 }
 
-
-void Anyterm::reap_timed_out_sessions(void)
-{
-  list<session_ptr_t> timed_out_sessions;  // The timed out sessions are transfered to this list
-                                           // which is destroyed after the lock on session has been released.
+void Anyterm::reap_timed_out_sessions(void) {
+  list< session_ptr_t > timed_out_sessions; // The timed out sessions are transfered to this list
+  // which is destroyed after the lock on session has been released.
   locked_sessions_t::writer sessions_wr(sessions);
-  for (sessions_t::iterator i = sessions_wr->begin();
-       i != sessions_wr->end();) {
-    sessions_t::iterator next = i; ++next;
+  for (sessions_t::iterator i = sessions_wr->begin(); i != sessions_wr->end();) {
+    sessions_t::iterator next = i;
+    ++next;
     if (i->second->timed_out()) {
       timed_out_sessions.push_back(i->second);
       sessions_wr->erase(i);
@@ -248,9 +239,7 @@ void Anyterm::reap_timed_out_sessions(void)
   }
 }
 
-
-void Anyterm::run_reaper_thread(void)
-{
+void Anyterm::run_reaper_thread(void) {
   while (1) {
     sleep(30);
     reap_timed_out_sessions();

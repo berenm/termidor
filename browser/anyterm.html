@@ -1,5 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <!--
 browser/anyterm.html
 This file is part of Anyterm; see http://anyterm.org/
@@ -19,67 +19,105 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 -->
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'
+      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+      xsi:schemaLocation='http://www.w3.org/1999/xhtml
+                          http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd'>
+  <head>
+    <title>Anyterm</title>
+    <script type='text/javascript' src='jquery-1.4.4.js'></script>
+    <script type='text/javascript' src='anyterm.js'></script>
+    <script type='text/javascript'>
+    // To create the terminal, just call create_term.  The paramters are:
+    //  - The id of a <div> element that will become the terminal.
+    //  - The title.  %h and %v expand to the hostname and Anyterm version.
+    //  - The number of rows and columns.
+    //  - An optional parameter which is substituted for %p in the command string.
+    //  - An optional character set.
+    //  - An option number of lines of scrollback (default 0).
 
-<html>
-<head>
-<title>Anyterm</title>
+    // So the following creates an 80x25 terminal with 50 lines of scrollback:
+    window.onload=function() {create_term("term","%h (Anyterm%v)",60,200,"","",200);};
 
-<script type="text/javascript" src="anyterm.js">
-</script>
+    // You might want to be able to control these settings, and you can write any
+    // JavaScript code you want here to do so.  A common requirement is to be able
+    // to control the terminal dimensions from the page's URL.  So you might have
+    // another HTML page with links like this:
+    // <a href="anyterm.html?rows=25&cols=80">Small terminal</a>
+    // <a href="anyterm.html?rows=60&cols=180">Large terminal</a>
+    // To make that work you need to extract those parameters from the page's URL
+    // and pass them to your call to create_term().  There's a function in
+    // anyterm.js to make this easier, as follows:
+    // var rows = get_url_param("rows",25);
+    // var cols = get_url_param("cols",80);
+    // window.onload=function() {create_term("term","Terminal",rows,cols,"","",0);};
+    // The second parameter to get_url_param is a default.
+    //
+    // Here's another example, passing the name of the host to connect to from a
+    // URL paramter to the %p parameter:
+    // <a href="anyterm.html?host=foo">Connect to foo</a>
+    // var host = get_url_param("host","default_host");
+    // window.onload=function() {create_term("term",host,25,80,host,"",0);};
+    // Use this with a command like:
+    //    anytermd -c 'ssh %p'
+    // You probably only want to do that with trusted users and HTTP AUTH, of course.
 
-<script type="text/javascript">
-  // To create the terminal, just call create_term.  The paramters are:
-  //  - The id of a <div> element that will become the terminal.
-  //  - The title.  %h and %v expand to the hostname and Anyterm version.
-  //  - The number of rows and columns.
-  //  - An optional parameter which is substituted for %p in the command string.
-  //  - An optional character set.
-  //  - An option number of lines of scrollback (default 0).
-
-  // So the following creates an 80x25 terminal with 50 lines of scrollback:
-  window.onload=function() {create_term("term","%h (Anyterm%v)",60,200,"","",200);};
-
-  // You might want to be able to control these settings, and you can write any
-  // JavaScript code you want here to do so.  A common requirement is to be able
-  // to control the terminal dimensions from the page's URL.  So you might have
-  // another HTML page with links like this:
-  // <a href="anyterm.html?rows=25&cols=80">Small terminal</a>
-  // <a href="anyterm.html?rows=60&cols=180">Large terminal</a>
-  // To make that work you need to extract those parameters from the page's URL
-  // and pass them to your call to create_term().  There's a function in
-  // anyterm.js to make this easier, as follows:
-  // var rows = get_url_param("rows",25);
-  // var cols = get_url_param("cols",80);
-  // window.onload=function() {create_term("term","Terminal",rows,cols,"","",0);};
-  // The second parameter to get_url_param is a default.
-  //
-  // Here's another example, passing the name of the host to connect to from a
-  // URL paramter to the %p parameter:
-  // <a href="anyterm.html?host=foo">Connect to foo</a>
-  // var host = get_url_param("host","default_host");
-  // window.onload=function() {create_term("term",host,25,80,host,"",0);};
-  // Use this with a command like:
-  //    anytermd -c 'ssh %p'
-  // You probably only want to do that with trusted users and HTTP AUTH, of course.
-
-  // When the user closes the terminal, by default they'll see a blank page.
-  // Generally you'll want to be more friendly than that.  If you set the
-  // variable on_close_goto_url to a URL, they'll be sent to that page after
-  // closing.  You could send them back to your home page, or something.
-  var on_close_goto_url = "";
-
-</script>
-
-<link rel="stylesheet" type="text/css" href="anyterm.css">
-
-</head>
-
-<body>
-
-<noscript>Javascript is essential for this page.  Please use a browser 
-that supports Javascript.</noscript>
-
-<div id="term"></div>
-
-</body>
+    // When the user closes the terminal, by default they'll see a blank page.
+    // Generally you'll want to be more friendly than that.  If you set the
+    // variable on_close_goto_url to a URL, they'll be sent to that page after
+    // closing.  You could send them back to your home page, or something.
+    var on_close_goto_url = "";
+    </script>
+    <link rel='stylesheet' type='text/css' href='anyterm.css'>
+  </head>
+  <body>
+    <noscript>Javascript is essential for this page.  Please use a browser that supports Javascript.</noscript>
+    <div id='term'></div>
+    <div id='templates'>
+      <div class='termframe'>
+        <p>
+          <a><img class='button' src='copy.gif' alt='[Copy]' title='Copy' /></a>
+          <a><img class='button' src='paste.gif' alt='[Paste]' title='Paste' /></a>
+          <select>
+            <option value='-1'>Control keys...</option>
+            <option value='0'>Ctrl-@</option>
+            <option value='1'>Ctrl-A</option>
+            <option value='2'>Ctrl-B</option>
+            <option value='3'>Ctrl-C</option>
+            <option value='4'>Ctrl-D</option>
+            <option value='5'>Ctrl-E</option>
+            <option value='6'>Ctrl-F</option>
+            <option value='7'>Ctrl-G</option>
+            <option value='8'>Ctrl-H</option>
+            <option value='9'>Ctrl-I</option>
+            <option value='10'>Ctrl-J</option>
+            <option value='11'>Ctrl-K</option>
+            <option value='12'>Ctrl-L</option>
+            <option value='13'>Ctrl-M</option>
+            <option value='14'>Ctrl-N</option>
+            <option value='15'>Ctrl-O</option>
+            <option value='16'>Ctrl-P</option>
+            <option value='17'>Ctrl-Q</option>
+            <option value='18'>Ctrl-R</option>
+            <option value='19'>Ctrl-S</option>
+            <option value='20'>Ctrl-T</option>
+            <option value='21'>Ctrl-U</option>
+            <option value='22'>Ctrl-V</option>
+            <option value='23'>Ctrl-W</option>
+            <option value='24'>Ctrl-X</option>
+            <option value='25'>Ctrl-Y</option>
+            <option value='26'>Ctrl-Z</option>
+            <option value='27'>Ctrl-[</option>
+            <option value='28'>Ctrl-\</option>
+            <option value='29'>Ctrl-]</option>
+            <option value='30'>Ctrl-^</option>
+            <option value='31'>Ctrl-_</option>
+          </select>
+          (Anyterm)
+          <a>[close] </a>
+        </p>
+        <pre class="term a p" style="overflow-y: scroll;"></pre>
+      </div>
+    </div>
+  </body>
 </html>

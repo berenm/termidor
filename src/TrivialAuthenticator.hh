@@ -24,16 +24,15 @@
 
 class TrivialAuthenticator: public HttpAuthenticator {
 
-public:
+  public:
 
-  void basic_auth(std::string username, std::string password) const {
-    if (username=="foo" && password=="blah") {
-      return;
+    void basic_auth(std::string username, std::string password) const {
+      if (username == "foo" && password == "blah") {
+        return;
+      }
+      throw NotAuthenticated();
     }
-    throw NotAuthenticated();
-  }
 
 };
-
 
 #endif

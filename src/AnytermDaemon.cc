@@ -27,35 +27,31 @@
 
 #include "segv_backtrace.hh"
 
-
 using namespace std;
 using namespace pbe;
 
-
-/*virtual*/ void AnytermDaemon::session_start()
-{
+/*virtual*/void AnytermDaemon::session_start() {
   get_backtrace_on_segv();
 }
 
-void AnytermDaemon::handle(const HttpRequest& req0, HttpResponse& resp)
-{
+void AnytermDaemon::handle(const HttpRequest& req0, HttpResponse& resp) {
   HttpRequest req = req0;
 
   //syslog(LOG_NOTICE,"anytermd handling %s",req.uri.c_str());
 
-  resp.headers["Server"]="anytermd";
+  resp.headers["Server"] = "anytermd";
 
   authenticate(req);
 
   // Redirect a request for '/' to '/anyterm.html'.
-  if (req.abs_path=="/") {
+  if (req.abs_path == "/") {
     string host = req.headers.find("Host")->second;
     // This is tricky if we're being proxied to because "host" is the post-proxy
     // hostname (e.g. locahost) while the browser needs to see the pre-proxy hostname.
     // Apache can fix this up for us if we use something like this:
     //   ProxyPassReverse http://localhost:8080
-    resp.headers["Location"]="http://"+host+"/anyterm.html";
-    resp.status_code=301;
+    resp.headers["Location"] = "http://" + host + "/anyterm.html";
+    resp.status_code = 301;
     return;
   }
 
@@ -69,6 +65,4 @@ void AnytermDaemon::handle(const HttpRequest& req0, HttpResponse& resp)
   resp.headers["Pragma"] = "no-cache";
   resp.body = r.body;
 }
-
-
 

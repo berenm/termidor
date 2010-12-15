@@ -25,25 +25,27 @@
 
 #include "SerialPort.hh"
 
-
 // This base class is just so that sp can be initialised before being Activity.
 struct SerialPortActivity_base {
-  pbe::SerialPort sp;
-  SerialPortActivity_base(std::string fn, pbe::FileDescriptor::open_mode_t open_mode,
-                          int baudrate, bool raw=true):
-    sp(fn,open_mode,baudrate,raw)
-  {}
+    pbe::SerialPort sp;
+    SerialPortActivity_base(std::string fn,
+                            pbe::FileDescriptor::open_mode_t open_mode,
+                            int baudrate,
+                            bool raw = true) :
+      sp(fn, open_mode, baudrate, raw) {
+    }
 };
-
 
 class SerialPortActivity: private SerialPortActivity_base, public Activity {
-public:
-  SerialPortActivity(Activity::onOutput_t onOutput,
-                     Activity::onError_t onError,
-                     std::string fn, int baudrate);
+  public:
+    SerialPortActivity(Activity::onOutput_t onOutput,
+                       Activity::onError_t onError,
+                       std::string fn,
+                       int baudrate);
 
-  ~SerialPortActivity() {};
+    ~SerialPortActivity() {
+    }
+    ;
 };
-
 
 #endif
