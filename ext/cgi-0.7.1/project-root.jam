@@ -1,0 +1,139 @@
+import os ;
+import modules ;
+
+local rule get-boost-root ( )
+{
+  local boost-root = [ MATCH "^--boost-root=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(boost-root)
+  {
+    return $(boost-root) ;
+  }
+  else
+  {
+    boost-root = [ os.environ BOOST_ROOT ] ;
+    if $(boost-root)
+    {
+      return $(boost-root) ;
+    }
+    else
+    {
+      ERROR "Can't find your Boost source. Either set the environment " ;
+      ERROR "variable BOOST_ROOT or pass --boost-root=/path/to/source on the " ;
+      ERROR "command line." ;
+    }
+  }
+}
+
+# Get the boost root
+path-constant boost-root : [ get-boost-root ] ;
+
+local rule get-bbv2-path ( boost-root * )
+{
+  local bbv2-path = [ os.environ BOOST_BUILD_PATH ] ;
+  if $(bbv2-path)
+  {
+    return $(bbv2-path) ;
+  }
+  else
+  if $(boost-root)
+  {
+    return "$(boost-root)/tools/build/v2" ;
+  }
+  else
+  {
+    ERROR "Can't find Boost Build. Please set either the environment variable " ;
+    ERROR "BOOST_ROOT (to your boost sources) or BOOST_BUILD_PATH (to boost build's " ;
+    ERROR "sources - usually located in BOOST_ROOT/tools/build/v2." ;
+  }
+}
+
+path-constant BOOST_BUILD_PATH : [ get-bbv2-path ] ;
+
+path-constant top : . ;
+path-constant include-dir : /usr/local/include ;
+
+# A relative path to boost (for documentation stuff)
+path-constant boost-root-relative : $(top)/../../boost/trunk/ ;
+
+
+#############################################################################
+# Rule so we can extract install bin directories easily
+#
+# User can pass either:
+# 
+# --cgi-bin=/path/to/cgi-bin (equally with fcgi-bin / scgi-bin)
+# 
+# on the bjam command line OR set the environment variable:
+# 
+# BOOST_CGI_BIN_PATH (equally with BOOST_FCGI_BIN_PATH / BOOST_SCGI_BIN_PATH)
+#
+# Note that the command line will override the environment variable!
+#############################################################################
+local rule get-bin-dir ( protocol )
+{
+  local bin-dir = [ MATCH "^--$(protocol:L)-bin=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(bin-dir)
+  {
+    return $(bin-dir) ;
+  }
+  else
+  {
+    bin-dir = [ os.environ "BOOST_$(protocol:U)_BIN_PATH" ] ;
+    if $(bin-dir)
+    {
+      return $(bin-dir) ;
+    }
+    else
+    {
+      return "$(top)/libs/cgi/example/$(protocol:L)-bin" ;
+    }
+  }
+}
+
+path-constant cgi-bin  : [ get-bin-dir "cgi" ] ; 
+path-constant fcgi-bin : [ get-bin-dir "fcgi" ] ;
+path-constant scgi-bin : [ get-bin-dir "scgi" ] ;
+
+#############################################################################
+# Rule to extract the directory for web documents (some servers call it
+# the htdocs folder). The amortization examples will want this to be set.
+#
+# User can pass either:
+# 
+# --htdocs=/path/to/htdocs
+#
+# on the bjam command line OR set the environment variable:
+# 
+# BOOST_CGI_HTDOCS_PATH
+#
+# Note that the command line will override the environment variable!
+#############################################################################
+local rule get-htdocs-dir ( )
+{
+  local dir = [ MATCH "^--htdocs=(.*)" : [ modules.peek : ARGV ] ] ;
+  if $(dir)
+  {
+    return $(dir) ;
+  }
+  else
+  {
+    dir = [ os.environ "BOOST_CGI_HTDOCS_PATH" ] ;
+    if $(dir)
+    {
+      return $(dir) ;
+    }
+    else
+    {
+      return "$(top)/htdocs" ;
+    }
+  }
+}
+
+path-constant htdocs : [ get-htdocs-dir ] ;
+
+
+use-project /boost/ : $(boost-root) ;
+use-project /boost/cgi/ : $(top)/libs/cgi/build ;
+
+# project anon : build-dir bin.v2 ;
+

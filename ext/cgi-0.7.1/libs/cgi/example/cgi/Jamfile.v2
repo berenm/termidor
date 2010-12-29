@@ -1,0 +1,29 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+# By default, just build the examples
+build-project hello_world ;
+build-project echo ;
+build-project cookies ;
+build-project file_browser ;
+#build-project stencil ;
+build-project upload ;
+
+# If the user explicitly passes "install" on the command line, build the
+# CGI examples and copy them to $(cgi-bin)
+install install
+  :
+    hello_world
+    echo
+    cookies
+    file_browser
+#    stencil
+    upload
+  :
+    <location>$(cgi-bin)
+  ;
+
+explicit install ;

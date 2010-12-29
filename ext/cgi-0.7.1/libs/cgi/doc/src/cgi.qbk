@@ -1,0 +1,120 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[library FastCGI / CGI
+    [quickbook 1.5]
+    [version 0.7]
+    [dirname the_document_dir]
+    [copyright 2007-2010 Darren Garvey]
+    [purpose Documentation for CGI / FastCGI C++ Library]
+    [authors [Garvey, Darren]]
+    [license
+        Distributed under the Boost Software License, Version 1.0.
+        (See accompanying file LICENSE_1_0.txt or copy at
+        [@http://www.boost.org/LICENSE_1_0.txt])
+    ]
+]
+
+[template mdash[] '''&mdash; ''']
+[template indexterm1[term1] '''<indexterm><primary>'''[term1]'''</primary></indexterm>''']
+[template indexterm2[term1 term2] '''<indexterm><primary>'''[term1]'''</primary><secondary>'''[term2]'''</secondary></indexterm>''']
+
+
+[def __this__    ["FSCGI"]] [/ name of the library]
+[def __cgi__     [@http://en.wikipedia.org/wiki/Common_Gateway_Interface CGI]]
+[def __scgi__    [@http://en.wikipedia.org/wiki/Simple_Common_Gateway_Interface SCGI]]
+[def __fcgi__    [@http://en.wikipedia.org/wiki/FastCGI FastCGI]]
+
+[def __FastCGI__ [link boost.cgi.reference.protocols.fcgi FastCGI]]
+
+[def __boost__   [@http://boost.org/ Boost]]
+[def __asio__    [@http://asio.sourceforge.net Boost.Asio]]
+[def __get_boost__ [@http://beta.boost.org/users/download get Boost]]
+[def __boost_jam__ [@http://sourceforge.net/project/showfiles.php?group_id=7586&package_id=72941 Boost.Jam]]
+
+[def __reading_the_docs__   [link boost.cgi.intro.reading_the_docs reading the docs]]
+[def __naming_conventions__ [link boost.cgi.intro.naming_conventions naming conventions]]
+
+[def __tutorial__           [link boost.cgi.tutorial tutorial]]
+[def __reference__          [link /doc/html/cgi/reference.html reference]]
+
+[def __current_branch__ http://svn.boost.org/trac/boost/browser/sandbox/SOC/2007/cgi/branches/release]
+
+[def __examples__ [@/docs/examples/examples.html examples]]
+[def __amort_example__ [@/docs/examples/examples.html#cgi.examples.acgi_examples.amortization Amortization]]
+
+
+[def __GET__  `GET` ]
+[def __POST__ `POST`]
+[def __HEAD__ `HEAD`]
+[def __PUT__  `PUT` ]
+
+[def __Boost__ [@http://boost.org Boost]]
+
+[def __ProtocolService__ `ProtocolService`]
+[def __Request__ `Request`]
+
+[def __Service__ [@http://asio.sourceforge.net/boost_asio_0_3_9/libs/asio/doc/html/boost_asio/reference/Service.html Service]]
+
+[/def __boost_thread__ #link#to#boost#thread#docs#]
+[/def __IoService__ #link#to#io#service#docs#]
+[/def __protocol__ #link#to#protocol#section# boost.user_guide.protocols]
+[/def __ProtocolService__ boost.reference.concepts.protocol_service]
+[/def __io_service__ #link#to#doxygen#reference#]
+[/def __async_write__]
+[/     __async_read__]
+[/     __async_write_some__]
+[/     __async_read_some__]
+
+[/ 'ug' is the id of the User's Guide section]
+[/ 'gs' is the id of the Getting Started section, which is in the User's Guide]
+[/ 'tut' is the id of the Tutorial, which is in the User's Guide]
+
+[def __headers__   boost.cgi.ug.gs.headers]
+[def __accepting__ boost.cgi.ug.tutorial.accepting]
+[def __loading__   boost.cgi.ug.tutorial.loading]
+
+[/def __hog__ []]
+[template rfc[number]
+[@http://www.ietf.com/rfc/rfc[number] RFC[number]]
+]
+
+[important
+This manual does [*not] document a library that is a part of __Boost__. The library was started just before the summer of 2007 and worked on during the [@http://code.google.com/soc/2007 Google Summer of Code 2007].
+
+There has been a lot of changes recently (as of May 2010) and the interface has reached a relatively stable state. Comments and bug reports are most welcome and should be directed to cgi-devel at lists.sf.net.
+
+The project is hosted at [@http://sourceforge.net/projects/cgi/ sourceforge] and the bleeding edge code is in the [@http://svn.boost.org/svn/boost/browser/sandbox/SOC/2007/cgi/trunk Boost SVN sandbox].
+]
+
+[/include preface.qbk]
+
+[include:intro introduction.qbk]
+
+[include tutorial.qbk]
+
+[include overview.qbk]
+
+[include utilities.qbk]
+
+[include:examples examples.qbk]
+
+[/include:reference reference.qbk]
+
+[include:future future_development.qbk]
+
+[/include:server_support user_guide/server_support.qbk]
+
+[/include troubleshooting.qbk]
+
+[include acknowledgements.qbk]
+
+[/xinclude index.xml]
+
+[/xinclude quickref.xml]
+
+[/include reference.qbk]

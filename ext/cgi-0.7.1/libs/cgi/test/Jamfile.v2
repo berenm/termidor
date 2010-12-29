@@ -1,0 +1,42 @@
+# Test everything works ok by running:
+#
+# $ bjam docs examples
+#
+# By default, all tests are run. The `docs` and `examples` args are optional
+# arguments for testing the documentation and examples build ok.
+#
+
+project
+  : requirements
+      <include>$(boost-root)
+      <include>../../../
+      # suppress annoying MSVC warnings
+      <toolset>msvc:<define>_CRT_SECURE_NO_DEPRECATE
+      <toolset>msvc:<define>_CRT_NONSTDC_NO_DEPRECATE
+      <toolset>msvc:<define>_SCL_SECURE_NO_DEPRECATE
+  : build-dir
+      ../../../bin.v2
+  ;
+
+build-project compile ;
+build-project run ;
+build-project compile_fail ;
+
+if [ MATCH "^(--build-examples)" : [ modules.peek : ARGV ] ]
+{
+  build-project ../example//all_examples ;
+}
+
+alias examples
+ :
+  ../example//all_examples
+ ;
+
+alias docs
+ :
+  ../doc//standalone
+  ../doc//cgi_xml
+  ../doc//autodoc
+ :
+  <include>../doc/src
+ ;

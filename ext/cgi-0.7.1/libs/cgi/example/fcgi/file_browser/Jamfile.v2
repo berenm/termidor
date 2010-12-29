@@ -1,0 +1,14 @@
+
+project boost/cgi/example/fcgi/file_browser ;
+
+exe fcgi_file_browser : main.cpp ;
+
+install install
+  :
+    fcgi_file_browser
+  :
+    <location>$(fcgi-bin)
+  ;
+
+explicit install ;
+

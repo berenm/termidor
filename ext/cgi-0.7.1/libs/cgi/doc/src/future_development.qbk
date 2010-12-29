@@ -1,0 +1,49 @@
+[/
+ / Copyright (c) 2007-2010 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:future Future Development]
+
+[h4 Iostream functionality.]
+
+Streamed IO, likely to be similar to Boost.Asio's `basic_socket_stream<>` would be nice, although .
+
+[h4 SCGI support.]
+
+I haven't managed to get apache/lighttpd configured properly for SCGI, so this isn't functional yet.
+
+[h4 FastCGI client support.]
+
+FastCGI is supported in server-side applications. Support for client-side applications would be useful.
+
+[h4 FastCGI support.]
+
+I would like to add to the FastCGI functionality on Windows, where currently only anonymous pipes are supported. It is possible to customise the library to use external FastCGI apps, but this is not documented.
+
+[h4 Access to error output streams]
+
+CGI, SCGI and FastCGI all make provisions for some sort of error outputting, according to the following table:
+
+[table
+ [[Protocol][Native error reporting capabilities]]
+ [[CGI] [Single error output stream (`std::cerr`)]]
+ [[SCGI] [A single output stream (`std::cerr`) is shared between requests: Boost.CGI will guarantee thread-safe access to it.]]
+ [[FastCGI] [Error stream per request. Inherently thread-safe.]]
+]
+
+Even though the server is not obliged to do anything with this output, it is generally dumped into the default server error log. This can be invaluable for debugging.
+
+Access to the above streams will be implemented as a __Service__, which can be switched on or off at runtime. Output can be sent either to stdout, stderr, or both simultaneously. If this isn't enough, a user can add their own custom service layer, which can manipulate the data as it is read/written in any way they wish (such as logging to a database, url-encoding/filtering data, or playing an April Fool's prank on your website visitors).
+
+[h4 Concept Documentation]
+
+Even though this library introduces very few new concepts, they are not currently documented. Links to Boost.Asio's concept documentation is also required (essentially as part of a reworking of the doxygen reference section).
+
+[h4 Unicode Support]
+
+The library currently makes no documented provisions for Internationalisation support. The string type used in the library is templated but this is as far as support goes. A Boost.Unicode library would help a lot with adding this support. Comments on this topic by domain experts are most welcome.
+
+[endsect]

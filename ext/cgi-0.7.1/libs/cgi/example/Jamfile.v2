@@ -1,0 +1,48 @@
+#             Copyright (c) 2007 Darren Garvey
+#
+# Distributed under the Boost Software License, Version 1.0.
+#     (See accompanying file LICENSE_1_0.txt or copy 
+#        at http://www.boost.org/LICENSE_1_0.txt)
+
+project boost/cgi/example
+: requirements
+      <library>/boost/cgi/
+      <library>/boost/system/
+      <library>/boost/thread/
+  ;
+
+# Build all of the cgi examples
+build-project cgi ;
+# Build all of the fcgi examples
+build-project fcgi ;
+# Build all of the xcgi examples
+build-project xcgi ;
+
+alias all_examples : cgi fcgi xcgi ;
+
+install cgi-install
+ : # sources
+   cgi//install
+ :
+   <location>$(cgi-bin)
+ ;
+
+install fcgi-install
+  :
+    fcgi//install
+  :
+    <location>$(fcgi-bin)
+  ;
+
+install xcgi-install
+  :
+    xcgi//install
+  ;
+
+alias install : cgi//install fcgi//install xcgi//install ;
+
+explicit cgi-install  ;
+explicit fcgi-install ;
+
+explicit install ;
+

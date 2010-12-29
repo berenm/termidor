@@ -1,0 +1,14 @@
+
+project boost/cgi/example/fcgi/echo ;
+
+exe fcgi_echo : main.cpp ;
+
+install install
+  :
+    fcgi_echo
+  :
+    <location>$(fcgi-bin)
+  ;
+
+explicit install ;
+

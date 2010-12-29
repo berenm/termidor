@@ -1,0 +1,120 @@
+[/
+ / Copyright (c) 2007-2009 Darren Garvey
+ /
+ / Distributed under the Boost Software License, Version 1.0. (See accompanying
+ / file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
+ /]
+
+[section:acceptors Acceptors]
+
+['[*TODO]: Document using Acceptors]
+
+[section:accepting Accepting Requests]
+
+A [classref cgi::basic_request_acceptor `basic_request_acceptor<>`] is responsible for accepting requests. The following `typedefs` are provided for typical use:
+``
+boost::cgi::acceptor // CGI
+boost::fcgi::acceptor // FastCGI
+``
+
+Accepting requests is considered distinct to the [link __loading__ loading] stage for several reasons, the most significant of which is to allow for multiplexing protocols like FastCGI work with the other protocols.
+
+A `basic_request_acceptor<>` takes an instance of a __ProtocolService__ in its constructor. The following member functions are available, where Request is any class that models the __Request__ concept:
+
+[table
+  [[Function signature] [Purpose]]
+  [
+    [`void accept(Request& empty_request)`]
+    [Takes an empty request and blocks until a request is waiting to be handled. This will throw if the accept fails.]
+  ]
+  [
+    [`boost::system::error_code&
+    accept(Request& empty_request, boost::system::error_code& ec)`]
+    [Takes an empty request and blocks until a request is waiting to be handled. `ec` will be set such that `!ec == false` if the accept fails with an error code `ec`.]
+  ]
+  [
+    [`void accept(RequestHandler handler)`]
+    [Accepts a new request and calls `handler` with the new request. A `RequestHandler` takes a request by reference and should match the signature `function<int (Request& req)>`.]
+  ]
+  [
+    [`void async_accept(Request& empty_request, Handler handler)`]
+    [Takes an empty request and asynchronously accepts a request. `handler` must be a model of __Handler__ and will be invoked when a request is accepted or an error occurs. The function always returns immediately.]
+  ]
+  [
+    [`void cancel()`]
+    [Cancel all outstanding asynchronous accepts that are running]
+  ]
+] [/table]
+
+[section:example1 Example 1]
+
+A simple example that runs a handler function for each request that is accepted. The requests are handled one at a time.
+
+``
+#include <boost/cgi/fcgi.hpp>
+
+namespace fcgi = boost::fcgi;
+
+int handler(fcgi::request& req)
+{
+  // use the request.
+}
+
+int main()
+{
+  // create a ProtocolService
+  fcgi::service service;
+
+  // create an acceptor
+  fcgi::acceptor acceptor(service);
+
+  int status(0)
+  while(!status) {
+    // accept a request
+    status = acceptor.accept(&handler);
+  }
+
+  return status;
+}
+``
+
+[endsect] [/ example1]
+
+[section:example2 Example 2]
+
+Another example that allows you to construct your own request object and then accept a new request into the object. Useful if you need to store a list of requests in your application.
+
+``
+#include <boost/cgi/fcgi.hpp>
+
+int main()
+{
+  using namespace cgi::fcgi; // for example
+
+  // create a ProtocolService
+  service service;
+
+  // create an acceptor
+  acceptor acceptor(service);
+
+  // make an empty request
+  request req(service);
+
+  boost::system::error_code ec;
+  // accept a request
+  acceptor.accept(req, ec);
+
+  if (!ec)
+  {
+    // a request was accepted ok
+  }
+
+  return 0;
+}
+``
+
+[endsect][/ example2]
+
+[endsect] [/ accepting]
+
+[endsect] [/ acceptors]

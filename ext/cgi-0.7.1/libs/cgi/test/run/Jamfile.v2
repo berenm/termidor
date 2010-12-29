@@ -1,0 +1,44 @@
+# These tests should run without error
+# (currently not here)
+
+import testing ;
+
+project boost/cgi/tests/run
+  : requirements
+    <library>/boost/test//boost_unit_test_framework/
+    <library>/boost/system/
+    <library>/boost/serialization//boost_serialization/
+    #<os>:<linkflags>-pthread
+    #<library>/boost/thread/
+    #<library>/boost/regex/
+  ;
+
+#local rule run-test( name )
+#{
+#  return [
+#      run $(name).cpp /boost/test//boost_unit_test_framework/<link>static
+#      ] ;
+#}
+
+test-suite run_test_suite
+  :
+    #[ run [ glob *.cpp ] ]
+    
+    [ run cookie.cpp ]
+    [ run response.cpp  ]
+    [ run cgi_simple_request.cpp ]
+    [ run name_test.cpp ]
+    [ run map_test.cpp ]
+    [ run parse_options.cpp ]
+    [ run data_map_proxy.cpp ]
+    [ run request_data.cpp ]
+    [ run sessions.cpp ]
+  ;
+
+#test-suite wget_test
+#  :
+    #[ run wget.cpp : "--log_level=message" ]
+#    [ run hello_world.cpp /boost/filesystem/ ]
+#  ;
+
+#explicit wget_test ;
