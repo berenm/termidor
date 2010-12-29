@@ -459,30 +459,41 @@ function keydown(ev) {
 
 // Open, close and initialisation:
 
-function open_term(rows, cols, p, charset, scrollback) {
-  var params = "a=open&rows=" + rows + "&cols=" + cols;
-  if (p) {
-    params += "&p=" + p;
-  }
-  if (charset) {
-    params += "&ch=" + charset;
-  }
-  if (scrollback) {
-    if (scrollback > 1000) {
-      alert("The maximum scrollback is currently limited to 1000 lines.  " + "Please choose a smaller value and try again.");
-      return;
-    }
-    params += "&sb=" + scrollback;
-  }
-  params += cachebust();
-  var resp = sync_load(url_prefix + "anyterm-module", params);
-
-  if (handle_resp_error(resp)) {
+function open_term(row_count_in, column_count_in, parameters_in, charset_in, scrollback_count_in) {
+  if (scrollback_count_in > 1000) {
+    alert("The maximum scrollback is currently limited to 1000 lines.  " + "Please choose a smaller value and try again.");
     return;
   }
 
-  open = true;
-  session = resp;
+  //params += cachebust();
+
+  request = {
+    url: "anytermd",
+    type: "GET",
+    data: ({
+      mode: 'json',
+      action: 'open',
+      row_count: row_count_in,
+      column_count: column_count_in,
+      parameters: parameters_in,
+      charset: charset_in,
+      scrollback_count: scrollback_count_in
+    }),
+    async: false,
+    success: function(msg) {
+      alert(msg);
+    }
+  };
+  $.ajax(request);
+
+//  var resp = sync_load(url_prefix + "anyterm-module", params);
+//
+//  if (handle_resp_error(resp)) {
+//    return;
+//  }
+//
+//  open = true;
+//  session = resp;
 }
 
 function close_term() {
@@ -491,7 +502,7 @@ function close_term() {
     return;
   }
   open = false;
-  var resp = sync_load(url_prefix + "anyterm-module", "a=close&s=" + session + cachebust());
+  var resp = sync_load(url_prefix + "anytermd", "a=close&s=" + session + cachebust());
   handle_resp_error(resp); // If we get an error, we still close everything.
   document.onkeypress = null;
   document.onkeydown = null;
@@ -519,7 +530,7 @@ var Anyterm = {
   },
 
   substitute_variables: function(string) {
-    var version = get_version();
+    var version = Anyterm.get_version();
     if (version != "") {
       version = "-" + version;
     }
@@ -709,7 +720,7 @@ function create_term(elem_id, title, rows, cols, p, charset, scrollback) {
     return;
   }
 
-  title = substitute_variables(title);
+  title = Anyterm.substitute_variables(title);
   frame = document.getElementById(elem_id);
   if (!frame) {
     alert("There is no element named '" + elem_id + "' in which to build a terminal");

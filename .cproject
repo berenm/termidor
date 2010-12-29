@@ -20,7 +20,13 @@
 					<folderInfo id="cdt.managedbuild.config.gnu.exe.debug.1091659308." name="/" resourcePath="">
 						<toolChain id="cdt.managedbuild.toolchain.gnu.exe.debug.948863955" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.exe.debug">
 							<targetPlatform id="cdt.managedbuild.target.gnu.platform.exe.debug.1462422063" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.exe.debug"/>
-							<builder buildPath="${workspace_loc:/anyterm/Debug}" id="cdt.managedbuild.target.gnu.builder.exe.debug.602313897" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug"/>
+							<builder buildPath="${workspace_loc:/anyterm}" cleanBuildTarget="--clean" command="bjam" id="cdt.managedbuild.target.gnu.builder.exe.debug.602313897" incrementalBuildTarget="debug" keepEnvironmentInBuildfile="true" managedBuildOn="false" name="Gnu Make Builder" superClass="cdt.managedbuild.target.gnu.builder.exe.debug">
+								<outputEntries>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name=""/>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release"/>
+									<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="outputPath" name="Release"/>
+								</outputEntries>
+							</builder>
 							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1918664770" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug.1810194190" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.exe.debug">
 								<option id="gnu.cpp.compiler.exe.debug.option.optimization.level.1026609462" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
@@ -45,10 +51,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libpbe/src"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ext/cgi-0.7.1/libs/cgi/src"/>
+						<entry excluding="libs/cgi/src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ext/cgi-0.7.1"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="libpbe/include"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -513,8 +519,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="libpbe/examples|include|ext/cgi-0.7.1" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ext/cgi-0.7.1/libs/cgi/src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
-						<entry excluding="include" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="libs/cgi/src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ext/cgi-0.7.1"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
