@@ -20,112 +20,124 @@
 #include "anyterm/html.hpp"
 
 #include <string>
+#include <sstream>
 
-// Screen to HTML conversion:
+#include <boost/bind.hpp>
+#include <boost/algorithm/string.hpp>
 
-static bool gen_style(ucs4_string& html_out, ::anyterm::attributes const& attributes_in) {
-  if (attributes_in != ::anyterm::attributes()) {
-    ::std::uint8_t foreground = attributes_in.foreground_;
-    ::std::uint8_t background = attributes_in.background_;
+::anyterm::attribute get_attribute(::anyterm::screen::attribute_vector_t const& attributes_in,
+                                   ::std::uint32_t row_number_in,
+                                   ::std::uint32_t column_number_in) {
+  ::anyterm::attribute attribute_out;
+  attribute_out.set_row(row_number_in);
+  attribute_out.set_column(column_number_in);
 
-    if (attributes_in.inverse_) {
-      ::std::swap(foreground, background);
-    }
+  ::anyterm::screen::attribute_vector_t::const_iterator attribute_it;
+  attribute_it = ::std::find_if(attributes_in.begin(), attributes_in.end(), ::boost::bind(::std::greater<
+      ::anyterm::attribute >(), _1, attribute_out));
 
-    ucs4_string classes;
-    if (attributes_in.bold_) {
-      classes += L'z';
-    }
-
-    if (background != ::anyterm::attributes().background_) {
-      if (!classes.empty()) {
-        classes += L' ';
-      }
-      classes += L'a' + background;
-    }
-
-    if (foreground != ::anyterm::attributes().foreground_) {
-      if (!classes.empty()) {
-        classes += L' ';
-      }
-      classes += L'i' + foreground;
-    }
-
-    html_out += L"<span class=\"" + classes + L"\">";
-
-    return true;
+  if (attribute_it == attributes_in.begin()) {
+    return ::anyterm::attribute();
+  } else {
+    return *(--attribute_it);
   }
-
-  return false;
 }
 
-static const ucs4_char* attr_end = L"</span>";
+struct row_transformer {
+    row_transformer(::std::stringstream& stream_inout,
+                    ::anyterm::screen::attribute_vector_t const& attributes_in,
+                    ::std::uint32_t const row_number_in,
+                    ::anyterm::attribute& last_attribute_in) :
+      __stream(stream_inout), __attributes(attributes_in), __row_number(row_number_in), __column_number(0),
+          __last_attribute(last_attribute_in) {
+    }
 
-static const ucs4_char* cursor_start = L"<span class=\"cursor\">";
-static const ucs4_char* cursor_end = L"</span>";
-
-ucs4_string htmlify_screen(const ::anyterm::screen& screen) {
-  // Convert screen into HTML.
-  // Slightly optimised to reduce spaces at right end of lines.
-
-  ucs4_string h;
-
-  for (int row = -screen.scrollback(); row < screen.rows(); row++) {
-    int sp = 0;
-    bool styled = false;
-    ::anyterm::attributes prev_attrs;
-    for (int column = 0; column < screen.cols(); column++) {
-      bool cursor = (row == screen.cursor_row_number_ && column == screen.cursor_column_number_)
-          && screen.cursor_visible_;
-      ::anyterm::cell cell = screen(row, column);
-      ucs4_char ch = cell.char_;
-      ::anyterm::attributes attrs = cell.attributes_;
-
-      if (ch == ' ' && attrs == ::anyterm::attributes() && !styled && column > 0 && row > 0 && !cursor) {
-        sp++;
-      } else {
-        while (sp > 0) {
-          h += L'\u00A0';
-          sp--;
-        }
-        if (styled && attrs != prev_attrs) {
-          h += attr_end;
-        }
-        if (column == 0 || attrs != prev_attrs) {
-          styled = gen_style(h, attrs);
-          prev_attrs = attrs;
-        }
-        if (cursor) {
-          h += cursor_start;
-        }
-        switch (ch) {
-          case '<':
-            h += L"&lt;";
-            break;
-          case '>':
-            h += L"&gt;";
-            break;
-          case '&':
-            h += L"&amp;";
-            break;
-          case ' ':
-            h += L'\u00A0';
-            break;
-          default:
-            h += ch;
-            break;
-        }
-        if (cursor) {
-          h += cursor_end;
-        }
+    void operator()(char const& char_in) {
+      ::anyterm::attribute attribute = get_attribute(__attributes, __row_number, __column_number);
+      if (attribute != __last_attribute) {
+        __stream << "</span>";
+        __last_attribute = attribute;
+        __stream << "<span class='" << __last_attribute.to_css() << "'>";
       }
-    }
-    if (styled) {
-      h += attr_end;
-    }
-    h += L"<br>";
-  }
 
-  return h;
+      switch (char_in) {
+        case '<':
+          __stream << "&lt;";
+          break;
+        case '>':
+          __stream << "&gt;";
+          break;
+        case '&':
+          __stream << "&amp;";
+          break;
+        case '\n':
+          __stream << "<br/>";
+          break;
+        default:
+          __stream << char_in;
+          break;
+      }
+
+      __column_number++;
+    }
+
+    ::std::string str() {
+      return ::boost::trim_right_copy(__stream.str());
+    }
+
+    ::std::uint32_t column_number() {
+      return __column_number;
+    }
+
+  private:
+    ::std::stringstream& __stream;
+    ::anyterm::screen::attribute_vector_t const& __attributes;
+    ::std::uint32_t const __row_number;
+    ::std::uint32_t __column_number;
+    ::anyterm::attribute& __last_attribute;
+};
+
+struct lines_transformer {
+    lines_transformer(::std::stringstream& stream_inout,
+                      ::anyterm::screen::attribute_vector_t const& attributes_in) :
+      __stream(stream_inout), __attributes(attributes_in), __row_number(0), __last_attribute() {
+    }
+
+    void operator()(::std::string const& row_in) {
+      ::std::stringstream stream;
+      ::std::for_each(row_in.begin(), row_in.end(), row_transformer(stream,
+                                                                    __attributes,
+                                                                    __row_number,
+                                                                    __last_attribute));
+      __stream << ::boost::trim_right_copy(stream.str()) << "<br/>";
+
+      __row_number++;
+    }
+
+  private:
+    ::std::stringstream& __stream;
+    ::anyterm::screen::attribute_vector_t const& __attributes;
+    ::std::uint32_t __row_number;
+    ::anyterm::attribute __last_attribute;
+};
+
+::std::string htmlify_screen(::anyterm::screen const& screen_in) {
+  ::anyterm::screen::line_vector_t const& lines = screen_in.lines();
+  ::anyterm::screen::attribute_vector_t const& attributes = screen_in.attributes();
+
+  ::std::stringstream html_stream;
+  html_stream << "<span class='" << ::anyterm::attribute().to_css() << "'>";
+
+  ::std::for_each(lines.begin(), lines.end(), lines_transformer(html_stream, attributes));
+
+  //  for (::std::uint32_t i = 0; i < screen.row_count(); ++i) {
+  //    ::anyterm::screen::const_row_view_t row_view = screen.row(i);
+  //
+  //    ::std::stringstream stream;
+  //    ::std::for_each(row_view.begin(), row_view.end(), lines_transformer(html_stream, last_attributes));
+  //    html_stream << ::boost::trim_right_copy(stream.str());
+  //  }
+
+  return ::boost::trim_right_copy_if(html_stream.str(), ::boost::is_any_of(" \n")) + "</span>";
 }
 

@@ -26,10 +26,10 @@
 
 #include <boost/lexical_cast.hpp>
 
-static ucs4_string ucs4_int(int i) {
-  ucs4_string s;
+static ::std::wstring ucs4_int(int i) {
+  ::std::wstring s;
   do {
-    s = ucs4_string(1, (i % 10) + L'0') + s;
+    s = ::std::wstring(1, (i % 10) + L'0') + s;
     i = i / 10;
   } while (i);
   return s;
@@ -37,8 +37,8 @@ static ucs4_string ucs4_int(int i) {
 
 void simplify_editscript(const DiffAlgo::ucs4_string_fragment_seq& in,
                          DiffAlgo::ucs4_string_fragment_seq& out) {
-  ucs4_string a_cf; // A data to carry forward
-  ucs4_string b_cf; // B data to carry forward
+  ::std::wstring a_cf; // A data to carry forward
+  ::std::wstring b_cf; // B data to carry forward
 
   for (DiffAlgo::ucs4_string_fragment_seq::const_iterator i = in.begin(); i != in.end(); ++i) {
     switch (i->first) {
@@ -76,7 +76,7 @@ void simplify_editscript(const DiffAlgo::ucs4_string_fragment_seq& in,
   }
 }
 
-ucs4_string make_editscript(ucs4_string o, ucs4_string n) {
+::std::wstring make_editscript(::std::wstring o, ::std::wstring n) {
   DiffAlgo::ucs4_string_fragment_seq e;
 
   DiffAlgo::ucs4_string_diff(o, n, e);
@@ -84,8 +84,8 @@ ucs4_string make_editscript(ucs4_string o, ucs4_string n) {
   DiffAlgo::ucs4_string_fragment_seq simp_e;
   simplify_editscript(e, simp_e);
 
-  ucs4_string editscript;
-  ucs4_string editscript_r = L"R";
+  ::std::wstring editscript;
+  ::std::wstring editscript_r = L"R";
   bool any_common = false;
   bool any_change = false;
 

@@ -6,20 +6,26 @@ lib boost_serialization ;
 lib boost_thread ;
 lib boost_iostreams ;
 lib util ;
+lib vte ;
 
 project anyterm : requirements
   <include>include/
   <include>libpbe/include/
   <include>ext/cgi-0.7.1/
+  <include>/usr/include/glib-2.0
+  <include>/usr/lib/glib-2.0/include
   <library>boost_system
   <library>boost_filesystem
   <library>boost_serialization
   <library>boost_thread
   <library>boost_iostreams
   <library>util
+  <library>vte
   <link>static
   <threading>multi
   <cflags>-std=c++0x
+  <cflags>"`pkg-config --cflags vte`"
+  <linkflags>"`pkg-config --libs vte`"
   ;
 
 path-constant TOP : . ;

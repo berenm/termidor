@@ -1,4 +1,72 @@
-// browser/anyterm.js
+
+
+function open_term(row_count_in, column_count_in, parameters_in, charset_in, scrollback_count_in) {
+  if (scrollback_count_in > 1000) {
+    alert("The maximum scrollback is currently limited to 1000 lines.  " + "Please choose a smaller value and try again.");
+    return;
+  }
+
+  $.ajaxSetup({
+      cache: false
+  });
+
+  request = {
+    url: "anytermd",
+    type: "GET",
+    data: ({
+      mode: 'json',
+      a: 'open',
+      row_count: row_count_in,
+      column_count: column_count_in,
+      parameters: parameters_in,
+      charset: charset_in,
+      scrollback_count: scrollback_count_in,
+      success: function(msg) {
+        get();
+      }
+    }),
+    async: false
+  };
+  $.ajax(request);
+
+}
+
+function get() {
+  request = {
+    url: "anytermd",
+    type: "GET",
+    data: ({
+      mode: 'json',
+      a: 'recv',
+      u: new Date().getTime()
+    }),
+    async: true,
+    success: function(msg) {
+      document.getElementById('terminal').innerHTML = msg.data;
+      get();
+    }
+  };
+
+  $.ajax(request);
+}
+
+$(document).keypress(function(event) {
+  request = {
+    url: "anytermd",
+    type: "GET",
+    data: ({
+      mode: 'json',
+      a: 'send',
+      u: new Date().getTime(),
+      k: String.fromCharCode(event.keyCode)
+    }),
+    async: true
+  };
+
+  $.ajax(request);
+});
+
+/*// browser/anyterm.js
 // This file is part of Anyterm; see http://anyterm.org/
 // (C) 2005-2006 Philip Endecott
 // This program is free software; you can redistribute it and/or modify
@@ -217,35 +285,25 @@ function scrollterm(pages) {
 var rcv_timeout;
 
 function get() {
-  //alert("get");
-  rcv_loader.load(url_prefix + "anyterm-module", "a=rcv&s=" + session + cachebust());
-  rcv_timeout = window.setTimeout("alert('no response from server after 60 secs')", 60000);
+  request = {
+    url: "anytermd",
+    type: "GET",
+    data: ({
+      mode: 'json',
+      action: 'recv',
+    }),
+    async: false,
+    success: function(msg) {
+alert(msg);
+      document.getElementById('terminal').innerHTML = msg.data;
+    }
+  };
+  $.ajax(request);
 }
 
 function rcv(resp) {
-  // Called asynchronously when the received document has returned
-  // from the server.
-  window.clearTimeout(rcv_timeout);
-
-  if (!open) {
-    return;
-  }
-
-  if (resp == "") {
-    // We seem to get this if the connection to the server fails.
-    alert("Connection to server failed");
-    return;
-  }
-
-  if (handle_resp_error(resp)) {
-    return;
-  }
-
-  display(resp);
-  get();
 }
 
-rcv_loader = new AsyncLoader(rcv);
 
 
 // Transmit channel:
@@ -817,4 +875,4 @@ $(document).keypress(function (event) {
     event.preventDefault();
   }
   console.log(event);
-});
+});*/

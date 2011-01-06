@@ -28,8 +28,7 @@
 #include <string>
 
 #include "anyterm/screen.hpp"
-#include "unicode.hh"
 
-ucs4_string htmlify_screen(anyterm::screen const& screen);
+::std::string htmlify_screen(anyterm::screen const& screen);
 
 #endif

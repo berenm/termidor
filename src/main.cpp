@@ -3,6 +3,7 @@
  * @date Dec 28, 2010
  */
 
+#define BOOST_CGI_NO_LOGGING
 #include "boost/cgi/fcgi.hpp"
 #include <iostream>
 
@@ -68,55 +69,63 @@ int handle_request(::anyterm::session_manager& manager,
 
   if (action.compare("open") == 0 || !session_ptr) {
     //    // Close last session and start a new one.
-    //    request_inout.session.loaded(false);
-    //    request_inout.session.id("");
-    //    request_inout.start_session();
-    //    manager.new_session(request_inout.session.id());
+    request_inout.session.loaded(false);
+    request_inout.session.id("");
+    request_inout.start_session();
+    manager.new_session(request_inout.session.id());
   } else if (action.compare("send") == 0 && session_ptr) {
     session_ptr->send(request_inout.get["k"]);
   } else if (action.compare("recv") == 0 && session_ptr) {
-    data = session_ptr->rcv();
+    //    do {
+    data = session_ptr->receive();
+    //      if(data.empty()) {
+    //        ::boost::this_thread::sleep(::boost::posix_time::milliseconds(500));
+    //      }
+    //    } while (data.empty());
   }
 
   // Responses in CGI programs require at least a 'Content-type' header. The
   // library provides helpers for several common headers:
+
+
+  //  format_map(::std::clog, request_inout, request_inout.get, "GET Variables");
+  //  format_map(::std::clog, request_inout, request_inout.post, "POST Variables");
   if (mode.compare("json") == 0) {
     response << ::boost::fcgi::content_type("application/json");
-    response << "{}";
+    response << "{\"data\": \"" << data << "\"}";
   } else {
     response << ::boost::fcgi::content_type("text/html");
-    response << "<html>"
-      "<head>"
+    response << "<html><head>"
       "<title>FastCGI Echo Example</title>"
-      "<style type=\"text/css\">" << gCSS_text << "</style>"
-      "<head>"
-      "<body>"
-      "Request ID = " << request_inout.id() << "<br />"
-      "<form method=post enctype=\"multipart/form-data\">"
-      "<input type=text name=name value='" << request_inout.post["name"] << "' />"
-      "<br />"
-      "<input type=text name=hello value='" << request_inout.post["hello"] << "' />"
-      "<br />"
-      "<input type=file name=user_file />"
-      "<input type=hidden name=cmd value=multipart_test />"
-      "<br />"
-      "<input type=submit value=submit />"
-      "</form><p />";
-
+      "<head><body>";
+    //      "Request ID = " << request_inout.id() << "<br />"
+    //      "<form method=post enctype=\"multipart/form-data\">"
+    //      "<input type=text name=name value='" << request_inout.post["name"] << "' />"
+    //      "<br />"
+    //      "<input type=text name=hello value='" << request_inout.post["hello"] << "' />"
+    //      "<br />"
+    //      "<input type=file name=user_file />"
+    //      "<input type=hidden name=cmd value=multipart_test />"
+    //      "<br />"
+    //      "<input type=submit value=submit />"
+    //      "</form><p />";
     //
-    // Use the function defined above to show some of the request data.
-    // (this function isn't part of the library)
-    //
-    format_map(response, request_inout, request_inout.env, "Environment Variables");
-    format_map(response, request_inout, request_inout.get, "GET Variables");
-    format_map(response, request_inout, request_inout.post, "POST Variables");
-    format_map(response, request_inout, request_inout.uploads, "File Uploads");
-    format_map(response, request_inout, request_inout.cookies, "Cookie Variables");
-    format_map(response, request_inout, request_inout.session, "Session Variables");
+    //    //
+    //    // Use the function defined above to show some of the request data.
+    //    // (this function isn't part of the library)
+    //    //
+    //    format_map(response, request_inout, request_inout.env, "Environment Variables");
+    //    format_map(response, request_inout, request_inout.uploads, "File Uploads");
+    //    format_map(response, request_inout, request_inout.cookies, "Cookie Variables");
+    //    format_map(response, request_inout, request_inout.session, "Session Variables");
 
     // Print the buffer containing the POST data and the FastCGI params.
+    //    response << "<pre>";
+    //    response << std::string(request_inout.post_buffer().begin(), request_inout.post_buffer().end());
+    //    response << "</pre>";
+
     response << "<pre>";
-    response << std::string(request_inout.post_buffer().begin(), request_inout.post_buffer().end());
+    response << data;
     response << "</pre>";
   }
 
@@ -135,6 +144,8 @@ int handle_request(::anyterm::session_manager& manager,
 }
 
 int main() {
+  g_type_init();
+
   ::anyterm::session_manager manager;
   //  Anyterm anyterm("", "", "ascii", true, 20);
 
@@ -146,12 +157,15 @@ int main() {
     // Make an `acceptor` for accepting requests through.
     ::boost::fcgi::acceptor a(s, 8088);
 
-    int status(0);
     do {
-      status = a.accept(::boost::bind(&handle_request, ::boost::ref(manager), boost::ref(a), _1));
-    } while (!status);
+      try {
+        a.accept(::boost::bind(&handle_request, ::boost::ref(manager), boost::ref(a), _1));
+      } catch (boost::system::system_error const& se) {
+        std::cerr << "[fcgi] System error: " << se.what() << std::endl;
+      }
+    } while (true);
 
-    return status;
+    return 0;
 
   } catch (boost::system::system_error const& se) {
     // This is the type of exception thrown by the library.

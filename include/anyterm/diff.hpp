@@ -23,8 +23,6 @@
 #include <string>
 #include <list>
 
-#include "unicode.hh"
-
 namespace DiffAlgo {
 
   // "Diff Algorithm" i.e. the algorithm used by the diff program.
@@ -70,14 +68,14 @@ namespace DiffAlgo {
 
   typedef fragment_seq< ::std::string >::Type string_fragment_seq;
 
-  typedef fragment_seq< ucs4_string >::Type ucs4_string_fragment_seq;
+  typedef fragment_seq< ::std::wstring >::Type ucs4_string_fragment_seq;
 
   // Here is the prototype for the diff function.  It returns its
   // result via an "out" parameter:
 
   void string_diff(const ::std::string& A, const ::std::string& B, string_fragment_seq& result);
 
-  void ucs4_string_diff(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result);
+  void ucs4_string_diff(const ::std::wstring& A, const ::std::wstring& B, ucs4_string_fragment_seq& result);
 
 }
 ;

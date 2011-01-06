@@ -130,3 +130,11 @@ img.button {
   overflow-x: visible;
 }
 
+
+.underlined_yes {
+  text-decoration: underline;
+}
+
+.foreground_4 {
+  color: #0000cd;
+}

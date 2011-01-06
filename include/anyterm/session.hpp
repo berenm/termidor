@@ -16,59 +16,47 @@
 #include "anyterm/activity.hpp"
 //#include "Iconver.hh"
 
+#include <iostream>
+#include <boost/algorithm/string.hpp>
+
 namespace anyterm {
+
+  struct debug_printer: ::std::unary_function< void, char > {
+      void operator()(char const char_in) {
+        if (::boost::is_print()(char_in)) {
+          ::std::clog << char_in;
+        } else {
+          ::std::clog << "\\x" << ::std::hex << ::std::setfill('0') << ::std::setw(2)
+              << static_cast< ::std::uint32_t > (char_in) << ::std::dec << ::std::setw(0);
+        }
+      }
+  };
 
   class session: ::boost::noncopyable {
     public:
-
-      //      const SessionId id;
-      ::std::uint8_t const row_count;
-      ::std::uint8_t const column_count;
-      ::std::uint16_t const scrollback_count;
-      ::std::uint32_t const timeout;
-      ::std::string const charset;
-      bool const diff;
-
-    private:
-      //      pbe::Iconver< pbe::permissive, utf8_char, char > utf8_to_charset;
-      //      pbe::Iconver< pbe::permissive, char, ucs4_char > charset_to_ucs4;
-      //      pbe::Iconver< pbe::valid, ucs4_char, utf8_char > ucs4_to_utf8;
+      ::std::uint8_t const __row_count;
+      ::std::uint8_t const __column_count;
+      ::std::uint16_t const __scrollback_count;
+      ::std::uint32_t const __timeout;
 
     public:
-      screen screen_;
-      ::boost::mutex screen_mutex;
-
-      volatile bool dirty;
-      ::boost::condition_variable dirty_condition;
-
-      volatile bool error;
-      ::std::string error_message;
-
-      ::std::wstring old_html_screen;
       volatile time_t last_access;
 
+      ::std::string __last_screen_html;
       terminal __terminal;
-      ::boost::scoped_ptr< activity_base > activity;
 
-      session(::std::uint8_t const row_count_in,
-              ::std::uint8_t const column_count_in,
-              ::std::uint16_t const scrollback_count_in,
-              ::std::uint32_t const timeout_in,
-              activity_factory_base const& activity_factory_in,
-              ::std::string const& charset_in,
-              bool const diff_in);
+      session(::std::uint8_t const row_count_in = 25,
+              ::std::uint8_t const column_count_in = 80,
+              ::std::uint16_t const scrollback_count_in = 0,
+              ::std::uint32_t const timeout_in = 60);
       ~session();
 
-      void touch(void);
-      void report_any_backend_error(void);
+      void touch();
+      void report_any_backend_error();
       void send(::std::string k);
-      ::std::string rcv();
+      ::std::string receive();
 
-      bool timed_out(void);
-
-    private:
-      void process_output(::std::string const& string_in);
-      void process_error(::std::string const& string_in);
+      bool timed_out();
   };
 
 } // namespace anyterm

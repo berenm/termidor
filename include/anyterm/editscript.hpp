@@ -21,7 +21,6 @@
 #define editscript_hh
 
 #include <string>
-#include "unicode.hh"
 
 // Create an edit script describing the difference between oc and
 // nc.  Storage for the result is allocated by this function using
@@ -32,6 +31,6 @@
 //   d(num):      delete num characters
 //   i(num):text  insert num characters, supplied
 
-ucs4_string make_editscript(ucs4_string o, ucs4_string n);
+::std::wstring make_editscript(::std::wstring o, ::std::wstring n);
 
 #endif

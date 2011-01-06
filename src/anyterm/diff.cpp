@@ -449,12 +449,14 @@ namespace DiffAlgo {
     }
   }
 
-  void make_trivial_solution(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result) {
+  void make_trivial_solution(const ::std::wstring& A,
+                             const ::std::wstring& B,
+                             ucs4_string_fragment_seq& result) {
     result.push_back(make_pair(from_a, A));
     result.push_back(make_pair(from_b, B));
   }
 
-  void ucs4_string_diff(const ucs4_string& A, const ucs4_string& B, ucs4_string_fragment_seq& result) {
+  void ucs4_string_diff(const ::std::wstring& A, const ::std::wstring& B, ucs4_string_fragment_seq& result) {
     // Consider time efficiency.  Aim not to take more than this much
     // time (arbitary units).  Return a sub-optimal solution if this
     // time is exceeded.
@@ -483,20 +485,20 @@ namespace DiffAlgo {
       // space complexity.  (This will take O(ND) space, but D could
       // equal N.)
       if ((sz * sz) < max_mem) {
-        Differ< ucs4_string > d1(A, B, result, true, max_time);
+        Differ< ::std::wstring > d1(A, B, result, true, max_time);
         d1.solve();
         d1.find_trace();
         return;
       }
 
       // If input is larger, do a first pass to find the edit distance:
-      Differ< ucs4_string > d2(A, B, result, false, max_time);
+      Differ< ::std::wstring > d2(A, B, result, false, max_time);
       d2.solve();
 
       // We could now solve this with space complexity O(ND), if that
       // were acceptable:
       if (sz * d2.get_edit_distance() < max_mem) {
-        Differ< ucs4_string > d3(A, B, result, true, d2.get_edit_distance());
+        Differ< ::std::wstring > d3(A, B, result, true, d2.get_edit_distance());
         d3.solve();
         d3.find_trace();
         return;
@@ -508,7 +510,7 @@ namespace DiffAlgo {
       make_trivial_solution(A, B, result);
     }
 
-    catch (Differ< ucs4_string >::max_D_exceeded) {
+    catch (Differ< ::std::wstring >::max_D_exceeded) {
       make_trivial_solution(A, B, result);
     }
   }

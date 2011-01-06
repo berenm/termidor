@@ -6,6 +6,8 @@
 #ifndef ANYTERM_ACTIVITY_SUB_PROCESS_HPP_
 #define ANYTERM_ACTIVITY_SUB_PROCESS_HPP_
 
+#include <vte/vte.h>
+
 #include "anyterm/activity.hpp"
 
 #include <string>
@@ -13,24 +15,24 @@
 namespace anyterm {
   namespace activity {
 
-    // This base class is just so that fd can be initialised before Activity.
-    struct sub_process_base {
-            sub_process_base(::std::pair< ::boost::shared_ptr< ::asiop::stream_descriptor >, ::pid_t > const& filedescriptor_process_id_in);
-        ~sub_process_base();
-
-      protected:
-        ::boost::shared_ptr< ::asiop::stream_descriptor > __file_stream_ptr;
-        ::pid_t const __process_id;
-    };
-
-    class sub_process: private sub_process_base, public activity_base {
-      public:
+    struct sub_process: virtual public activity_base {
         sub_process(activity_base::on_output_slot_t on_output_in,
                     activity_base::on_error_slot_t on_error_in,
                     ::std::string const& command_in,
                     ::std::uint8_t const terminal_row_count_in = 25,
                     ::std::uint8_t const terminal_column_count_in = 80);
-        ~sub_process();
+        virtual ~sub_process();
+
+        virtual void start();
+        virtual void stop();
+
+      protected:
+        GtkWidget* __terminal;
+
+        ::pid_t __process_id;
+        ::std::string const __command;
+        ::std::uint8_t const __terminal_row_count;
+        ::std::uint8_t const __terminal_column_count;
     };
 
   } // namespace activity
