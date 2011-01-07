@@ -134,7 +134,26 @@ img.button {
 .underlined_yes {
   text-decoration: underline;
 }
-
-.foreground_4 {
-  color: #0000cd;
+.cursor_yes {
+  border: 1px solid red;
+  margin: -1px;
 }
+
+.background_0 { background-color: #2E3436; }
+.background_1 { background-color: #CC0000; }
+.background_2 { background-color: #4E9A06; }
+.background_3 { background-color: #C4A000; }
+.background_4 { background-color: #3465A4; }
+.background_5 { background-color: #75507B; }
+.background_6 { background-color: #06989A; }
+.background_7 { background-color: #D3D7CF; }
+
+.foreground_0 { color: #555753; }
+.foreground_1 { color: #EF2929; }
+.foreground_2 { color: #8AE234; }
+.foreground_3 { color: #FCE94F; }
+.foreground_4 { color: #729FCF; }
+.foreground_5 { color: #AD7FA8; }
+.foreground_6 { color: #34E2E2; }
+.foreground_7 { color: #EEEEEC; }
+

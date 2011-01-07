@@ -98,31 +98,6 @@ int handle_request(::anyterm::session_manager& manager,
     response << "<html><head>"
       "<title>FastCGI Echo Example</title>"
       "<head><body>";
-    //      "Request ID = " << request_inout.id() << "<br />"
-    //      "<form method=post enctype=\"multipart/form-data\">"
-    //      "<input type=text name=name value='" << request_inout.post["name"] << "' />"
-    //      "<br />"
-    //      "<input type=text name=hello value='" << request_inout.post["hello"] << "' />"
-    //      "<br />"
-    //      "<input type=file name=user_file />"
-    //      "<input type=hidden name=cmd value=multipart_test />"
-    //      "<br />"
-    //      "<input type=submit value=submit />"
-    //      "</form><p />";
-    //
-    //    //
-    //    // Use the function defined above to show some of the request data.
-    //    // (this function isn't part of the library)
-    //    //
-    //    format_map(response, request_inout, request_inout.env, "Environment Variables");
-    //    format_map(response, request_inout, request_inout.uploads, "File Uploads");
-    //    format_map(response, request_inout, request_inout.cookies, "Cookie Variables");
-    //    format_map(response, request_inout, request_inout.session, "Session Variables");
-
-    // Print the buffer containing the POST data and the FastCGI params.
-    //    response << "<pre>";
-    //    response << std::string(request_inout.post_buffer().begin(), request_inout.post_buffer().end());
-    //    response << "</pre>";
 
     response << "<pre>";
     response << data;

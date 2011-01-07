@@ -25,35 +25,17 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
-::anyterm::attribute get_attribute(::anyterm::screen::attribute_vector_t const& attributes_in,
-                                   ::std::uint32_t row_number_in,
-                                   ::std::uint32_t column_number_in) {
-  ::anyterm::attribute attribute_out;
-  attribute_out.set_row(row_number_in);
-  attribute_out.set_column(column_number_in);
-
-  ::anyterm::screen::attribute_vector_t::const_iterator attribute_it;
-  attribute_it = ::std::find_if(attributes_in.begin(), attributes_in.end(), ::boost::bind(::std::greater<
-      ::anyterm::attribute >(), _1, attribute_out));
-
-  if (attribute_it == attributes_in.begin()) {
-    return ::anyterm::attribute();
-  } else {
-    return *(--attribute_it);
-  }
-}
-
 struct row_transformer {
     row_transformer(::std::stringstream& stream_inout,
-                    ::anyterm::screen::attribute_vector_t const& attributes_in,
+                    ::anyterm::screen const& screen_in,
                     ::std::uint32_t const row_number_in,
                     ::anyterm::attribute& last_attribute_in) :
-      __stream(stream_inout), __attributes(attributes_in), __row_number(row_number_in), __column_number(0),
+      __stream(stream_inout), __screen(screen_in), __row_number(row_number_in), __column_number(0),
           __last_attribute(last_attribute_in) {
     }
 
     void operator()(char const& char_in) {
-      ::anyterm::attribute attribute = get_attribute(__attributes, __row_number, __column_number);
+      ::anyterm::attribute attribute = __screen.get_attribute(__row_number, __column_number);
       if (attribute != __last_attribute) {
         __stream << "</span>";
         __last_attribute = attribute;
@@ -91,52 +73,42 @@ struct row_transformer {
 
   private:
     ::std::stringstream& __stream;
-    ::anyterm::screen::attribute_vector_t const& __attributes;
+    ::anyterm::screen const& __screen;
     ::std::uint32_t const __row_number;
     ::std::uint32_t __column_number;
     ::anyterm::attribute& __last_attribute;
 };
 
 struct lines_transformer {
-    lines_transformer(::std::stringstream& stream_inout,
-                      ::anyterm::screen::attribute_vector_t const& attributes_in) :
-      __stream(stream_inout), __attributes(attributes_in), __row_number(0), __last_attribute() {
+    lines_transformer(::std::stringstream& stream_inout, ::anyterm::screen const& screen_in) :
+      __stream(stream_inout), __screen(screen_in), __row_number(0), __last_attribute() {
     }
 
     void operator()(::std::string const& row_in) {
       ::std::stringstream stream;
       ::std::for_each(row_in.begin(), row_in.end(), row_transformer(stream,
-                                                                    __attributes,
+                                                                    __screen,
                                                                     __row_number,
                                                                     __last_attribute));
-      __stream << ::boost::trim_right_copy(stream.str()) << "<br/>";
+      __stream << stream.str() << "<br/>";
 
       __row_number++;
     }
 
   private:
     ::std::stringstream& __stream;
-    ::anyterm::screen::attribute_vector_t const& __attributes;
+    ::anyterm::screen const& __screen;
     ::std::uint32_t __row_number;
     ::anyterm::attribute __last_attribute;
 };
 
 ::std::string htmlify_screen(::anyterm::screen const& screen_in) {
   ::anyterm::screen::line_vector_t const& lines = screen_in.lines();
-  ::anyterm::screen::attribute_vector_t const& attributes = screen_in.attributes();
 
   ::std::stringstream html_stream;
   html_stream << "<span class='" << ::anyterm::attribute().to_css() << "'>";
 
-  ::std::for_each(lines.begin(), lines.end(), lines_transformer(html_stream, attributes));
-
-  //  for (::std::uint32_t i = 0; i < screen.row_count(); ++i) {
-  //    ::anyterm::screen::const_row_view_t row_view = screen.row(i);
-  //
-  //    ::std::stringstream stream;
-  //    ::std::for_each(row_view.begin(), row_view.end(), lines_transformer(html_stream, last_attributes));
-  //    html_stream << ::boost::trim_right_copy(stream.str());
-  //  }
+  ::std::for_each(lines.begin(), lines.end(), lines_transformer(html_stream, screen_in));
 
   return ::boost::trim_right_copy_if(html_stream.str(), ::boost::is_any_of(" \n")) + "</span>";
 }

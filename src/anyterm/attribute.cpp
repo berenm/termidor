@@ -10,7 +10,8 @@
 namespace anyterm {
 
   attribute::attribute() :
-    __foreground("def_fg"), __background("def_bg"), __underlined(false), __strikethrough(false)
+    __foreground("def_fg"), __background("def_bg"), __underlined(false), __strikethrough(false),
+        __cursor(false)
   //  , __halfbright(false), __bold(false), __blink(false), __inverse(false)
   {
   }
@@ -18,6 +19,7 @@ namespace anyterm {
   bool attribute::operator==(attribute const& other_in) const {
     return __foreground.compare(other_in.__foreground) == 0 && __background.compare(other_in.__background)
         == 0 && __underlined == other_in.__underlined && __strikethrough == other_in.__strikethrough
+        && __cursor == other_in.__cursor;
     //        && __halfbright == other_in.__halfbright && __bold == other_in.__bold && __blink == other_in.__blink && __inverse == other_in.__inverse
     ;
   }
@@ -59,6 +61,9 @@ namespace anyterm {
   void attribute::set_strikethrough(bool const strikethrough_in) {
     __strikethrough = strikethrough_in;
   }
+  void attribute::set_cursor(bool const cursor_in) {
+    __cursor = cursor_in;
+  }
   //  void attribute::set_halfbright(bool const halfbright_in) {
   //    __halfbright = halfbright_in;
   //  }
@@ -75,11 +80,11 @@ namespace anyterm {
   //    __cursor = cursor_in;
   //  }
 
-  ::std::uint32_t attribute::row() {
+  ::std::uint32_t attribute::row() const {
     return __row;
   }
 
-  ::std::uint32_t attribute::column() {
+  ::std::uint32_t attribute::column() const {
     return __column;
   }
 
@@ -89,6 +94,7 @@ namespace anyterm {
     css_classes += "background_" + __background + " ";
     css_classes += ::std::string("underlined_") + (__underlined ? "yes" : "no") + " ";
     css_classes += ::std::string("strikethrough_") + (__strikethrough ? "yes" : "no") + " ";
+    css_classes += ::std::string("cursor_") + (__cursor ? "yes" : "no") + " ";
     //    css_classes += ::std::string("halfbright_") + (__halfbright ? "yes" : "no");
     //    css_classes += ::std::string("bold_") + (__bold ? "yes" : "no");
     //    css_classes += ::std::string("blink_") + (__blink ? "yes" : "no");

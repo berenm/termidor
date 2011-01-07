@@ -47,10 +47,6 @@ namespace anyterm {
   }
 
   void session::send(::std::string k) {
-    //    ::std::clog << "Writing input:'";
-    //    ::std::for_each(k.begin(), k.end(), debug_printer());
-    //    ::std::clog << "'" << ::std::endl;
-
     if (!k.empty()) {
       __terminal.write(k);
     }

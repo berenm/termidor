@@ -1,0 +1,193 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en'
+      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
+      xsi:schemaLocation='http://www.w3.org/1999/xhtml
+                          http://www.w3.org/MarkUp/SCHEMA/xhtml11.xsd'>
+  <head>
+    <title>Anyterm</title>
+    <script type='text/javascript' src='jquery-1.4.4.js'></script>
+    <script type='text/javascript' src='jquery.simulate.js'></script>
+    <script type='text/javascript'>
+
+$(document).keypress(function(event) {
+	  console.log(String.fromCharCode(event.which), event);
+});
+
+$(document).keydown(function(event) {
+  var code = -1;
+  if(event.ctrlKey) {
+    switch(event.which) {
+      case 50:
+      case '@':
+        code = 0;
+        break;
+      case 65:
+      case 'A':
+        code = 1;
+        break;
+      case 66:
+      case 'B':
+        code = 2;
+        break;
+      case 67:
+      case 'C':
+        code = 3;
+        break;
+      case 68:
+      case 'D':
+        code = 4;
+        break;
+      case 69:
+      case 'E':
+        code = 5;
+        break;
+      case 70:
+      case 'F':
+        code = 6;
+        break;
+      case 71:
+      case 'G':
+        code = 7;
+        break;
+      case 72:
+      case 'H':
+        code = 8;
+        break;
+      case 73:
+      case 'I':
+        code = 9;
+        break;
+      case 74:
+      case 'J':
+        code = 10;
+        break;
+      case 75:
+      case 'K':
+        code = 11;
+        break;
+      case 76:
+      case 'L':
+        code = 12;
+        break;
+      case 77:
+      case 'M':
+        code = 13;
+        break;
+      case 78:
+      case 'N':
+        code = 14;
+        break;
+      case 79:
+      case 'O':
+        code = 15;
+        break;
+      case 80:
+      case 'P':
+        code = 16;
+        break;
+      case 81:
+      case 'Q':
+        code = 17;
+        break;
+      case 82:
+      case 'R':
+        code = 18;
+        break;
+      case 83:
+      case 'S':
+        code = 19;
+        break;
+      case 84:
+      case 'T':
+        code = 20;
+        break;
+      case 85:
+      case 'U':
+        code = 21;
+        break;
+      case 86:
+      case 'V':
+        code = 22;
+        break;
+      case 87:
+      case 'W':
+        code = 23;
+        break;
+      case 88:
+      case 'X':
+        code = 24;
+        break;
+      case 89:
+      case 'Y':
+        code = 25;
+        break;
+      case 90:
+      case 'Z':
+        code = 26;
+        break;
+      case 219:
+      case '[':
+        code = 27;
+        break;
+      case 220:
+      case '\\':
+        code = 28;
+        break;
+      case 221:
+      case ']':
+        code = 29;
+        break;
+      case 222:
+      case '^':
+        code = 30;
+        break;
+      case 189:
+      case '_':
+        code = 31;
+        break;
+      case 188:
+      case '?':
+        code = 127;
+        break;
+    }
+  }
+
+  switch(event.which) {
+    case 37:
+      code = 27;
+      $(document).simulate("keypress", { ctrlKey: true, keyCode: code, charCode: code, which: code });
+      code = 'D'.charCodeAt(0);
+      break;
+    case 38:
+      code = 27;
+      $(document).simulate("keypress", { ctrlKey: true, keyCode: code, charCode: code, which: code });
+      code = 'A'.charCodeAt(0);
+      break;
+    case 39:
+      code = 27;
+      $(document).simulate("keypress", { ctrlKey: true, keyCode: code, charCode: code, which: code });
+      code = 'C'.charCodeAt(0);
+      break;
+    case 40:
+      code = 27;
+      $(document).simulate("keypress", { ctrlKey: true, keyCode: code, charCode: code, which: code });
+      code = 'B'.charCodeAt(0);
+      break;
+  }
+    
+  if(code >= 0) {
+    $(document).simulate("keypress", { ctrlKey: true, keyCode: code, charCode: code, which: code });
+    return false;
+  }
+  
+  console.log(event.which, event);
+  return true;
+});
+
+    </script>
+    <link rel='stylesheet' type='text/css' href='anyterm.css'>
+  </head>
+  <body>
+  </body>
+</html>
