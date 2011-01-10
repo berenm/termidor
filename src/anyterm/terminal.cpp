@@ -82,56 +82,13 @@ namespace anyterm {
     reinterpret_cast< terminal* > (data_in)->set_dirty(true);
   }
 
-  terminal::terminal(::std::uint8_t const row_count_in,
-                     ::std::uint8_t const column_count_in,
-                     ::std::uint16_t const scrollback_count_in) {
-    ::std::clog << "terminal()" << ::std::endl;
+  static void set_killed_callback(VteTerminal*, void* data_in) {
+    reinterpret_cast< terminal* > (data_in)->set_alive(false);
+  }
+
+  terminal::terminal() :
+    __alive(false), __dirty(false) {
     __terminal = vte_terminal_new();
-
-    //    g_timeout_add(250, check_terminated_static, this);
-
-    //    g_signal_connect(G_OBJECT(__terminal), "eof", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "encoding-changed", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "emulation-changed", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "contents-changed", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "commit", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "child-exited", G_CALLBACK(gtk_main_quit), NULL);
-    //    g_signal_connect(G_OBJECT(__terminal), "beep", G_CALLBACK(gtk_main_quit), NULL);
-    //    Signals
-    //
-    //      "beep"                                           : Run Last
-    //      "char-size-changed"                              : Run Last
-    //      "child-exited"                                   : Run Last
-    //      "commit"                                         : Run Last
-    //      "contents-changed"                               : Run Last
-    //      "copy-clipboard"                                 : Action
-    //      "cursor-moved"                                   : Run Last
-    //      "decrease-font-size"                             : Run Last
-    //      "deiconify-window"                               : Run Last
-    //      "emulation-changed"                              : Run Last
-    //      "encoding-changed"                               : Run Last
-    //      "eof"                                            : Run Last
-    //      "icon-title-changed"                             : Run Last
-    //      "iconify-window"                                 : Run Last
-    //      "increase-font-size"                             : Run Last
-    //      "lower-window"                                   : Run Last
-    //      "maximize-window"                                : Run Last
-    //      "move-window"                                    : Run Last
-    //      "paste-clipboard"                                : Action
-    //      "raise-window"                                   : Run Last
-    //      "refresh-window"                                 : Run Last
-    //      "resize-window"                                  : Run Last
-    //      "restore-window"                                 : Run Last
-    //      "selection-changed"                              : Run Last
-    //      "status-line-changed"                            : Run Last
-    //      "text-deleted"                                   : Run Last
-    //      "text-inserted"                                  : Run Last
-    //      "text-modified"                                  : Run Last
-    //      "text-scrolled"                                  : Run Last
-    //      "window-title-changed"                           : Run Last
-
-    set_size(row_count_in, column_count_in);
-    set_scrollback_size(scrollback_count_in);
 
     vte_terminal_set_audible_bell(VTE_TERMINAL(__terminal), false);
     vte_terminal_set_visible_bell(VTE_TERMINAL(__terminal), false);
@@ -140,13 +97,7 @@ namespace anyterm {
     vte_terminal_set_scroll_on_keystroke(VTE_TERMINAL(__terminal), true);
     vte_terminal_set_backspace_binding(VTE_TERMINAL(__terminal), VTE_ERASE_AUTO);
     vte_terminal_set_delete_binding(VTE_TERMINAL(__terminal), VTE_ERASE_AUTO);
-
-    //    ::std::cout << "emulation: " << vte_terminal_get_emulation(VTE_TERMINAL(__terminal)) << ::std::endl;
-    //    ::std::cout << "default emulation: " << vte_terminal_get_default_emulation(VTE_TERMINAL(__terminal))
-    //        << ::std::endl;
     vte_terminal_set_emulation(VTE_TERMINAL(__terminal), "xterm");
-
-    //    ::std::cout << "encoding: " << vte_terminal_get_encoding(VTE_TERMINAL(__terminal)) << ::std::endl;
     vte_terminal_set_encoding(VTE_TERMINAL(__terminal), "utf8");
 
     g_signal_connect(G_OBJECT(__terminal), "beep", G_CALLBACK(set_dirty_callback), this);
@@ -160,16 +111,17 @@ namespace anyterm {
     g_signal_connect(G_OBJECT(__terminal), "text-inserted", G_CALLBACK(set_dirty_callback), this);
     g_signal_connect(G_OBJECT(__terminal), "text-modified", G_CALLBACK(set_dirty_callback), this);
     g_signal_connect(G_OBJECT(__terminal), "text-scrolled", G_CALLBACK(set_dirty_callback_i), this);
+
+    g_signal_connect(G_OBJECT(__terminal), "child-exited", G_CALLBACK(set_killed_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "eof", G_CALLBACK(set_killed_callback), this);
   }
 
   terminal::~terminal() {
     gtk_widget_destroy(__terminal);
-    ::close(vte_terminal_get_pty(VTE_TERMINAL(__terminal)));
-
-    ::std::clog << "~terminal()" << ::std::endl;
+    ::close(vte_terminal_get_pty(VTE_TERMINAL( __terminal)));
   }
 
-  void terminal::set_size(::std::uint8_t const row_count_in, ::std::uint8_t const column_count_in) {
+  void terminal::set_size(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in) {
     vte_terminal_set_size(VTE_TERMINAL(__terminal), column_count_in, row_count_in);
   }
   void terminal::set_scrollback_size(::std::int16_t const scrollback_size_in) {
@@ -196,28 +148,48 @@ namespace anyterm {
     return row_out;
   }
 
-  void terminal::fork_command(::std::string const& command_in) {
-    char* args[] = { "/bin/sh", "-c", const_cast< char* > (command_in.c_str()), NULL };
-    vte_terminal_fork_command(VTE_TERMINAL(__terminal), "/bin/sh", args, NULL, NULL, false, false, false);
+  void terminal::login(::std::string const& username_in) {
+    ::std::string command = "su ";
+    command += username_in;
+    command += " - ";
+
+    //    char const* args[] = { "/bin/sh", "-c", const_cast< char* > (command.c_str()), NULL };
+    char const* args[] = { "/bin/bash", "-l", NULL };
+    vte_terminal_fork_command(VTE_TERMINAL(__terminal),
+                              "/bin/bash",
+                              const_cast< char** > (args),
+                              NULL,
+                              NULL,
+                              false,
+                              false,
+                              false);
+
+    set_alive(true);
   }
 
-  void terminal::write(::std::string const& string_in) {
-    vte_terminal_feed_child(VTE_TERMINAL(__terminal), string_in.c_str(), string_in.size());
+  bool terminal::is_alive() const {
+    return __alive;
+  }
+  void terminal::set_alive(bool const alive_in) {
+    __alive = alive_in;
   }
 
-  bool terminal::is_dirty() {
+  bool terminal::is_dirty() const {
     return __dirty;
   }
-
   void terminal::set_dirty(bool const dirty_in) {
     __dirty = dirty_in;
+  }
+
+  void terminal::write(::std::string const& data_in) {
+    vte_terminal_feed_child(VTE_TERMINAL(__terminal), data_in.c_str(), data_in.size());
   }
 
   screen terminal::read() {
     palette().apply(__terminal);
 
     GArray* attributes_array = g_array_new(false, false, sizeof(VteCharAttributes));
-    char* text = vte_terminal_get_text(VTE_TERMINAL(__terminal), NULL, NULL, attributes_array);
+    char* text = vte_terminal_get_text_include_trailing_spaces(VTE_TERMINAL(__terminal), NULL, NULL, attributes_array);
     __dirty = false;
 
     screen::line_vector_t lines;

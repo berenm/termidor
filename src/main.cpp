@@ -9,25 +9,6 @@
 
 #include "anyterm/session_manager.hpp"
 
-//#include "Anyterm.hh"
-
-// The styling information for the page, just to make things look nicer.
-static const char* gCSS_text = "body { padding: 0; margin: 3%; border-color: #efe; }"
-  "ul.data-map .title"
-  "{ font-weight: bold; font-size: large; }"
-  "ul.data-map"
-  "{ border: 1px dotted; padding: 2px 3px 2px 3px; margin-bottom: 3%; }"
-  "ul.data-map li"
-  "{ border-top: 1px dotted; overflow: auto; padding: 0; margin: 0; }"
-  "ul.data-map div.name"
-  "{ position: relative; float: left; width: 30%; font-weight: bold; }"
-  "ul.data-map div.value"
-  "{ position: relative; float: left; width: 65%; left: 1%;"
-  " border-left: 1px solid; padding: 0 5px 0 5px;"
-  " overflow: auto; white-space: pre; }"
-  ".clear"
-  "{ clear: both; }";
-
 //
 // This function writes the title and map contents to the ostream in an
 // HTML-encoded format (to make them easier on the eye).
@@ -58,53 +39,52 @@ int handle_request(::anyterm::session_manager& manager,
   // Load in the request data so we can access it easily.
   request_inout.load(::boost::fcgi::parse_all); // Read and parse STDIN (ie. POST) data.
 
-
   ::boost::shared_ptr< ::anyterm::session > session_ptr = manager.get_session(request_inout.session.id());
 
-  ::std::cout << request_inout.query_string() << ::std::endl;
-
-  ::std::string mode = request_inout.get["mode"];
-  ::std::string action = request_inout.get["a"];
-  ::std::string data;
+  ::std::string action = request_inout.post["action"];
+  if (action.empty()) {
+    action = request_inout.get["action"];
+  }
 
   ::boost::fcgi::response response;
-  if (action.compare("open") == 0) { //  || !session_ptr
-    ::std::uint8_t row_count = ::boost::lexical_cast< ::std::uint32_t >(request_inout.get["r"]);
-    ::std::uint8_t column_count = ::boost::lexical_cast< ::std::uint32_t >(request_inout.get["c"]);
+  if (action.compare("open") == 0) {
+    ::std::uint16_t row_count = ::boost::lexical_cast< int >(request_inout.post["row_count"]);
+    ::std::uint16_t column_count = ::boost::lexical_cast< int >(request_inout.post["column_count"]);
+    ::std::string username = request_inout.post["username"];
 
-    //    // Close last session and start a new one.
+    // Close last session and start a new one.
     request_inout.session.loaded(false);
     request_inout.session.id("");
     request_inout.start_session();
-    manager.new_session(request_inout.session.id(), row_count, column_count);
-  } else if (action.compare("send") == 0 && session_ptr) {
-    session_ptr->send(request_inout.get["k"]);
-  } else if (action.compare("recv") == 0 && session_ptr) {
-    //    do {
-    data = session_ptr->receive();
+
+    manager.new_session(request_inout.session.id(), username, row_count, column_count);
+
+  } else if (action.compare("resize") == 0 && session_ptr) {
+    ::std::cout << request_inout.post["row_count"] << ::std::endl;
+    ::std::cout << request_inout.post["column_count"] << ::std::endl;
+    ::std::uint16_t row_count = ::boost::lexical_cast< int >(request_inout.post["row_count"]);
+    ::std::uint16_t column_count = ::boost::lexical_cast< int >(request_inout.post["column_count"]);
+
+    session_ptr->resize(row_count, column_count);
+
+  } else if (action.compare("write") == 0 && session_ptr) {
+    session_ptr->write(request_inout.post["data"]);
+
+  } else if (action.compare("read") == 0 && session_ptr) {
+    ::std::string data = session_ptr->read();
 
     if (data.empty()) {
       response << ::boost::fcgi::http::not_modified;
       response << ::boost::fcgi::header("Status", "304");
-      return ::boost::fcgi::commit(request_inout, response);
+    } else {
+      response << ::boost::fcgi::content_type("text/html");
+      response << ::boost::fcgi::charset("utf-8");
+      response << data;
     }
   }
 
-  // Responses in CGI programs require at least a 'Content-type' header. The
-  // library provides helpers for several common headers:
-
-  // Construct a `response` object (makes writing/sending responses easier).
-  if (mode.compare("json") == 0) {
-    response << ::boost::fcgi::content_type("application/json");
-    response << "{\"data\": \"" << data << "\"}";
-  } else {
-    response << ::boost::fcgi::content_type("text/html");
-    response << data;
-  }
-  response << ::boost::fcgi::charset("utf-8");
-
   // Response headers can be added at any time before send/flushing it:
-  response << ::boost::fcgi::content_length(response); // the content-length (returns std::size_t)
+  response << ::boost::fcgi::content_length(response);
 
   int status = 0;
   try {
@@ -126,7 +106,6 @@ int main() {
   //  Anyterm anyterm("", "", "ascii", true, 20);
 
   try {
-    ::std::cerr << "*** Ping! ***" << '\n';
     // Make a `service` (more about this in other examples).
     ::boost::fcgi::service s;
 
@@ -147,12 +126,12 @@ int main() {
     // This is the type of exception thrown by the library.
     std::cerr << "[fcgi] System error: " << se.what() << std::endl;
     return -1;
-  } catch (std::exception const& e) {
-    // Catch any other exceptions
-    std::cerr << "[fcgi] Exception: " << e.what() << std::endl;
-    return -2;
-  } catch (...) {
-    std::cerr << "[fcgi] Uncaught exception!" << std::endl;
-    return -3;
+    //  } catch (std::exception const& e) {
+    //    // Catch any other exceptions
+    //    std::cerr << "[fcgi] Exception: " << e.what() << std::endl;
+    //    return -2;
+    //  } catch (...) {
+    //    std::cerr << "[fcgi] Uncaught exception!" << std::endl;
+    //    return -3;
   }
 }

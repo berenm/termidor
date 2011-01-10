@@ -17,12 +17,10 @@ namespace anyterm {
 
   class terminal {
     public:
-      terminal(::std::uint8_t const row_count_in,
-               ::std::uint8_t const column_count_in,
-               ::std::uint16_t const scrollback_count_in);
+      terminal();
       ~terminal();
 
-      void set_size(::std::uint8_t const row_count_in, ::std::uint8_t const column_count_in);
+      void set_size(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in);
       void set_scrollback_size(::std::int16_t const scrollback_size_in);
 
       ::std::uint32_t column_count();
@@ -31,16 +29,21 @@ namespace anyterm {
       ::std::uint32_t cursor_column();
       ::std::uint32_t cursor_row();
 
-      void fork_command(::std::string const& command_in);
+      void login(::std::string const& username_in = "remi");
 
-      void write(::std::string const& string_in);
+      void write(::std::string const& data_in);
       screen read();
 
-      bool is_dirty();
+      bool is_alive() const;
+      void set_alive(bool const alive_in);
+
+      bool is_dirty() const;
       void set_dirty(bool const dirty_in);
 
     private:
+      volatile bool __alive;
       volatile bool __dirty;
+
       GtkWidget* __terminal;
   };
 

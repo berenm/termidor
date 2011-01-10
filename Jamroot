@@ -1,10 +1,14 @@
 import path ;
 
-lib boost_system ;
-lib boost_filesystem ;
-lib boost_serialization ;
-lib boost_thread ;
-lib boost_iostreams ;
+lib boost_thread : : <search>/usr/local/lib ;
+lib boost_program_options : : <search>/usr/local/lib ;
+lib boost_filesystem : : <search>/usr/local/lib ;
+lib boost_regex : : <search>/usr/local/lib ;
+lib boost_iostreams : : <search>/usr/local/lib ;
+lib boost_date_time : : <search>/usr/local/lib ;
+lib boost_system : : <search>/usr/local/lib ;
+lib boost_serialization : : <search>/usr/local/lib ;
+lib boost_log : : <search>/usr/local/lib ;
 lib util ;
 lib vte ;
 
@@ -48,7 +52,7 @@ rule for-each ( rule : suffix ? : sources * : dependencies * : properties * ) {
   return $(objects) ;
 }
 
-lib anyterm : [ path.glob-tree $(TOP)/src : *.cpp ] [ path.glob-tree $(TOP)/src : *.cpp ] ;
+lib anyterm : [ path.glob-tree $(TOP)/src/anyterm : *.cpp ] ;
 
 exe anytermd : src/main.cpp anyterm ;
 

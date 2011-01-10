@@ -15,25 +15,23 @@
 #include <boost/thread.hpp>
 
 #include "anyterm/html.hpp"
-#include "anyterm/editscript.hpp"
 
 #include <iostream>
 
 namespace anyterm {
 
-  session::session(::std::uint8_t const row_count_in,
-                   ::std::uint8_t const column_count_in,
+  session::session(::std::string const& username_in,
+                   ::std::uint16_t const row_count_in,
+                   ::std::uint16_t const column_count_in,
                    ::std::uint16_t const scrollback_count_in,
                    ::std::uint32_t const timeout_in) :
-    __row_count(row_count_in), __column_count(column_count_in), __scrollback_count(scrollback_count_in),
-        __timeout(timeout_in), __terminal(row_count_in, column_count_in, scrollback_count_in) {
-    ::std::clog << "session()" << ::std::endl;
-    __terminal.fork_command("su username -");
+    __username(username_in), __timeout(timeout_in), __terminal() {
+    __terminal.set_size(row_count_in, column_count_in);
+    __terminal.set_scrollback_size(scrollback_count_in);
     touch();
   }
 
   session::~session() {
-    ::std::clog << "~session()" << ::std::endl;
   }
 
   void session::touch() {
@@ -46,37 +44,27 @@ namespace anyterm {
     return b;
   }
 
-  void session::send(::std::string k) {
-    if (!k.empty()) {
-      __terminal.write(k);
+  void session::resize(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in) {
+    __terminal.set_size(row_count_in, column_count_in);
+  }
+
+  void session::write(::std::string const& data_in) {
+    if (!__terminal.is_alive()) {
+      __terminal.login(__username);
+    }
+
+    if (!data_in.empty()) {
+      __terminal.write(data_in);
     }
 
     touch();
   }
 
-  ::std::string escape_html(::std::string s) {
-    ::std::string t;
-    for (::std::string::size_type i = 0; i < s.length(); i++) {
-      char c = s[i];
-      switch (c) {
-        case '<':
-          t += "&lt;";
-          break;
-        case '>':
-          t += "&gt;";
-          break;
-        case '&':
-          t += "&amp;";
-          break;
-        default:
-          t += c;
-          break;
-      }
+  ::std::string session::read() {
+    if (!__terminal.is_alive()) {
+      __terminal.login(__username);
     }
-    return t;
-  }
 
-  ::std::string session::receive() {
     if (__terminal.is_dirty()) {
       screen current_screen = __terminal.read();
 

@@ -7,7 +7,6 @@
 #define ANYTERM_SESSION_MANAGER_HPP_
 
 #include "anyterm/session.hpp"
-#include "anyterm/activity/sub_process.hpp"
 
 #include <map>
 
@@ -39,9 +38,10 @@ namespace anyterm {
       }
 
       void new_session(::std::string const& session_id_in,
-                       ::std::uint8_t const row_count_in,
-                       ::std::uint8_t const column_count_in) {
-        __sessions[session_id_in].reset(new session(row_count_in, column_count_in));
+                       ::std::string const& username_in,
+                       ::std::uint16_t const row_count_in,
+                       ::std::uint16_t const column_count_in) {
+        __sessions[session_id_in].reset(new session(username_in, row_count_in, column_count_in));
       }
 
       ::boost::shared_ptr< session > get_session(::std::string const& session_id_in) {
