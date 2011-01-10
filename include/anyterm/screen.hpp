@@ -16,14 +16,15 @@
 namespace anyterm {
 
   struct screen {
-      typedef ::std::vector< ::std::string > line_vector_t;
-      typedef ::std::vector< attribute > attribute_vector_t;
+      typedef ::std::vector< ::std::wstring > line_vector_t;
+      typedef ::std::vector< attribute > attribute_line_t;
+      typedef ::std::vector< attribute_line_t > attribute_lines_t;
 
-      screen(line_vector_t const& lines_in, attribute_vector_t attributes_in = attribute_vector_t());
+      screen(line_vector_t const& lines_in, attribute_lines_t attributes_in = attribute_lines_t());
       ~screen();
 
       line_vector_t const& lines() const;
-      attribute_vector_t const& attributes() const;
+      attribute_lines_t const& attributes() const;
 
       ::anyterm::attribute get_attribute(::std::uint32_t const row_number_in,
                                          ::std::uint32_t const column_number_in) const;
@@ -33,7 +34,7 @@ namespace anyterm {
 
     private:
       line_vector_t __lines;
-      attribute_vector_t __attributes;
+      attribute_lines_t __attributes;
   };
 
 } // namespace anyterm

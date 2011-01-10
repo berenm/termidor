@@ -41,8 +41,6 @@ namespace anyterm {
 
     public:
       volatile time_t last_access;
-
-      ::std::string __last_screen_html;
       terminal __terminal;
 
       session(::std::uint8_t const row_count_in = 25,

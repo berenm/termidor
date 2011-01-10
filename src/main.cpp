@@ -58,51 +58,50 @@ int handle_request(::anyterm::session_manager& manager,
   // Load in the request data so we can access it easily.
   request_inout.load(::boost::fcgi::parse_all); // Read and parse STDIN (ie. POST) data.
 
-  // Construct a `response` object (makes writing/sending responses easier).
-  ::boost::fcgi::response response;
 
   ::boost::shared_ptr< ::anyterm::session > session_ptr = manager.get_session(request_inout.session.id());
+
+  ::std::cout << request_inout.query_string() << ::std::endl;
 
   ::std::string mode = request_inout.get["mode"];
   ::std::string action = request_inout.get["a"];
   ::std::string data;
 
-  if (action.compare("open") == 0 || !session_ptr) {
+  ::boost::fcgi::response response;
+  if (action.compare("open") == 0) { //  || !session_ptr
+    ::std::uint8_t row_count = ::boost::lexical_cast< ::std::uint32_t >(request_inout.get["r"]);
+    ::std::uint8_t column_count = ::boost::lexical_cast< ::std::uint32_t >(request_inout.get["c"]);
+
     //    // Close last session and start a new one.
     request_inout.session.loaded(false);
     request_inout.session.id("");
     request_inout.start_session();
-    manager.new_session(request_inout.session.id());
+    manager.new_session(request_inout.session.id(), row_count, column_count);
   } else if (action.compare("send") == 0 && session_ptr) {
     session_ptr->send(request_inout.get["k"]);
   } else if (action.compare("recv") == 0 && session_ptr) {
     //    do {
     data = session_ptr->receive();
-    //      if(data.empty()) {
-    //        ::boost::this_thread::sleep(::boost::posix_time::milliseconds(500));
-    //      }
-    //    } while (data.empty());
+
+    if (data.empty()) {
+      response << ::boost::fcgi::http::not_modified;
+      response << ::boost::fcgi::header("Status", "304");
+      return ::boost::fcgi::commit(request_inout, response);
+    }
   }
 
   // Responses in CGI programs require at least a 'Content-type' header. The
   // library provides helpers for several common headers:
 
-
-  //  format_map(::std::clog, request_inout, request_inout.get, "GET Variables");
-  //  format_map(::std::clog, request_inout, request_inout.post, "POST Variables");
+  // Construct a `response` object (makes writing/sending responses easier).
   if (mode.compare("json") == 0) {
     response << ::boost::fcgi::content_type("application/json");
     response << "{\"data\": \"" << data << "\"}";
   } else {
     response << ::boost::fcgi::content_type("text/html");
-    response << "<html><head>"
-      "<title>FastCGI Echo Example</title>"
-      "<head><body>";
-
-    response << "<pre>";
     response << data;
-    response << "</pre>";
   }
+  response << ::boost::fcgi::charset("utf-8");
 
   // Response headers can be added at any time before send/flushing it:
   response << ::boost::fcgi::content_length(response); // the content-length (returns std::size_t)
@@ -119,6 +118,8 @@ int handle_request(::anyterm::session_manager& manager,
 }
 
 int main() {
+  ::std::setlocale(LC_ALL, "utf8");
+
   g_type_init();
 
   ::anyterm::session_manager manager;

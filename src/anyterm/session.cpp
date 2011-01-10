@@ -77,16 +77,13 @@ namespace anyterm {
   }
 
   ::std::string session::receive() {
-    screen current_screen = __terminal.read();
+    if (__terminal.is_dirty()) {
+      screen current_screen = __terminal.read();
 
-    ::std::string const html = htmlify_screen(current_screen);
-    if (__last_screen_html.compare(html)) {
-      __last_screen_html = html;
-
-      return html;
+      return htmlify_screen(current_screen);
     }
 
-    return __last_screen_html;
+    return "";
   }
 
   bool session::timed_out() {

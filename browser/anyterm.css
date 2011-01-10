@@ -139,6 +139,14 @@ img.button {
   margin: -1px;
 }
 
+html {
+  font-size: 100%;
+}
+
+body {
+  font-size: 0.9em;
+}
+
 .background_0 { background-color: #2E3436; }
 .background_1 { background-color: #CC0000; }
 .background_2 { background-color: #4E9A06; }

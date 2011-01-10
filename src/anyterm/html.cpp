@@ -25,6 +25,8 @@
 #include <boost/bind.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include <boost/regex/pending/unicode_iterator.hpp>
+
 struct row_transformer {
     row_transformer(::std::stringstream& stream_inout,
                     ::anyterm::screen const& screen_in,
@@ -34,13 +36,16 @@ struct row_transformer {
           __last_attribute(last_attribute_in) {
     }
 
-    void operator()(char const& char_in) {
+    void operator()(wchar_t const& char_in) {
       ::anyterm::attribute attribute = __screen.get_attribute(__row_number, __column_number);
       if (attribute != __last_attribute) {
         __stream << "</span>";
         __last_attribute = attribute;
         __stream << "<span class='" << __last_attribute.to_css() << "'>";
       }
+
+      typedef ::boost::u32_to_u8_iterator< ::std::wstring::iterator > to_u8;
+      ::std::wstring wstr(1, char_in);
 
       switch (char_in) {
         case '<':
@@ -56,7 +61,7 @@ struct row_transformer {
           __stream << "<br/>";
           break;
         default:
-          __stream << char_in;
+          __stream << ::std::string(to_u8(wstr.begin()), to_u8(wstr.end()));
           break;
       }
 
@@ -84,7 +89,7 @@ struct lines_transformer {
       __stream(stream_inout), __screen(screen_in), __row_number(0), __last_attribute() {
     }
 
-    void operator()(::std::string const& row_in) {
+    void operator()(::std::wstring const& row_in) {
       ::std::stringstream stream;
       ::std::for_each(row_in.begin(), row_in.end(), row_transformer(stream,
                                                                     __screen,

@@ -36,7 +36,11 @@ namespace anyterm {
       void write(::std::string const& string_in);
       screen read();
 
+      bool is_dirty();
+      void set_dirty(bool const dirty_in);
+
     private:
+      volatile bool __dirty;
       GtkWidget* __terminal;
   };
 

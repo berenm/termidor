@@ -1,5 +1,3 @@
-
-
 function open_term(row_count_in, column_count_in, parameters_in, charset_in, scrollback_count_in) {
   if (scrollback_count_in > 1000) {
     alert("The maximum scrollback is currently limited to 1000 lines.  " + "Please choose a smaller value and try again.");
@@ -16,8 +14,8 @@ function open_term(row_count_in, column_count_in, parameters_in, charset_in, scr
     data: ({
       mode: 'json',
       a: 'open',
-      row_count: row_count_in,
-      column_count: column_count_in,
+      r: row_count_in,
+      c: column_count_in,
       parameters: parameters_in,
       charset: charset_in,
       scrollback_count: scrollback_count_in,
@@ -27,11 +25,18 @@ function open_term(row_count_in, column_count_in, parameters_in, charset_in, scr
     }),
     async: false
   };
-  $.ajax(request);
 
+  $.ajax(request);
 }
 
+var initialTimeout = 50;
+var timeout = 50;
+var timeoutID = 0;
+
+var terminalContents = "";
+
 function get() {
+/*
   request = {
     url: "anytermd",
     type: "GET",
@@ -45,9 +50,25 @@ function get() {
       document.getElementById('terminal').innerHTML = msg.data;
       get();
     }
-  };
+  };*/
 
-  $.ajax(request);
+  $.ajaxSetup({
+      ifModified: true,
+      cache: false
+  });
+
+  $('#terminal').load('anytermd?mode=html&a=recv',
+                      function(text, status, request) {
+                        if(status == "notmodified") {
+                          $('#terminal').html(terminalContents);
+                          timeout *= 1.5;
+                        } else if(status = "success") {
+                          terminalContents = text;
+                          timeout = initialTimeout;
+                        }
+
+                        timeoutID = window.setTimeout(function() { get(); }, timeout);
+                      });
 }
 
 function send(string) {
@@ -60,7 +81,16 @@ function send(string) {
       u: new Date().getTime(),
       k: string
     }),
-    async: true
+    async: false,
+    success: function(msg) {
+      if(timeoutID > 0) {
+        window.clearTimeout(timeoutID);
+        timeoutID = 0;
+      }
+
+      timeout = initialTimeout;
+      timeoutID = window.setTimeout(function() { get(); }, timeout);
+    }
   };
 
   $.ajax(request);
@@ -69,6 +99,43 @@ function send(string) {
 $(document).keypress(function(event) {
   send(String.fromCharCode(event.keyCode));
 });
+
+var codes = {
+  NUL: 0x00,
+  SOH: 0x01,
+  STX: 0x02,
+  ETX: 0x03,
+  EOT: 0x04,
+  ENQ: 0x05,
+  ACK: 0x06,
+  BEL: 0x07,
+  BS: 0x08,
+  HT: 0x09,
+  LF: 0x0A,
+  VT: 0x0B,
+  FF: 0x0C,
+  CR: 0x0D,
+  SO: 0x0E,
+  SI: 0x0F,
+  DLE: 0x10,
+  DC1: 0x11,
+  DC2: 0x12,
+  DC3: 0x13,
+  DC4: 0x14,
+  NAK: 0x15,
+  SYN: 0x16,
+  ETB: 0x17,
+  CAN: 0x18,
+  EM: 0x19,
+  SUB: 0x1A,
+  ESC: 0x1B,
+  FS: 0x1C,
+  GS: 0x1D,
+  RS: 0x1E,
+  US: 0x1F,
+  DEL: 0x7F,
+  CSI: 0x9B,
+};
 
 $(document).keydown(function(event) {
   var code = -1;
@@ -210,17 +277,26 @@ $(document).keydown(function(event) {
   }
 
   switch(event.which) {
+    case 8:
+      code = 0x08;
+      break;
+    case 9:
+      code = 0x09;
+      break;
+    case 46:
+      code = 127;
+      break;
     case 37:
-      send(String.fromCharCode(27) + '[D');
+      send(String.fromCharCode(0x1B) + '[D');
       break;
     case 38:
-      send(String.fromCharCode(27) + '[A');
+      send(String.fromCharCode(0x1B) + '[A');
       break;
     case 39:
-      send(String.fromCharCode(27) + '[C');
+      send(String.fromCharCode(0x1B) + '[C');
       break;
     case 40:
-      send(String.fromCharCode(27) + '[B');
+      send(String.fromCharCode(0x1B) + '[B');
       break;
   }
     

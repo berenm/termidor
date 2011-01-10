@@ -12,6 +12,8 @@
 #include <iostream>
 #include <iomanip>
 
+#include <boost/regex/pending/unicode_iterator.hpp>
+
 namespace anyterm {
 
   struct palette {
@@ -24,16 +26,13 @@ namespace anyterm {
       GdkColor highlight_bg_color;
 
       palette() :
-        default_fg_color( { 0, 0, 0 }), default_bg_color( { 255, 255, 255 }), bold_fg_color( { 1, 0, 0 }),
-            dim_fg_color( { 0, 1, 0 }), cursor_bg_color( { 254, 255, 255 }), highlight_bg_color( { 255,
-                                                                                                   254,
-                                                                                                   255 }) {
-        int offset = 0;
-        for (int color = 0; color < 255; ++color) {
-          offset += ((color % 3) == 0 ? 1 : 0);
-          colors[color].red = offset + ((color % 3) == 0 ? 1 : 0);
-          colors[color].green = offset + ((color % 3) == 1 ? 1 : 0);
-          colors[color].blue = offset + ((color % 3) == 2 ? 1 : 0);
+        default_fg_color( { 0xFF, 0xFF, 0xFF }), default_bg_color( { 0x00, 0x00, 0x00 }),
+            bold_fg_color( { 0xFF, 0xFF, 0xFE }), dim_fg_color( { 0xFF, 0xFF, 0xFD }),
+            cursor_bg_color( { 0x00, 0x00, 0x01 }), highlight_bg_color( { 0x00, 0x00, 0x02 }) {
+        for (int color = 0, value = 0xFFFF03; color < 255 && value < 0xFFFFFD; ++color, ++value) {
+          colors[color].red = (value >> 0x16) & 0xFF;
+          colors[color].green = (value >> 0x08) & 0xFF;
+          colors[color].blue = (value >> 0x00) & 0xFF;
         }
       }
 
@@ -76,6 +75,13 @@ namespace anyterm {
       }
   };
 
+  static void set_dirty_callback(VteTerminal*, void* data_in) {
+    reinterpret_cast< terminal* > (data_in)->set_dirty(true);
+  }
+  static void set_dirty_callback_i(VteTerminal*, int, void* data_in) {
+    reinterpret_cast< terminal* > (data_in)->set_dirty(true);
+  }
+
   terminal::terminal(::std::uint8_t const row_count_in,
                      ::std::uint8_t const column_count_in,
                      ::std::uint16_t const scrollback_count_in) {
@@ -91,6 +97,38 @@ namespace anyterm {
     //    g_signal_connect(G_OBJECT(__terminal), "commit", G_CALLBACK(gtk_main_quit), NULL);
     //    g_signal_connect(G_OBJECT(__terminal), "child-exited", G_CALLBACK(gtk_main_quit), NULL);
     //    g_signal_connect(G_OBJECT(__terminal), "beep", G_CALLBACK(gtk_main_quit), NULL);
+    //    Signals
+    //
+    //      "beep"                                           : Run Last
+    //      "char-size-changed"                              : Run Last
+    //      "child-exited"                                   : Run Last
+    //      "commit"                                         : Run Last
+    //      "contents-changed"                               : Run Last
+    //      "copy-clipboard"                                 : Action
+    //      "cursor-moved"                                   : Run Last
+    //      "decrease-font-size"                             : Run Last
+    //      "deiconify-window"                               : Run Last
+    //      "emulation-changed"                              : Run Last
+    //      "encoding-changed"                               : Run Last
+    //      "eof"                                            : Run Last
+    //      "icon-title-changed"                             : Run Last
+    //      "iconify-window"                                 : Run Last
+    //      "increase-font-size"                             : Run Last
+    //      "lower-window"                                   : Run Last
+    //      "maximize-window"                                : Run Last
+    //      "move-window"                                    : Run Last
+    //      "paste-clipboard"                                : Action
+    //      "raise-window"                                   : Run Last
+    //      "refresh-window"                                 : Run Last
+    //      "resize-window"                                  : Run Last
+    //      "restore-window"                                 : Run Last
+    //      "selection-changed"                              : Run Last
+    //      "status-line-changed"                            : Run Last
+    //      "text-deleted"                                   : Run Last
+    //      "text-inserted"                                  : Run Last
+    //      "text-modified"                                  : Run Last
+    //      "text-scrolled"                                  : Run Last
+    //      "window-title-changed"                           : Run Last
 
     set_size(row_count_in, column_count_in);
     set_scrollback_size(scrollback_count_in);
@@ -102,10 +140,26 @@ namespace anyterm {
     vte_terminal_set_scroll_on_keystroke(VTE_TERMINAL(__terminal), true);
     vte_terminal_set_backspace_binding(VTE_TERMINAL(__terminal), VTE_ERASE_AUTO);
     vte_terminal_set_delete_binding(VTE_TERMINAL(__terminal), VTE_ERASE_AUTO);
+
+    //    ::std::cout << "emulation: " << vte_terminal_get_emulation(VTE_TERMINAL(__terminal)) << ::std::endl;
+    //    ::std::cout << "default emulation: " << vte_terminal_get_default_emulation(VTE_TERMINAL(__terminal))
+    //        << ::std::endl;
     vte_terminal_set_emulation(VTE_TERMINAL(__terminal), "xterm");
+
+    //    ::std::cout << "encoding: " << vte_terminal_get_encoding(VTE_TERMINAL(__terminal)) << ::std::endl;
     vte_terminal_set_encoding(VTE_TERMINAL(__terminal), "utf8");
 
-    palette().apply(__terminal);
+    g_signal_connect(G_OBJECT(__terminal), "beep", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "contents-changed", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "cursor-moved", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "emulation-changed", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "encoding-changed", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "paste-clipboard", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "selection-changed", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "text-deleted", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "text-inserted", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "text-modified", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(__terminal), "text-scrolled", G_CALLBACK(set_dirty_callback_i), this);
   }
 
   terminal::~terminal() {
@@ -151,19 +205,29 @@ namespace anyterm {
     vte_terminal_feed_child(VTE_TERMINAL(__terminal), string_in.c_str(), string_in.size());
   }
 
-  screen terminal::read() {
-    GArray* attributes_array = g_array_new(false, false, sizeof(VteCharAttributes));
-    char* text = vte_terminal_get_text_include_trailing_spaces(VTE_TERMINAL(__terminal),
-                                                               NULL,
-                                                               NULL,
-                                                               attributes_array);
+  bool terminal::is_dirty() {
+    return __dirty;
+  }
 
-    ::std::vector< ::std::string > lines;
+  void terminal::set_dirty(bool const dirty_in) {
+    __dirty = dirty_in;
+  }
+
+  screen terminal::read() {
+    palette().apply(__terminal);
+
+    GArray* attributes_array = g_array_new(false, false, sizeof(VteCharAttributes));
+    char* text = vte_terminal_get_text(VTE_TERMINAL(__terminal), NULL, NULL, attributes_array);
+    __dirty = false;
+
+    screen::line_vector_t lines;
     if (text != NULL) {
+      typedef ::boost::u8_to_u32_iterator< ::std::string::iterator > to_u32;
       ::std::string screen_contents(text);
       delete[] text;
 
-      ::boost::split(lines, screen_contents, ::boost::is_any_of("\n"));
+      ::std::wstring wcontents(to_u32(screen_contents.begin()), to_u32(screen_contents.end()));
+      ::boost::split(lines, wcontents, ::boost::is_any_of(L"\n"));
     }
 
     screen screen_out(lines);

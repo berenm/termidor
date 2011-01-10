@@ -38,8 +38,10 @@ namespace anyterm {
         __background_worker.timed_join(::boost::posix_time::seconds(1));
       }
 
-      void new_session(::std::string const& session_id_in) {
-        __sessions[session_id_in].reset(new session());
+      void new_session(::std::string const& session_id_in,
+                       ::std::uint8_t const row_count_in,
+                       ::std::uint8_t const column_count_in) {
+        __sessions[session_id_in].reset(new session(row_count_in, column_count_in));
       }
 
       ::boost::shared_ptr< session > get_session(::std::string const& session_id_in) {
