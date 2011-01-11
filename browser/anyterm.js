@@ -85,12 +85,15 @@ $(window).resize(function() {
 
 $(document).keypress(function(event) {
   if(!(event.ctrlKey || event.altKey)) {
-    console.log('keypress', event);
+//    console.log('keypress', event);
     Anyterm.write(String.fromCharCode(event.which));
   }
 });
 
+var ESC = String.fromCharCode(0x1B);
+
 var codes = {
+// C0 codes
   NUL: String.fromCharCode(0x00),
   SOH: String.fromCharCode(0x01),
   STX: String.fromCharCode(0x02),
@@ -99,14 +102,14 @@ var codes = {
   ENQ: String.fromCharCode(0x05),
   ACK: String.fromCharCode(0x06),
   BEL: String.fromCharCode(0x07),
-  BS:  String.fromCharCode(0x08),
-  HT:  String.fromCharCode(0x09),
-  LF:  String.fromCharCode(0x0A),
-  VT:  String.fromCharCode(0x0B),
-  FF:  String.fromCharCode(0x0C),
-  CR:  String.fromCharCode(0x0D),
-  SO:  String.fromCharCode(0x0E),
-  SI:  String.fromCharCode(0x0F),
+  BS : String.fromCharCode(0x08),
+  HT : String.fromCharCode(0x09),
+  LF : String.fromCharCode(0x0A),
+  VT : String.fromCharCode(0x0B),
+  FF : String.fromCharCode(0x0C),
+  CR : String.fromCharCode(0x0D),
+  SO : String.fromCharCode(0x0E),
+  SI : String.fromCharCode(0x0F),
   DLE: String.fromCharCode(0x10),
   DC1: String.fromCharCode(0x11),
   DC2: String.fromCharCode(0x12),
@@ -116,72 +119,103 @@ var codes = {
   SYN: String.fromCharCode(0x16),
   ETB: String.fromCharCode(0x17),
   CAN: String.fromCharCode(0x18),
-  EM:  String.fromCharCode(0x19),
+  EM : String.fromCharCode(0x19),
   SUB: String.fromCharCode(0x1A),
   ESC: String.fromCharCode(0x1B),
-  FS:  String.fromCharCode(0x1C),
-  GS:  String.fromCharCode(0x1D),
-  RS:  String.fromCharCode(0x1E),
-  US:  String.fromCharCode(0x1F),
+  FS : String.fromCharCode(0x1C),
+  GS : String.fromCharCode(0x1D),
+  RS : String.fromCharCode(0x1E),
+  US : String.fromCharCode(0x1F),
   DEL: String.fromCharCode(0x7F),
-  CSI: String.fromCharCode(0x9B),
+
+// C1 codes
+  IND: ESC + 'D', // String.fromCharCode(0x84),
+  NEL: ESC + 'E', // String.fromCharCode(0x85),
+  HTS: ESC + 'H', // String.fromCharCode(0x88),
+  RI : ESC + 'M', // String.fromCharCode(0x8D),
+  SS2: ESC + 'N', // String.fromCharCode(0x8E),
+  SS3: ESC + 'O', // String.fromCharCode(0x8F),
+  DCS: ESC + 'P', // String.fromCharCode(0x90),
+  SPA: ESC + 'V', // String.fromCharCode(0x96),
+  EPA: ESC + 'W', // String.fromCharCode(0x97),
+  SOS: ESC + 'X', // String.fromCharCode(0x98),
+  DEC: ESC + 'Z', // String.fromCharCode(0x9A),
+  CSI: ESC + '[', // String.fromCharCode(0x9B),
+  ST : ESC + '\\', // String.fromCharCode(0x9C),
+  OSC: ESC + ']', // String.fromCharCode(0x9D),
+  PM : ESC + '^', // String.fromCharCode(0x9E),
+  APC: ESC + '_', // String.fromCharCode(0x9F),
 };
 
-$(document).keydown(function(event) {
-  if(!event.ctrlKey && !event.shiftKey && !event.altKey) {
-    modifier = '';
-  } else if(!event.ctrlKey && event.shiftKey && !event.altKey) {
-    modifier = ';2';
-  } else if(!event.ctrlKey && !event.shiftKey && event.altKey) {
-    modifier = ';3';
-  } else if(!event.ctrlKey && event.shiftKey && event.altKey) {
-    modifier = ';4';
-  } else if(event.ctrlKey && !event.shiftKey && !event.altKey) {
-    modifier = ';5';
-  } else if(event.ctrlKey && event.shiftKey && !event.altKey) {
-    modifier = ';6';
-  } else if(event.ctrlKey && !event.shiftKey && event.altKey) {
-    modifier = ';7';
+keyMapping = {
+  '45':  { code: codes.CSI, number: '2',  character: '~' }, // Insert
+  '46':  { code: codes.CSI, number: '3',  character: '~' }, // Suppr
+  '33':  { code: codes.CSI, number: '5',  character: '~' }, // Page Up
+  '34':  { code: codes.CSI, number: '6',  character: '~' }, // Page Down
+
+  '35':  { code: codes.SS3, number:  '',  character: 'F' }, // End
+  '36':  { code: codes.SS3, number:  '',  character: 'H' }, // Home
+
+  '37':  { code: codes.SS3, number:  '',  character: 'D', modCode: codes.CSI }, // Left
+  '38':  { code: codes.SS3, number:  '',  character: 'A', modCode: codes.CSI }, // Up
+  '39':  { code: codes.SS3, number:  '',  character: 'C', modCode: codes.CSI }, // Right
+  '40':  { code: codes.SS3, number:  '',  character: 'B', modCode: codes.CSI }, // Down
+
+  '112': { code: codes.SS3, number:  '',  character: 'P' }, // F1
+  '113': { code: codes.SS3, number:  '',  character: 'Q' }, // F2
+  '114': { code: codes.SS3, number:  '',  character: 'R' }, // F3
+  '115': { code: codes.SS3, number:  '',  character: 'S' }, // F4
+
+  '116': { code: codes.CSI, number: '15', character: '~' }, // F5
+
+  '117': { code: codes.CSI, number: '17', character: '~' }, // F6
+  '118': { code: codes.CSI, number: '18', character: '~' }, // F7
+  '119': { code: codes.CSI, number: '19', character: '~' }, // F8
+  '120': { code: codes.CSI, number: '20', character: '~' }, // F9
+  '121': { code: codes.CSI, number: '21', character: '~' }, // F10
+  '122': { code: codes.CSI, number: '23', character: '~' }, // F11
+  '123': { code: codes.CSI, number: '24', character: '~' }, // F12
+}
+
+getModified = function(event, termCode) {
+  if(termCode.modifiable != undefined && !termCode.modifiable) {
+    return termCode.number + termCode.character;
   }
 
+  number = (termCode.number == undefined || termCode.number == '') ? '1' : termCode.number;
+  code = (termCode.modCode == undefined) ? termCode.code : termCode.modCode;
+  character = (termCode.modChar == undefined) ? termCode.character : termCode.modChar;
+
+  if(!event.ctrlKey && !event.shiftKey && !event.altKey) {
+    return termCode.code + termCode.number + termCode.character;
+  } else if(!event.ctrlKey &&  event.shiftKey && !event.altKey) {
+    return code + number + ';2' + character;
+  } else if(!event.ctrlKey && !event.shiftKey &&  event.altKey) {
+    return code + number + ';3' + character;
+  } else if(!event.ctrlKey &&  event.shiftKey &&  event.altKey) {
+    return code + number + ';4' + character;
+  } else if( event.ctrlKey && !event.shiftKey && !event.altKey) {
+    return code + number + ';5' + character;
+  } else if( event.ctrlKey &&  event.shiftKey && !event.altKey) {
+    return code + number + ';6' + character;
+  } else if( event.ctrlKey && !event.shiftKey &&  event.altKey) {
+    return code + number + ';7' + character;
+  } else if( event.ctrlKey &&  event.shiftKey &&  event.altKey) {
+    return code + number + ';8' + character;
+  }
+}
+
+$(document).keydown(function(event) {
   switch(event.which) {
-    case 46:
-      Anyterm.write(codes.CSI + '3' + modifier + '~');
-      return false;
-    case 33:
-      Anyterm.write(codes.CSI + '5' + modifier + '~');
-      return false;
-    case 34:
-      Anyterm.write(codes.CSI + '6' + modifier + '~');
-      return false;
-    case 37:
-      if(modifier != '') {
-        Anyterm.write(codes.ESC + '[1' + modifier + 'D');
-      } else {
-        Anyterm.write(codes.ESC + 'OD');
-      }
-      return false;
-    case 38:
-      if(modifier != '') {
-        Anyterm.write(codes.ESC + '[1' + modifier + 'A');
-      } else {
-        Anyterm.write(codes.ESC + 'OA');
-      }
-      return false;
-    case 39:
-      if(modifier != '') {
-        Anyterm.write(codes.ESC + '[1' + modifier + 'C');
-      } else {
-        Anyterm.write(codes.ESC + 'OC');
-      }
-      return false;
-    case 40:
-      if(modifier != '') {
-        Anyterm.write(codes.ESC + '[1' + modifier + 'B');
-      } else {
-        Anyterm.write(codes.ESC + 'OB');
-      }
-      return false;
+    case 16:
+    case 17:
+    case 18:
+      return true;
+  }
+
+  if(keyMapping[event.which] != undefined) {
+    Anyterm.write(getModified(event, keyMapping[event.which]));
+    return false;
   }
 
   if(event.ctrlKey) {
@@ -333,13 +367,47 @@ $(document).keydown(function(event) {
       case 9:
         Anyterm.write(codes.HT);
         return false;
-      case 35:
-        Anyterm.write(codes.ESC + 'OF');
-        return false;
-      case 36:
-        Anyterm.write(codes.ESC + 'OH');
-        return false;
     }
+  }
+
+  switch(event.which) {
+    case 65:
+    case 66:
+    case 67:
+    case 68:
+    case 69:
+    case 70:
+    case 71:
+    case 72:
+    case 73:
+    case 74:
+    case 75:
+    case 76:
+    case 77:
+    case 78:
+    case 79:
+    case 80:
+    case 81:
+    case 82:
+    case 83:
+    case 84:
+    case 85:
+    case 86:
+    case 87:
+    case 88:
+    case 89:
+    case 90:
+    case 96:
+    case 97:
+    case 98:
+    case 99:
+    case 100:
+    case 101:
+    case 102:
+    case 103:
+    case 104:
+    case 105:
+      return true;
   }
 
   console.log(event.which, event);
