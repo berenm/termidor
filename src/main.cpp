@@ -60,8 +60,6 @@ int handle_request(::anyterm::session_manager& manager,
     manager.new_session(request_inout.session.id(), username, row_count, column_count);
 
   } else if (action.compare("resize") == 0 && session_ptr) {
-    ::std::cout << request_inout.post["row_count"] << ::std::endl;
-    ::std::cout << request_inout.post["column_count"] << ::std::endl;
     ::std::uint16_t row_count = ::boost::lexical_cast< int >(request_inout.post["row_count"]);
     ::std::uint16_t column_count = ::boost::lexical_cast< int >(request_inout.post["column_count"]);
 

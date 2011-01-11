@@ -58,7 +58,7 @@ Anyterm.prototype = {
   },
 
   read: function() {
-    $('#terminal').load('anytermd?action=read', Anyterm.onRead);
+    $('#terminal').load('anytermd?action=read&dummy=', Anyterm.onRead);
   },
 
   onWrite: function(data) {
@@ -71,7 +71,7 @@ Anyterm.prototype = {
   },
 
   write: function(value) {
-    $.post('anytermd', { action: 'write', data: value }, Anyterm.onWrite);
+    $.post('anytermd', { action: 'write', data: value, dummy: '' }, Anyterm.onWrite);
   }
 };
 
@@ -84,7 +84,10 @@ $(window).resize(function() {
 });
 
 $(document).keypress(function(event) {
-  Anyterm.write(String.fromCharCode(event.keyCode));
+  if(!(event.ctrlKey || event.altKey)) {
+    console.log('keypress', event);
+    Anyterm.write(String.fromCharCode(event.which));
+  }
 });
 
 var codes = {
@@ -143,25 +146,41 @@ $(document).keydown(function(event) {
 
   switch(event.which) {
     case 46:
-      Anyterm.write(codes.ESC + '[3' + modifier + '~');
+      Anyterm.write(codes.CSI + '3' + modifier + '~');
       return false;
     case 33:
-      Anyterm.write(codes.ESC + '[5' + modifier + '~');
+      Anyterm.write(codes.CSI + '5' + modifier + '~');
       return false;
     case 34:
-      Anyterm.write(codes.ESC + '[6' + modifier + '~');
+      Anyterm.write(codes.CSI + '6' + modifier + '~');
       return false;
     case 37:
-      Anyterm.write(codes.ESC + '[' + (modifier != '' ? '1' + modifier : '') + 'D');
+      if(modifier != '') {
+        Anyterm.write(codes.ESC + '[1' + modifier + 'D');
+      } else {
+        Anyterm.write(codes.ESC + 'OD');
+      }
       return false;
     case 38:
-      Anyterm.write(codes.ESC + '[' + (modifier != '' ? '1' + modifier : '') + 'A');
+      if(modifier != '') {
+        Anyterm.write(codes.ESC + '[1' + modifier + 'A');
+      } else {
+        Anyterm.write(codes.ESC + 'OA');
+      }
       return false;
     case 39:
-      Anyterm.write(codes.ESC + '[' + (modifier != '' ? '1' + modifier : '') + 'C');
+      if(modifier != '') {
+        Anyterm.write(codes.ESC + '[1' + modifier + 'C');
+      } else {
+        Anyterm.write(codes.ESC + 'OC');
+      }
       return false;
     case 40:
-      Anyterm.write(codes.ESC + '[' + (modifier != '' ? '1' + modifier : '') + 'B');
+      if(modifier != '') {
+        Anyterm.write(codes.ESC + '[1' + modifier + 'B');
+      } else {
+        Anyterm.write(codes.ESC + 'OB');
+      }
       return false;
   }
 
