@@ -15,6 +15,7 @@ Anyterm.prototype = {
   timeoutFactor: 2,
   timeoutId: 0,
   timeout: 50,
+  writeBuffer: '',
 
   resetTimeout: function() {
     Anyterm.timeout = Anyterm.initialTimeout;
@@ -54,10 +55,17 @@ Anyterm.prototype = {
       Anyterm.increaseTimeout();
     } 
 
-    Anyterm.timeoutId = window.setTimeout(Anyterm.read, Anyterm.timeout);
+    if(Anyterm.timeoutId == 0) {
+      Anyterm.timeoutId = window.setTimeout(Anyterm.read, Anyterm.timeout);
+    }
   },
 
   read: function() {
+    if(Anyterm.timeoutId > 0) {
+      window.clearTimeout(Anyterm.timeoutId);
+      Anyterm.timeoutId = 0;
+    }
+
     $('#terminal').load('anytermd?action=read&dummy=', Anyterm.onRead);
   },
 
@@ -68,10 +76,26 @@ Anyterm.prototype = {
     }
 
     Anyterm.timeoutId = window.setTimeout(Anyterm.read, Anyterm.initialTimeout);
+
+    if(Anyterm.writeBuffer == '') {
+      Anyterm.writing = false;
+    } else {
+      Anyterm.flushWriteBuffer();
+    }
+  },
+
+  flushWriteBuffer: function() {
+    var value = Anyterm.writeBuffer;
+    Anyterm.writeBuffer = '';
+    Anyterm.writing = true;
+    $.post('anytermd', { action: 'write', data: value, dummy: '' }, Anyterm.onWrite);
   },
 
   write: function(value) {
-    $.post('anytermd', { action: 'write', data: value, dummy: '' }, Anyterm.onWrite);
+    Anyterm.writeBuffer += value;
+    if(!Anyterm.writing) {
+      Anyterm.flushWriteBuffer();
+    }
   }
 };
 
@@ -85,7 +109,6 @@ $(window).resize(function() {
 
 $(document).keypress(function(event) {
   if(!(event.ctrlKey || event.altKey)) {
-//    console.log('keypress', event);
     Anyterm.write(String.fromCharCode(event.which));
   }
 });
@@ -410,7 +433,6 @@ $(document).keydown(function(event) {
       return true;
   }
 
-  console.log(event.which, event);
   return true;
 });
 
