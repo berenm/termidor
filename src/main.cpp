@@ -124,12 +124,12 @@ int main() {
     // This is the type of exception thrown by the library.
     std::cerr << "[fcgi] System error: " << se.what() << std::endl;
     return -1;
-    //  } catch (std::exception const& e) {
-    //    // Catch any other exceptions
-    //    std::cerr << "[fcgi] Exception: " << e.what() << std::endl;
-    //    return -2;
-    //  } catch (...) {
-    //    std::cerr << "[fcgi] Uncaught exception!" << std::endl;
-    //    return -3;
+  } catch (std::exception const& e) {
+    // Catch any other exceptions
+    std::cerr << "[fcgi] Exception: " << e.what() << std::endl;
+    return -2;
+  } catch (...) {
+    std::cerr << "[fcgi] Uncaught exception!" << std::endl;
+    return -3;
   }
 }

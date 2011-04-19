@@ -136,16 +136,16 @@ namespace anyterm {
   }
 
   ::std::uint32_t terminal::cursor_column() {
-    ::std::int64_t column_out;
-    ::std::int64_t row;
+    glong column_out;
+    glong row;
     vte_terminal_get_cursor_position(VTE_TERMINAL(__terminal), &column_out, &row);
-    return column_out;
+    return static_cast< ::std::uint32_t >(column_out);
   }
   ::std::uint32_t terminal::cursor_row() {
-    ::std::int64_t column;
-    ::std::int64_t row_out;
+    glong column;
+    glong row_out;
     vte_terminal_get_cursor_position(VTE_TERMINAL(__terminal), &column, &row_out);
-    return row_out;
+    return static_cast< ::std::uint32_t >(row_out);
   }
 
   void terminal::login(::std::string const& username_in) {
