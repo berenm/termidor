@@ -101,7 +101,7 @@ struct lines_transformer {
                                                                     __screen,
                                                                     __row_number,
                                                                     __last_attribute));
-      __stream << stream.str() << "<br/>";
+      __stream << ::boost::trim_right_copy_if(stream.str(), ::boost::is_any_of(" \t")) << "<br/>";
 
       __row_number++;
     }
