@@ -11,6 +11,7 @@ lib boost_serialization : : <search>/usr/local/lib ;
 lib boost_log : : <search>/usr/local/lib ;
 lib util ;
 lib vte ;
+lib ncurses ;
 
 project anyterm : requirements
   <include>include/
@@ -25,7 +26,9 @@ project anyterm : requirements
   <library>boost_iostreams
   <library>util
   <library>vte
+  <library>ncurses
   <link>static
+  <variant>debug:<cflags>-DANYTERM_BUILD_DEBUG
   <threading>multi
   <cflags>-std=c++0x
   <cflags>"`pkg-config --cflags vte`"
@@ -54,8 +57,8 @@ rule for-each ( rule : suffix ? : sources * : dependencies * : properties * ) {
 
 lib anyterm : [ path.glob-tree $(TOP)/src/anyterm : *.cpp ] ;
 
-exe anytermd : src/main.cpp anyterm ;
+exe anytermd : src/main.cpp anyterm ; #src/diff_match_patch.cpp ;
 
 install anytermd_dist
-    : anytermd [ for-each exe : : [ path.glob-tree $(TOP)/test : *.cpp ] : anyterm : <include>include/ ]
+    : anytermd # [ for-each exe : : [ path.glob-tree $(TOP)/test : *.cpp ] : anyterm : <include>include/ ] graph
     : <location>./dist/ ;

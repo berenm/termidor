@@ -9,12 +9,20 @@
 
 namespace anyterm {
 
+#ifdef ANYTERM_BUILD_DEBUG
   attribute::attribute() :
-    __foreground("def_fg"), __background("def_bg"), __underlined(false), __strikethrough(false),
-        __cursor(false)
+  __foreground("def_fg"), __background("def_bg"), __underlined(false), __strikethrough(false),
+  __cursor(false)
   //  , __halfbright(false), __bold(false), __blink(false), __inverse(false)
   {
   }
+#else
+  attribute::attribute() :
+    __foreground("d"), __background("d"), __underlined(false), __strikethrough(false), __cursor(false)
+  //  , __halfbright(false), __bold(false), __blink(false), __inverse(false)
+  {
+  }
+#endif
 
   bool attribute::operator==(attribute const& other_in) const {
     return __foreground.compare(other_in.__foreground) == 0 && __background.compare(other_in.__background)
@@ -89,7 +97,9 @@ namespace anyterm {
   }
 
   ::std::string attribute::to_css() const {
-    ::std::string css_classes = "attributes ";
+    ::std::string css_classes;
+#ifdef ANYTERM_BUILD_DEBUG
+    css_classes += "attributes ";
     css_classes += "foreground_" + __foreground + " ";
     css_classes += "background_" + __background + " ";
     css_classes += ::std::string("underlined_") + (__underlined ? "yes" : "no") + " ";
@@ -99,7 +109,18 @@ namespace anyterm {
     //    css_classes += ::std::string("bold_") + (__bold ? "yes" : "no");
     //    css_classes += ::std::string("blink_") + (__blink ? "yes" : "no");
     //    css_classes += ::std::string("inverse_") + (__inverse ? "yes" : "no");
-    //    css_classes += ::std::string("cursor_") + (__cursor ? "yes" : "no");
+#else
+    css_classes += "a ";
+    css_classes += "f" + __foreground + " ";
+    css_classes += "b" + __background + " ";
+    css_classes += ::std::string("u") + (__underlined ? "y" : "n") + " ";
+    css_classes += ::std::string("s") + (__strikethrough ? "y" : "n") + " ";
+    css_classes += ::std::string("c") + (__cursor ? "y" : "n") + " ";
+    //    css_classes += ::std::string("h") + (__halfbright ? "y" : "n");
+    //    css_classes += ::std::string("b") + (__bold ? "y" : "n");
+    //    css_classes += ::std::string("l") + (__blink ? "y" : "n");
+    //    css_classes += ::std::string("i") + (__inverse ? "y" : "n");
+#endif
 
     return css_classes;
   }

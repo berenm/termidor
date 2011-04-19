@@ -39,9 +39,15 @@ struct row_transformer {
     void operator()(wchar_t const& char_in) {
       ::anyterm::attribute attribute = __screen.get_attribute(__row_number, __column_number);
       if (attribute != __last_attribute) {
-        __stream << "</span>";
+        if (__last_attribute != ::anyterm::attribute()) {
+          __stream << "</span>";
+        }
+
+        if (attribute != ::anyterm::attribute()) {
+          __stream << "<span class='" << attribute.to_css() << "'>";
+        }
+
         __last_attribute = attribute;
-        __stream << "<span class='" << __last_attribute.to_css() << "'>";
       }
 
       typedef ::boost::u32_to_u8_iterator< ::std::wstring::iterator > to_u8;
