@@ -1,0 +1,3 @@
+[submodule "ext/cgi"]
+	path = ext/cgi
+	url = git://github.com/berenm/cgi.git
