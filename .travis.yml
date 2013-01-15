@@ -1,0 +1,13 @@
+language: cpp
+script:
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - make test
+compiler:
+  - clang
+  - gcc
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install libboost1.48-all-dev libvte-dev
