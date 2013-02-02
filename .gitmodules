@@ -1,3 +1,6 @@
-[submodule "ext/cgi"]
-	path = ext/cgi
-	url = git://github.com/berenm/cgi.git
+[submodule "cmake/extra"]
+	path = cmake/extra
+	url = git://github.com/berenm/cmake-extra.git
+[submodule "lib/cpp-netlib"]
+	path = lib/cpp-netlib
+	url = git://github.com/cpp-netlib/cpp-netlib.git

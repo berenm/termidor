@@ -16,6 +16,7 @@ Anyterm.prototype = {
   timeoutId: 0,
   timeout: 50,
   writeBuffer: '',
+  writing: false,
 
   resetTimeout: function() {
     Anyterm.timeout = Anyterm.initialTimeout;

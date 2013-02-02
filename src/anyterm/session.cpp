@@ -1,81 +1,53 @@
 /**
  * @file
- * @date Dec 29, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
 #include "anyterm/session.hpp"
 
-#include <sstream>
-#include <iomanip>
-
-#include <unistd.h>
-#include <signal.h>
-
-#include <boost/bind.hpp>
-#include <boost/thread.hpp>
-
-#include "anyterm/html.hpp"
-
-#include <iostream>
-
 namespace anyterm {
 
-  session::session(::std::string const& username_in,
-                   ::std::uint16_t const row_count_in,
-                   ::std::uint16_t const column_count_in,
-                   ::std::uint16_t const scrollback_count_in,
-                   ::std::uint32_t const timeout_in) :
-    __username(username_in), __timeout(timeout_in), __terminal() {
-    __terminal.set_size(row_count_in, column_count_in);
-    __terminal.set_scrollback_size(scrollback_count_in);
-    touch();
+  session::session(std::string const& username, std::uint16_t const row_count, std::uint16_t const column_count, std::uint16_t const scrollback_count, std::chrono::seconds const timeout) :
+    username(username), timeout(timeout), terminal() {
+    this->terminal.set_size(row_count, column_count);
+    this->terminal.set_scrollback_size(scrollback_count);
+    this->touch();
   }
 
-  session::~session() {
+  session::~session() {}
+
+  void session::resize(std::uint16_t const row_count, std::uint16_t const column_count) {
+    this->terminal.set_size(row_count, column_count);
   }
 
-  void session::touch() {
-    last_access = time(NULL);
+  void session::write(std::string const& data) {
+    if (!this->terminal.is_alive())
+      this->terminal.login(username);
+
+    if (!data.empty())
+      this->terminal.write(data);
+
+    this->touch();
   }
 
-  ::std::string int_to_string(int i) {
-    char b[32];
-    snprintf(b, sizeof(b), "%d", i);
-    return b;
-  }
+  std::string session::read() {
+    if (!this->terminal.is_alive())
+      this->terminal.login(this->username);
 
-  void session::resize(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in) {
-    __terminal.set_size(row_count_in, column_count_in);
-  }
-
-  void session::write(::std::string const& data_in) {
-    if (!__terminal.is_alive()) {
-      __terminal.login(__username);
-    }
-
-    if (!data_in.empty()) {
-      __terminal.write(data_in);
-    }
-
-    touch();
-  }
-
-  ::std::string session::read() {
-    if (!__terminal.is_alive()) {
-      __terminal.login(__username);
-    }
-
-    if (__terminal.is_dirty()) {
-      screen current_screen = __terminal.read();
-
-      return htmlify_screen(current_screen);
-    }
+    // if (this->terminal.is_dirty())
+      return this->terminal.read().to_html();
 
     return "";
   }
 
+  void session::touch() {
+    this->last_access = anyterm::clock::now();
+  }
+
   bool session::timed_out() {
-    return time(NULL) - last_access > __timeout;
+    return anyterm::clock::now() - this->last_access > timeout;
   }
 
 } // namespace anyterm

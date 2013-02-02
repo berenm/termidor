@@ -1,17 +1,17 @@
 /**
  * @file
- * @date Dec 15, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef ANYTERM_TERMINAL_HPP_
-#define ANYTERM_TERMINAL_HPP_
+#ifndef __ANYTERM_TERMINAL_HPP__
+#define __ANYTERM_TERMINAL_HPP__
 
-#include <vte/vte.h>
-
-#include "anyterm/attribute.hpp"
-#include "anyterm/screen.hpp"
-
+#include <cstdint>
 #include <string>
+
+#include "anyterm/screen.hpp"
 
 namespace anyterm {
 
@@ -20,33 +20,33 @@ namespace anyterm {
       terminal();
       ~terminal();
 
-      void set_size(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in);
-      void set_scrollback_size(::std::int16_t const scrollback_size_in);
+      void set_size(std::uint16_t const row_count, std::uint16_t const column_count);
+      void set_scrollback_size(std::int16_t const scrollback_size);
 
-      ::std::uint32_t column_count();
-      ::std::uint32_t row_count();
+      std::uint32_t column_count();
+      std::uint32_t row_count();
 
-      ::std::uint32_t cursor_column();
-      ::std::uint32_t cursor_row();
+      std::uint32_t cursor_column();
+      std::uint32_t cursor_row();
 
-      void login(::std::string const& username_in = "remi");
+      void login(std::string const& username);
 
-      void write(::std::string const& data_in);
+      void   write(std::string const& data);
       screen read();
 
       bool is_alive() const;
-      void set_alive(bool const alive_in);
+      void set_alive(bool const alive);
 
       bool is_dirty() const;
-      void set_dirty(bool const dirty_in);
+      void set_dirty(bool const dirty);
 
     private:
-      volatile bool __alive;
-      volatile bool __dirty;
+      bool volatile alive;
+      bool volatile dirty;
 
-      GtkWidget* __terminal;
+      void* widget;
   };
 
 } // namespace anyterm
 
-#endif /* ANYTERM_TERMINAL_HPP_ */
+#endif // ifndef __ANYTERM_TERMINAL_HPP__

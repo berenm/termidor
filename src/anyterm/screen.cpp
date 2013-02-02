@@ -1,101 +1,61 @@
 /**
  * @file
- * @date Dec 16, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
 #include "anyterm/screen.hpp"
 
-#include <iostream>
-
-#include <boost/bind.hpp>
+#include <algorithm>
 
 namespace anyterm {
 
-  screen::screen(line_vector_t const& lines_in, attribute_lines_t attributes_in) :
-    __lines(lines_in), __attributes(attributes_in) {
-    ::std::sort(__attributes.begin(), __attributes.end());
-  }
-  screen::~screen() {
+  screen::screen(text_lines const& lines, text_attributes const& attributes) :
+    lines(lines), attributes(attributes) {
+    std::sort(this->attributes.begin(), this->attributes.end());
   }
 
-  screen::line_vector_t const& screen::lines() const {
-    return __lines;
-  }
-  screen::attribute_lines_t const& screen::attributes() const {
-    return __attributes;
-  }
+  screen::~screen() {}
 
-  ::anyterm::attribute screen::get_attribute(::std::uint32_t const row_number_in,
-                                             ::std::uint32_t const column_number_in) const {
-    //    ::anyterm::attribute attribute_out;
-    //    attribute_out.set_row(row_number_in);
-    //    attribute_out.set_column(column_number_in);
-    //
-    if (__attributes.size() < row_number_in + 1) {
-      return attribute();
-    }
+  screen::text_lines screen::get_lines() const { return this->lines; }
+  screen::text_attributes screen::get_attributes() const { return this->attributes; }
 
-    attribute_line_t const& attributes = __attributes[row_number_in];
-    if (attributes.size() < column_number_in + 1) {
-      return attribute();
-    } else {
-      ::anyterm::attribute attribute_out = attributes[column_number_in];
-      attribute_out.set_row(row_number_in);
-      attribute_out.set_column(column_number_in);
-      return attribute_out;
-    }
-    //
-    //    ::anyterm::screen::attribute_vector_t::const_iterator attribute_it;
-    //    attribute_it = ::std::find_if(__attributes.begin(), __attributes.end(), ::boost::bind(::std::greater<
-    //        ::anyterm::attribute >(), _1, attribute_out));
-    //
-    //    if (attribute_it == __attributes.begin()) {
-    //      return ::anyterm::attribute();
-    //    } else {
-    //      return *(--attribute_it);
-    //    }
+  anyterm::attribute screen::get_attribute(std::uint32_t const row, std::uint32_t const column) const {
+    if (this->attributes.size() < row + 1)
+      return anyterm::attribute();
+
+    screen::line_attributes const& line_attribs = this->attributes[row];
+    if (line_attribs.size() < column + 1)
+      return anyterm::attribute();
+
+    anyterm::attribute attrib = line_attribs[column];
+    attrib.set_row(row);
+    attrib.set_column(column);
+
+    return attrib;
   }
 
-  void screen::set_attribute(::std::uint32_t const row_number_in,
-                             ::std::uint32_t const column_number_in,
-                             ::anyterm::attribute const& attribute_in) {
-    ::anyterm::attribute attribute_out = attribute_in;
-    attribute_out.set_row(row_number_in);
-    attribute_out.set_column(column_number_in);
+  void screen::set_attribute(std::uint32_t const row, std::uint32_t const column, anyterm::attribute const& attribute) {
+    anyterm::attribute attrib = attribute;
 
-    if (__attributes.size() < row_number_in + 1) {
-      __attributes.resize(row_number_in + 1, attribute_line_t());
-    }
+    attrib.set_row(row);
+    attrib.set_column(column);
 
-    attribute_line_t& attributes = __attributes[row_number_in];
-    if (attributes.size() < column_number_in + 1) {
-      attributes.resize(column_number_in + 1, attribute());
-    }
+    if (this->attributes.size() < row + 1)
+      this->attributes.resize(row + 1, screen::line_attributes());
 
-    attributes[column_number_in] = attribute_out;
+    screen::line_attributes& line_attribs = this->attributes[row];
+    if (line_attribs.size() < column + 1)
+      line_attribs.resize(column + 1, anyterm::attribute());
 
-    //    ::anyterm::screen::attribute_vector_t::iterator attribute_it;
-    //    attribute_it
-    //        = ::std::find_if(__attributes.begin(), __attributes.end(), ::boost::bind(::std::greater_equal<
-    //            ::anyterm::attribute >(), _1, attribute));
-    //
-    //    if (attribute_it != __attributes.end()) {
-    //      if (attribute_it->row() == attribute.row() && attribute_it->column() == attribute.column()) {
-    //        __attributes.erase(attribute_it);
-    //      }
-    //    }
-    //
-    //    __attributes.push_back(attribute);
-    //    ::std::sort(__attributes.begin(), __attributes.end());
+    line_attribs[column] = attrib;
+    if (lines.size() < row + 1)
+      lines.resize(row + 1, std::wstring(column, L' '));
 
-    if (__lines.size() < row_number_in + 1) {
-      __lines.resize(row_number_in + 1, ::std::wstring(column_number_in, L' '));
-    }
-
-    ::std::wstring& line = __lines[row_number_in];
-    if (line.size() < column_number_in) {
-      line.append(::std::wstring(column_number_in - line.size(), L' '));
-    }
+    std::wstring& line = lines[row];
+    if (line.size() < column)
+      line.append(std::wstring(column - line.size(), L' '));
   }
 
 } // namespace anyterm

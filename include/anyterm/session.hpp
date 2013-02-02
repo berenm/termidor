@@ -1,52 +1,48 @@
 /**
  * @file
- * @date Dec 29, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef ANYTERM_SESSION_HPP_
-#define ANYTERM_SESSION_HPP_
+#ifndef __ANYTERM_SESSION_HPP__
+#define __ANYTERM_SESSION_HPP__
 
-#include <vector>
+#include <cstdint>
 #include <string>
-#include <boost/scoped_ptr.hpp>
+#include <chrono>
+
+#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 
 #include "anyterm/screen.hpp"
 #include "anyterm/terminal.hpp"
-//#include "Iconver.hh"
-
-#include <iostream>
-#include <boost/algorithm/string.hpp>
 
 namespace anyterm {
+  typedef std::chrono::system_clock clock;
 
-  class session: ::boost::noncopyable {
+  struct session : boost::noncopyable {
     public:
-      ::std::string const __username;
-      ::std::uint32_t const __timeout;
-
-    public:
-      volatile time_t last_access;
-      terminal __terminal;
-
-      session(::std::string const& username_in,
-              ::std::uint16_t const row_count_in,
-              ::std::uint16_t const column_count_in,
-              ::std::uint16_t const scrollback_count_in = 0,
-              ::std::uint32_t const timeout_in = 60);
+      session(std::string const& username, std::uint16_t const row_count, std::uint16_t const column_count, std::uint16_t const scrollback_count=0, std::chrono::seconds const timeout=std::chrono::seconds(60));
       ~session();
 
+      void resize(std::uint16_t const row_count, std::uint16_t const column_count);
+
+      void        write(std::string const& data);
+      std::string read();
+
       void touch();
-      void report_any_backend_error();
-
-      void resize(::std::uint16_t const row_count_in, ::std::uint16_t const column_count_in);
-
-      void write(::std::string const& data_in);
-      ::std::string read();
-
       bool timed_out();
+
+    private:
+      std::string const          username;
+      std::chrono::seconds const timeout;
+      clock::time_point          last_access;
+      anyterm::terminal          terminal;
+
   };
+  typedef boost::shared_ptr< session > session_ptr;
 
 } // namespace anyterm
 
-#endif /* ANYTERM_SESSION_HPP_ */
+#endif // ifndef __ANYTERM_SESSION_HPP__

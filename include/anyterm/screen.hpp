@@ -1,42 +1,42 @@
 /**
  * @file
- * @date Dec 15, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef ANYTERM_SCREEN_HPP_
-#define ANYTERM_SCREEN_HPP_
+#ifndef __ANYTERM_SCREEN_HPP__
+#define __ANYTERM_SCREEN_HPP__
+
+#include <cstdint>
+#include <string>
+#include <vector>
 
 #include "anyterm/attribute.hpp"
-
-#include <boost/multi_array.hpp>
-
-#include <vector>
-#include <algorithm>
 
 namespace anyterm {
 
   struct screen {
-      typedef ::std::vector< ::std::wstring > line_vector_t;
-      typedef ::std::vector< attribute > attribute_line_t;
-      typedef ::std::vector< attribute_line_t > attribute_lines_t;
+    public:
+      typedef std::vector< std::wstring >    text_lines;
+      typedef std::vector< attribute >       line_attributes;
+      typedef std::vector< line_attributes > text_attributes;
 
-      screen(line_vector_t const& lines_in, attribute_lines_t attributes_in = attribute_lines_t());
+      screen(text_lines const& lines, text_attributes const& attributes=text_attributes());
       ~screen();
 
-      line_vector_t const& lines() const;
-      attribute_lines_t const& attributes() const;
+      text_lines      get_lines() const;
+      text_attributes get_attributes() const;
+      std::string     to_html() const;
 
-      ::anyterm::attribute get_attribute(::std::uint32_t const row_number_in,
-                                         ::std::uint32_t const column_number_in) const;
-      void set_attribute(::std::uint32_t const row_number_in,
-                         ::std::uint32_t const column_number_in,
-                         ::anyterm::attribute const& attribute_in);
+      anyterm::attribute get_attribute(std::uint32_t const row, std::uint32_t const column) const;
+      void               set_attribute(std::uint32_t const row, std::uint32_t const column, anyterm::attribute const& attribute);
 
     private:
-      line_vector_t __lines;
-      attribute_lines_t __attributes;
+      text_lines      lines;
+      text_attributes attributes;
   };
 
 } // namespace anyterm
 
-#endif /* ANYTERM_SCREEN_HPP_ */
+#endif // ifndef __ANYTERM_SCREEN_HPP__

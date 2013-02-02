@@ -1,10 +1,12 @@
 /**
  * @file
- * @date Dec 15, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef ANYTERM_ATTRIBUTE_HPP_
-#define ANYTERM_ATTRIBUTE_HPP_
+#ifndef __ANYTERM_ATTRIBUTE_HPP__
+#define __ANYTERM_ATTRIBUTE_HPP__
 
 #include <cstdint>
 #include <string>
@@ -12,48 +14,51 @@
 namespace anyterm {
 
   struct attribute {
+    public:
       attribute();
 
-      bool operator==(attribute const& other_in) const;
-      bool operator!=(attribute const& other_in) const;
-      bool operator<(attribute const& other_in) const;
-      bool operator<=(attribute const& other_in) const;
-      bool operator>(attribute const& other_in) const;
-      bool operator>=(attribute const& other_in) const;
+      bool operator==(attribute const& o) const;
+      bool operator!=(attribute const& o) const;
+      bool operator<(attribute const& o) const;
+      bool operator<=(attribute const& o) const;
+      bool operator>(attribute const& o) const;
+      bool operator>=(attribute const& o) const;
 
-      void set_row(::std::uint32_t const row_in);
-      void set_column(::std::uint32_t const column_in);
-      void set_foreground(::std::string const& foreground_in);
-      void set_background(::std::string const& foreground_in);
-      void set_underlined(bool const underlined_in);
-      void set_strikethrough(bool const strikethrough_in);
-      void set_cursor(bool const cursor_in);
-      //      void set_halfbright(bool const halfbright_in);
-      //      void set_bold(bool const bold_in);
-      //      void set_blink(bool const blink_in);
-      //      void set_inverse(bool const inverse_in);
-      //      void set_cursor(bool const cursor_in);
+      void set_row(std::uint32_t const row);
+      void set_column(std::uint32_t const column);
+      void set_foreground(std::string const& foreground);
+      void set_background(std::string const& foreground);
+      void set_underlined(bool const underlined);
+      void set_strikethrough(bool const strikethrough);
+      void set_cursor(bool const cursor);
 
-      ::std::uint32_t row() const;
-      ::std::uint32_t column() const;
+      // void set_halfbright(bool const halfbright);
+      // void set_bold(bool const bold);
+      // void set_blink(bool const blink);
+      // void setverse(bool const inverse);
+      // void set_cursor(bool const cursor);
 
-      ::std::string to_css() const;
+      std::uint32_t get_row() const;
+      std::uint32_t get_column() const;
 
-    protected:
-      ::std::uint32_t __row;
-      ::std::uint32_t __column;
-      ::std::string __foreground;
-      ::std::string __background;
-      bool __underlined;
-      bool __strikethrough;
-      bool __cursor;
-      //      bool __halfbright;
-      //      bool __bold;
-      //      bool __blink;
-      //      bool __inverse;
-      //      bool __cursor;
+      std::string to_css() const;
+
+    private:
+      std::uint32_t row;
+      std::uint32_t column;
+      std::string   foreground;
+      std::string   background;
+      bool          underlined;
+      bool          strikethrough;
+      bool          cursor;
+
+      // bool halfbright;
+      // bool bold;
+      // bool blink;
+      // bool inverse;
+      // bool cursor;
   };
 
 } // namespace anyterm
 
-#endif /* ANYTERM_ATTRIBUTE_HPP_ */
+#endif // ifndef __ANYTERM_ATTRIBUTE_HPP__

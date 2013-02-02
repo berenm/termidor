@@ -1,126 +1,157 @@
 /**
  * @file
- * @date Dec 16, 2010
+ *
+ * Distributed under the Boost Software License, Version 1.0.
+ * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
 #include "anyterm/attribute.hpp"
-
-#include <boost/lexical_cast.hpp>
 
 namespace anyterm {
 
 #ifdef ANYTERM_BUILD_DEBUG
   attribute::attribute() :
-  __foreground("def_fg"), __background("def_bg"), __underlined(false), __strikethrough(false),
-  __cursor(false)
-  //  , __halfbright(false), __bold(false), __blink(false), __inverse(false)
-  {
-  }
-#else
+    foreground("def_fg"),
+    background("def_bg"),
+    underlined(false),
+    strikethrough(false),
+    cursor(false)
+
+    // , halfbright(false)
+    // , bold(false)
+    // , blink(false)
+    // , inverse(false)
+  {}
+
+#else // ifdef ANYTERM_BUILD_DEBUG
   attribute::attribute() :
-    __foreground("d"), __background("d"), __underlined(false), __strikethrough(false), __cursor(false)
-  //  , __halfbright(false), __bold(false), __blink(false), __inverse(false)
-  {
-  }
-#endif
+    foreground("d"),
+    background("d"),
+    underlined(false),
+    strikethrough(false),
+    cursor(false)
 
-  bool attribute::operator==(attribute const& other_in) const {
-    return __foreground.compare(other_in.__foreground) == 0 && __background.compare(other_in.__background)
-        == 0 && __underlined == other_in.__underlined && __strikethrough == other_in.__strikethrough
-        && __cursor == other_in.__cursor;
-    //        && __halfbright == other_in.__halfbright && __bold == other_in.__bold && __blink == other_in.__blink && __inverse == other_in.__inverse
-    ;
-  }
+    // , halfbright(false)
+    // , bold(false)
+    // , blink(false)
+    // , inverse(false)
+  {}
 
-  bool attribute::operator!=(attribute const& other_in) const {
-    return !operator==(other_in);
-  }
+#endif // ifdef ANYTERM_BUILD_DEBUG
 
-  bool attribute::operator<(attribute const& other_in) const {
-    return __row < other_in.__row || (__row == other_in.__row && __column < other_in.__column);
-  }
-  bool attribute::operator<=(attribute const& other_in) const {
-    return __row < other_in.__row || (__row == other_in.__row && __column <= other_in.__column);
-  }
-  bool attribute::operator>(attribute const& other_in) const {
-    return __row > other_in.__row || (__row == other_in.__row && __column > other_in.__column);
-  }
-  bool attribute::operator>=(attribute const& other_in) const {
-    return __row > other_in.__row || (__row == other_in.__row && __column >= other_in.__column);
+  bool attribute::operator==(attribute const& o) const {
+    return this->foreground == o.foreground
+           && this->background == o.background
+           && underlined == o.underlined
+           && strikethrough == o.strikethrough
+           && cursor == o.cursor;
+
+    // && halfbright == o.halfbright
+    // && bold == o.bold
+    // && blink == o.blink
+    // && inverse == o.inverse
   }
 
-  void attribute::set_row(::std::uint32_t const row_in) {
-    __row = row_in;
+  bool attribute::operator!=(attribute const& o) const {
+    return !operator==(o);
   }
 
-  void attribute::set_column(::std::uint32_t const column_in) {
-    __column = column_in;
+  bool attribute::operator<(attribute const& o) const {
+    return this->row < o.row || (this->row == o.row && this->column < o.column);
   }
 
-  void attribute::set_foreground(::std::string const& foreground_in) {
-    __foreground = foreground_in;
-  }
-  void attribute::set_background(::std::string const& background_in) {
-    __background = background_in;
-  }
-  void attribute::set_underlined(bool const underlined_in) {
-    __underlined = underlined_in;
-  }
-  void attribute::set_strikethrough(bool const strikethrough_in) {
-    __strikethrough = strikethrough_in;
-  }
-  void attribute::set_cursor(bool const cursor_in) {
-    __cursor = cursor_in;
-  }
-  //  void attribute::set_halfbright(bool const halfbright_in) {
-  //    __halfbright = halfbright_in;
-  //  }
-  //  void attribute::set_bold(bool const bold_in) {
-  //    __bold = bold_in;
-  //  }
-  //  void attribute::set_blink(bool const blink_in) {
-  //    __blink = blink_in;
-  //  }
-  //  void attribute::set_inverse(bool const inverse_in) {
-  //    __inverse = inverse_in;
-  //  }
-  //  void attribute::set_cursor(bool const cursor_in) {
-  //    __cursor = cursor_in;
-  //  }
-
-  ::std::uint32_t attribute::row() const {
-    return __row;
+  bool attribute::operator<=(attribute const& o) const {
+    return this->row < o.row || (this->row == o.row && this->column <= o.column);
   }
 
-  ::std::uint32_t attribute::column() const {
-    return __column;
+  bool attribute::operator>(attribute const& o) const {
+    return this->row > o.row || (this->row == o.row && this->column > o.column);
   }
 
-  ::std::string attribute::to_css() const {
-    ::std::string css_classes;
+  bool attribute::operator>=(attribute const& o) const {
+    return this->row > o.row || (this->row == o.row && this->column >= o.column);
+  }
+
+  void attribute::set_row(std::uint32_t const row) {
+    this->row = row;
+  }
+
+  void attribute::set_column(std::uint32_t const column) {
+    this->column = column;
+  }
+
+  void attribute::set_foreground(std::string const& foreground) {
+    this->foreground = foreground;
+  }
+
+  void attribute::set_background(std::string const& background) {
+    this->background = background;
+  }
+
+  void attribute::set_underlined(bool const underlined) {
+    this->underlined = underlined;
+  }
+
+  void attribute::set_strikethrough(bool const strikethrough) {
+    this->strikethrough = strikethrough;
+  }
+
+  void attribute::set_cursor(bool const cursor) {
+    this->cursor = cursor;
+  }
+
+  // void attribute::set_halfbright(bool const halfbright) {
+  // this->halfbright = halfbright;
+  // }
+  // void attribute::set_bold(bool const bold) {
+  // this->bold = bold;
+  // }
+  // void attribute::set_blink(bool const blink) {
+  // this->blink = blink;
+  // }
+  // void attribute::setverse(bool const inverse) {
+  // this->inverse = inverse;
+  // }
+  // void attribute::set_cursor(bool const cursor) {
+  // this->cursor = cursor;
+  // }
+
+  std::uint32_t attribute::get_row() const {
+    return this->row;
+  }
+
+  std::uint32_t attribute::get_column() const {
+    return this->column;
+  }
+
+  std::string attribute::to_css() const {
+    std::string css_classes;
+
 #ifdef ANYTERM_BUILD_DEBUG
     css_classes += "attributes ";
-    css_classes += "foreground_" + __foreground + " ";
-    css_classes += "background_" + __background + " ";
-    css_classes += ::std::string("underlined_") + (__underlined ? "yes" : "no") + " ";
-    css_classes += ::std::string("strikethrough_") + (__strikethrough ? "yes" : "no") + " ";
-    css_classes += ::std::string("cursor_") + (__cursor ? "yes" : "no") + " ";
-    //    css_classes += ::std::string("halfbright_") + (__halfbright ? "yes" : "no");
-    //    css_classes += ::std::string("bold_") + (__bold ? "yes" : "no");
-    //    css_classes += ::std::string("blink_") + (__blink ? "yes" : "no");
-    //    css_classes += ::std::string("inverse_") + (__inverse ? "yes" : "no");
-#else
+    css_classes += "foreground_" + this->foreground + " ";
+    css_classes += "background_" + this->background + " ";
+    css_classes += std::string("underlined_") + (this->underlined ? "yes" : "no") + " ";
+    css_classes += std::string("strikethrough_") + (this->strikethrough ? "yes" : "no") + " ";
+    css_classes += std::string("cursor_") + (this->cursor ? "yes" : "no") + " ";
+
+    // css_classes += std::string("halfbright_") + (this->halfbright ? "yes" : "no");
+    // css_classes += std::string("bold_") + (this->bold ? "yes" : "no");
+    // css_classes += std::string("blink_") + (this->blink ? "yes" : "no");
+    // css_classes += std::string("inverse_") + (this->inverse ? "yes" : "no");
+#else // ifdef ANYTERM_BUILD_DEBUG
     css_classes += "a ";
-    css_classes += "f" + __foreground + " ";
-    css_classes += "b" + __background + " ";
-    css_classes += ::std::string("u") + (__underlined ? "y" : "n") + " ";
-    css_classes += ::std::string("s") + (__strikethrough ? "y" : "n") + " ";
-    css_classes += ::std::string("c") + (__cursor ? "y" : "n") + " ";
-    //    css_classes += ::std::string("h") + (__halfbright ? "y" : "n");
-    //    css_classes += ::std::string("b") + (__bold ? "y" : "n");
-    //    css_classes += ::std::string("l") + (__blink ? "y" : "n");
-    //    css_classes += ::std::string("i") + (__inverse ? "y" : "n");
-#endif
+    css_classes += "f" + this->foreground + " ";
+    css_classes += "b" + this->background + " ";
+    css_classes += std::string("u") + (this->underlined ? "y" : "n") + " ";
+    css_classes += std::string("s") + (this->strikethrough ? "y" : "n") + " ";
+    css_classes += std::string("c") + (this->cursor ? "y" : "n") + " ";
+
+    // css_classes += std::string("h") + (this->halfbright ? "y" : "n");
+    // css_classes += std::string("b") + (this->bold ? "y" : "n");
+    // css_classes += std::string("l") + (this->blink ? "y" : "n");
+    // css_classes += std::string("i") + (this->inverse ? "y" : "n");
+#endif // ifdef ANYTERM_BUILD_DEBUG
 
     return css_classes;
   }

@@ -1,7 +1,17 @@
 cmake_minimum_required(VERSION 2.8)
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+include(CMakeExtraBootstrap)
 include(GNUInstallDirs)
+include(AddSubmodule)
+include(FindCXX11)
+include(FixCCache)
+include(FixStaticLink)
+
 
 project(anyterm CXX)
+
+add_submodule(cpp-netlib git://github.com/cpp-netlib/cpp-netlib.git lib/cpp-netlib TAG 0.9.4 INCLUDE_DIRS .)
 
 find_package(Boost COMPONENTS thread program_options filesystem regex iostreams date_time system serialization REQUIRED)
 find_package(PkgConfig REQUIRED)
@@ -42,7 +52,7 @@ target_link_libraries(anyterm ${VTE_LIBRARIES} ${Boost_LIBRARIES})
 # -------------------------------------------------------------------------
 # anytermd
 add_executable(anytermd src/anytermd.cpp)
-target_link_libraries(anytermd anyterm ${Boost_LIBRARIES})
+target_link_libraries(anytermd anyterm ${Boost_LIBRARIES} cppnetlib-uri)
 
 # -------------------------------------------------------------------------
 # installation
