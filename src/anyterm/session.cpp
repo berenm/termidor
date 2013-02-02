@@ -36,7 +36,7 @@ namespace anyterm {
     if (!this->terminal.is_alive())
       this->terminal.login(this->username);
 
-    // if (this->terminal.is_dirty())
+    if (this->terminal.is_dirty())
       return this->terminal.read().to_html();
 
     return "";

@@ -17,6 +17,14 @@ namespace anyterm {
     public:
       attribute();
 
+      static char const default_foreground[];
+      static char const default_background[];
+      static char const default_bold[];
+      static char const default_faint[];
+      static char const default_bright[];
+      static char const default_cursor[];
+      static char const unkonwn[];
+
       bool operator==(attribute const& o) const;
       bool operator!=(attribute const& o) const;
       bool operator<(attribute const& o) const;
@@ -31,12 +39,10 @@ namespace anyterm {
       void set_underlined(bool const underlined);
       void set_strikethrough(bool const strikethrough);
       void set_cursor(bool const cursor);
-
-      // void set_halfbright(bool const halfbright);
-      // void set_bold(bool const bold);
-      // void set_blink(bool const blink);
-      // void setverse(bool const inverse);
-      // void set_cursor(bool const cursor);
+      void set_bold(bool const bold);
+      void set_faint(bool const faint);
+      void set_bright(bool const bright);
+      void set_blink(bool const blink);
 
       std::uint32_t get_row() const;
       std::uint32_t get_column() const;
@@ -51,12 +57,10 @@ namespace anyterm {
       bool          underlined;
       bool          strikethrough;
       bool          cursor;
-
-      // bool halfbright;
-      // bool bold;
-      // bool blink;
-      // bool inverse;
-      // bool cursor;
+      bool          bold;
+      bool          faint;
+      bool          bright;
+      bool          blink;
   };
 
 } // namespace anyterm

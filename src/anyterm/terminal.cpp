@@ -18,22 +18,22 @@ namespace anyterm {
   namespace {
 
     struct palette {
-      GdkColor       colors[255];
+      GdkColor       colors[256];
       GdkColor const default_fg_color;
       GdkColor const default_bg_color;
       GdkColor const bold_fg_color;
-      GdkColor const dim_fg_color;
+      GdkColor const faint_fg_color;
       GdkColor const cursor_bg_color;
-      GdkColor const highlight_bg_color;
+      GdkColor const bright_bg_color;
 
       palette() :
         default_fg_color({ 0xFF, 0xFF, 0xFF }),
         default_bg_color({ 0x00, 0x00, 0x00 }),
         bold_fg_color({ 0xFF, 0xFF, 0xFE }),
-        dim_fg_color({ 0xFF, 0xFF, 0xFD }),
+        faint_fg_color({ 0xFF, 0xFF, 0xFD }),
         cursor_bg_color({ 0x00, 0x00, 0x01 }),
-        highlight_bg_color({ 0x00, 0x00, 0x0 }) {
-        for (std::size_t color = 0, value = 0xFFFF03; color < 255 && value < 0xFFFFFD; ++color, ++value) {
+        bright_bg_color({ 0x00, 0x00, 0x0 }) {
+        for (std::size_t color = 0, value = 0xFFFF03; color < 256 && value < 0xFFFFFD; ++color, ++value) {
           this->colors[color].red   = (value >> 0x16) & 0xFF;
           this->colors[color].green = (value >> 0x08) & 0xFF;
           this->colors[color].blue  = (value >> 0x00) & 0xFF;
@@ -46,30 +46,30 @@ namespace anyterm {
         vte_terminal_set_color_background(VTE_TERMINAL(widget), &this->default_bg_color);
         vte_terminal_set_color_cursor(VTE_TERMINAL(widget), &this->cursor_bg_color);
         vte_terminal_set_color_bold(VTE_TERMINAL(widget), &this->bold_fg_color);
-        vte_terminal_set_color_dim(VTE_TERMINAL(widget), &this->dim_fg_color);
-        vte_terminal_set_color_highlight(VTE_TERMINAL(widget), &this->highlight_bg_color);
+        vte_terminal_set_color_dim(VTE_TERMINAL(widget), &this->faint_fg_color);
+        vte_terminal_set_color_highlight(VTE_TERMINAL(widget), &this->bright_bg_color);
       }
 
       std::string get_color(GdkColor const& color) const {
         if (gdk_color_equal(&color, &this->default_fg_color))
-          return "def_fg";
+          return attribute::default_foreground;
 
         if (gdk_color_equal(&color, &this->default_bg_color))
-          return "def_bg";
+          return attribute::default_background;
 
         if (gdk_color_equal(&color, &this->bold_fg_color))
-          return "def_bold";
+          return attribute::default_bold;
 
-        if (gdk_color_equal(&color, &this->dim_fg_color))
-          return "def_dim";
+        if (gdk_color_equal(&color, &this->faint_fg_color))
+          return attribute::default_faint;
 
         if (gdk_color_equal(&color, &this->cursor_bg_color))
-          return "cursor_bg";
+          return attribute::default_cursor;
 
-        if (gdk_color_equal(&color, &this->highlight_bg_color))
-          return "highlight_bg";
+        if (gdk_color_equal(&color, &this->bright_bg_color))
+          return attribute::default_bright;
 
-        for (std::size_t i = 0; i < 255; ++i) {
+        for (std::size_t i = 0; i < 256; ++i) {
           if (gdk_color_equal(&color, &this->colors[i]))
             return boost::lexical_cast< std::string >(i);
         }
@@ -95,7 +95,7 @@ namespace anyterm {
 
   terminal::terminal() :
     alive(false),
-    dirty(false),
+    dirty(true),
     widget(vte_terminal_new()) {
 
     vte_terminal_set_audible_bell(VTE_TERMINAL(this->widget), false);
@@ -119,6 +119,11 @@ namespace anyterm {
     g_signal_connect(G_OBJECT(this->widget), "text-inserted", G_CALLBACK(set_dirty_callback), this);
     g_signal_connect(G_OBJECT(this->widget), "text-modified", G_CALLBACK(set_dirty_callback), this);
     g_signal_connect(G_OBJECT(this->widget), "text-scrolled", G_CALLBACK(set_dirty_callback_i), this);
+
+    // g_signal_connect(G_OBJECT(this->widget), "current-directory-uri-changed", G_CALLBACK(set_dirty_callback), this);
+    // g_signal_connect(G_OBJECT(this->widget), "current-file-uri-changed", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(this->widget), "decrease-font-size", G_CALLBACK(set_dirty_callback), this);
+    g_signal_connect(G_OBJECT(this->widget), "increase-font-size", G_CALLBACK(set_dirty_callback), this);
 
     g_signal_connect(G_OBJECT(this->widget), "child-exited", G_CALLBACK(set_killed_callback), this);
     g_signal_connect(G_OBJECT(this->widget), "eof", G_CALLBACK(set_killed_callback), this);
@@ -173,7 +178,7 @@ namespace anyterm {
     char const* args[] = { "/bin/bash", "-l", nullptr };
     vte_terminal_fork_command_full(VTE_TERMINAL(this->widget), VTE_PTY_DEFAULT, nullptr, const_cast< char** >(args), nullptr, static_cast< GSpawnFlags >(0), nullptr, nullptr, nullptr, nullptr);
 
-    this->set_alive(true);
+    this->alive = true;
   }
 
   bool terminal::is_alive() const {
@@ -194,6 +199,7 @@ namespace anyterm {
 
   void terminal::write(std::string const& data) {
     vte_terminal_feed_child(VTE_TERMINAL(this->widget), data.c_str(), data.size());
+    this->dirty = true;
   }
 
   screen terminal::read() {
@@ -239,6 +245,10 @@ namespace anyterm {
       cell_attributes.set_underlined(vte_attributes.underline);
       cell_attributes.set_row(current_row);
       cell_attributes.set_column(current_column);
+      cell_attributes.set_bold(vte_attributes.bold);
+      cell_attributes.set_faint(vte_attributes.half);
+      cell_attributes.set_bright(vte_attributes.standout);
+      cell_attributes.set_blink(vte_attributes.blink);
 
       screen.set_attribute(current_row, current_column, cell_attributes);
     }

@@ -431,9 +431,9 @@ $(document).keydown(function(event) {
     case 103:
     case 104:
     case 105:
-      return true;
+      return false;
   }
 
-  return true;
+  return false;
 });
 

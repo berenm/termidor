@@ -9,7 +9,7 @@ body {
   color: #839496;
 
   font-family: "Dejavu Sans Mono" monospace;
-  font-size: 0.9em;
+  font-size: 1em;
 
   height: 100%;
   width: 100%;
@@ -18,7 +18,7 @@ body {
 
 pre {
   font-family: "Dejavu Sans Mono" monospace;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 .terminal-frame {
@@ -62,45 +62,533 @@ pre {
   padding: 0;
 }
 
-.underlined_yes, .uy { text-decoration: underline; }
+.underlined_yes,    .uy { text-decoration: underline; }
+.strikethrough_yes, .sy { text-decoration: line-through; }
+.bold_yes,          .by { font-weight: bold; }
+.faint_yes,         .hy { opacity: 0.5; }
+.bright_yes,        .iy { }
+.blink_yes,         .ly { text-decoration: blink; }
 
 .cursor_yes, .cy { outline: 1px solid red; }
 
-.foreground_def_bg, .bd { background-color: transparent; }
-.background_0, .b0   { background-color: #002b36; }
-.background_1, .b1   { background-color: #cb4b16; }
-.background_2, .b2   { background-color: #586e75; }
-.background_3, .b3   { background-color: #657b83; }
-.background_4, .b4   { background-color: #839496; }
-.background_5, .b5   { background-color: #6c71c4; }
-.background_6, .b6   { background-color: #93a1a1; }
-.background_7, .b7   { background-color: #fdf6e3; }
+.foreground_D,  .bD  { background-color: transparent; }
+.background_0,  .b0  { background-color: #002b36; }
+.background_1,  .b1  { background-color: #cb4b16; }
+.background_2,  .b2  { background-color: #586e75; }
+.background_3,  .b3  { background-color: #657b83; }
+.background_4,  .b4  { background-color: #839496; }
+.background_5,  .b5  { background-color: #6c71c4; }
+.background_6,  .b6  { background-color: #93a1a1; }
+.background_7,  .b7  { background-color: #fdf6e3; }
 
-.background_8, .b8   { background-color: #073642; }
-.background_9, .b9   { background-color: #dc322f; }
-.background_10, .b10   { background-color: #859900; }
-.background_11, .b11   { background-color: #b58900; }
-.background_12, .b12   { background-color: #268bd2; }
-.background_13, .b13   { background-color: #d33682; }
-.background_14, .b14   { background-color: #2aa198; }
-.background_15, .b15   { background-color: #eee8d5; }
+.background_8,  .b8  { background-color: #073642; }
+.background_9,  .b9  { background-color: #dc322f; }
+.background_10, .b10 { background-color: #859900; }
+.background_11, .b11 { background-color: #b58900; }
+.background_12, .b12 { background-color: #268bd2; }
+.background_13, .b13 { background-color: #d33682; }
+.background_14, .b14 { background-color: #2aa198; }
+.background_15, .b15 { background-color: #eee8d5; }
 
-.foreground_def_fg, .fd { color: #839496; }
-.foreground_0, .f0   { color: #073642; }
-.foreground_1, .f1   { color: #dc322f; }
-.foreground_2, .f2   { color: #859900; }
-.foreground_3, .f3   { color: #b58900; }
-.foreground_4, .f4   { color: #268bd2; }
-.foreground_5, .f5   { color: #d33682; }
-.foreground_6, .f6   { color: #2aa198; }
-.foreground_7, .f7   { color: #eee8d5; }
+.background_16, .b16 { background-color: rgb(0, 0, 0); }
+.background_17, .b17 { background-color: rgb(0, 0, 51); }
+.background_18, .b18 { background-color: rgb(0, 0, 102); }
+.background_19, .b19 { background-color: rgb(0, 0, 153); }
+.background_20, .b20 { background-color: rgb(0, 0, 204); }
+.background_21, .b21 { background-color: rgb(0, 0, 255); }
+.background_22, .b22 { background-color: rgb(0, 51, 0); }
+.background_23, .b23 { background-color: rgb(0, 51, 51); }
+.background_24, .b24 { background-color: rgb(0, 51, 102); }
+.background_25, .b25 { background-color: rgb(0, 51, 153); }
+.background_26, .b26 { background-color: rgb(0, 51, 204); }
+.background_27, .b27 { background-color: rgb(0, 51, 255); }
+.background_28, .b28 { background-color: rgb(0, 102, 0); }
+.background_29, .b29 { background-color: rgb(0, 102, 51); }
+.background_30, .b30 { background-color: rgb(0, 102, 102); }
+.background_31, .b31 { background-color: rgb(0, 102, 153); }
+.background_32, .b32 { background-color: rgb(0, 102, 204); }
+.background_33, .b33 { background-color: rgb(0, 102, 255); }
+.background_34, .b34 { background-color: rgb(0, 153, 0); }
+.background_35, .b35 { background-color: rgb(0, 153, 51); }
+.background_36, .b36 { background-color: rgb(0, 153, 102); }
+.background_37, .b37 { background-color: rgb(0, 153, 153); }
+.background_38, .b38 { background-color: rgb(0, 153, 204); }
+.background_39, .b39 { background-color: rgb(0, 153, 255); }
+.background_40, .b40 { background-color: rgb(0, 204, 0); }
+.background_41, .b41 { background-color: rgb(0, 204, 51); }
+.background_42, .b42 { background-color: rgb(0, 204, 102); }
+.background_43, .b43 { background-color: rgb(0, 204, 153); }
+.background_44, .b44 { background-color: rgb(0, 204, 204); }
+.background_45, .b45 { background-color: rgb(0, 204, 255); }
+.background_46, .b46 { background-color: rgb(0, 255, 0); }
+.background_47, .b47 { background-color: rgb(0, 255, 51); }
+.background_48, .b48 { background-color: rgb(0, 255, 102); }
+.background_49, .b49 { background-color: rgb(0, 255, 153); }
+.background_50, .b50 { background-color: rgb(0, 255, 204); }
+.background_51, .b51 { background-color: rgb(0, 255, 255); }
+.background_52, .b52 { background-color: rgb(51, 0, 0); }
+.background_53, .b53 { background-color: rgb(51, 0, 51); }
+.background_54, .b54 { background-color: rgb(51, 0, 102); }
+.background_55, .b55 { background-color: rgb(51, 0, 153); }
+.background_56, .b56 { background-color: rgb(51, 0, 204); }
+.background_57, .b57 { background-color: rgb(51, 0, 255); }
+.background_58, .b58 { background-color: rgb(51, 51, 0); }
+.background_59, .b59 { background-color: rgb(51, 51, 51); }
+.background_60, .b60 { background-color: rgb(51, 51, 102); }
+.background_61, .b61 { background-color: rgb(51, 51, 153); }
+.background_62, .b62 { background-color: rgb(51, 51, 204); }
+.background_63, .b63 { background-color: rgb(51, 51, 255); }
+.background_64, .b64 { background-color: rgb(51, 102, 0); }
+.background_65, .b65 { background-color: rgb(51, 102, 51); }
+.background_66, .b66 { background-color: rgb(51, 102, 102); }
+.background_67, .b67 { background-color: rgb(51, 102, 153); }
+.background_68, .b68 { background-color: rgb(51, 102, 204); }
+.background_69, .b69 { background-color: rgb(51, 102, 255); }
+.background_70, .b70 { background-color: rgb(51, 153, 0); }
+.background_71, .b71 { background-color: rgb(51, 153, 51); }
+.background_72, .b72 { background-color: rgb(51, 153, 102); }
+.background_73, .b73 { background-color: rgb(51, 153, 153); }
+.background_74, .b74 { background-color: rgb(51, 153, 204); }
+.background_75, .b75 { background-color: rgb(51, 153, 255); }
+.background_76, .b76 { background-color: rgb(51, 204, 0); }
+.background_77, .b77 { background-color: rgb(51, 204, 51); }
+.background_78, .b78 { background-color: rgb(51, 204, 102); }
+.background_79, .b79 { background-color: rgb(51, 204, 153); }
+.background_80, .b80 { background-color: rgb(51, 204, 204); }
+.background_81, .b81 { background-color: rgb(51, 204, 255); }
+.background_82, .b82 { background-color: rgb(51, 255, 0); }
+.background_83, .b83 { background-color: rgb(51, 255, 51); }
+.background_84, .b84 { background-color: rgb(51, 255, 102); }
+.background_85, .b85 { background-color: rgb(51, 255, 153); }
+.background_86, .b86 { background-color: rgb(51, 255, 204); }
+.background_87, .b87 { background-color: rgb(51, 255, 255); }
+.background_88, .b88 { background-color: rgb(102, 0, 0); }
+.background_89, .b89 { background-color: rgb(102, 0, 51); }
+.background_90, .b90 { background-color: rgb(102, 0, 102); }
+.background_91, .b91 { background-color: rgb(102, 0, 153); }
+.background_92, .b92 { background-color: rgb(102, 0, 204); }
+.background_93, .b93 { background-color: rgb(102, 0, 255); }
+.background_94, .b94 { background-color: rgb(102, 51, 0); }
+.background_95, .b95 { background-color: rgb(102, 51, 51); }
+.background_96, .b96 { background-color: rgb(102, 51, 102); }
+.background_97, .b97 { background-color: rgb(102, 51, 153); }
+.background_98, .b98 { background-color: rgb(102, 51, 204); }
+.background_99, .b99 { background-color: rgb(102, 51, 255); }
+.background_100, .b100 { background-color: rgb(102, 102, 0); }
+.background_101, .b101 { background-color: rgb(102, 102, 51); }
+.background_102, .b102 { background-color: rgb(102, 102, 102); }
+.background_103, .b103 { background-color: rgb(102, 102, 153); }
+.background_104, .b104 { background-color: rgb(102, 102, 204); }
+.background_105, .b105 { background-color: rgb(102, 102, 255); }
+.background_106, .b106 { background-color: rgb(102, 153, 0); }
+.background_107, .b107 { background-color: rgb(102, 153, 51); }
+.background_108, .b108 { background-color: rgb(102, 153, 102); }
+.background_109, .b109 { background-color: rgb(102, 153, 153); }
+.background_110, .b110 { background-color: rgb(102, 153, 204); }
+.background_111, .b111 { background-color: rgb(102, 153, 255); }
+.background_112, .b112 { background-color: rgb(102, 204, 0); }
+.background_113, .b113 { background-color: rgb(102, 204, 51); }
+.background_114, .b114 { background-color: rgb(102, 204, 102); }
+.background_115, .b115 { background-color: rgb(102, 204, 153); }
+.background_116, .b116 { background-color: rgb(102, 204, 204); }
+.background_117, .b117 { background-color: rgb(102, 204, 255); }
+.background_118, .b118 { background-color: rgb(102, 255, 0); }
+.background_119, .b119 { background-color: rgb(102, 255, 51); }
+.background_120, .b120 { background-color: rgb(102, 255, 102); }
+.background_121, .b121 { background-color: rgb(102, 255, 153); }
+.background_122, .b122 { background-color: rgb(102, 255, 204); }
+.background_123, .b123 { background-color: rgb(102, 255, 255); }
+.background_124, .b124 { background-color: rgb(153, 0, 0); }
+.background_125, .b125 { background-color: rgb(153, 0, 51); }
+.background_126, .b126 { background-color: rgb(153, 0, 102); }
+.background_127, .b127 { background-color: rgb(153, 0, 153); }
+.background_128, .b128 { background-color: rgb(153, 0, 204); }
+.background_129, .b129 { background-color: rgb(153, 0, 255); }
+.background_130, .b130 { background-color: rgb(153, 51, 0); }
+.background_131, .b131 { background-color: rgb(153, 51, 51); }
+.background_132, .b132 { background-color: rgb(153, 51, 102); }
+.background_133, .b133 { background-color: rgb(153, 51, 153); }
+.background_134, .b134 { background-color: rgb(153, 51, 204); }
+.background_135, .b135 { background-color: rgb(153, 51, 255); }
+.background_136, .b136 { background-color: rgb(153, 102, 0); }
+.background_137, .b137 { background-color: rgb(153, 102, 51); }
+.background_138, .b138 { background-color: rgb(153, 102, 102); }
+.background_139, .b139 { background-color: rgb(153, 102, 153); }
+.background_140, .b140 { background-color: rgb(153, 102, 204); }
+.background_141, .b141 { background-color: rgb(153, 102, 255); }
+.background_142, .b142 { background-color: rgb(153, 153, 0); }
+.background_143, .b143 { background-color: rgb(153, 153, 51); }
+.background_144, .b144 { background-color: rgb(153, 153, 102); }
+.background_145, .b145 { background-color: rgb(153, 153, 153); }
+.background_146, .b146 { background-color: rgb(153, 153, 204); }
+.background_147, .b147 { background-color: rgb(153, 153, 255); }
+.background_148, .b148 { background-color: rgb(153, 204, 0); }
+.background_149, .b149 { background-color: rgb(153, 204, 51); }
+.background_150, .b150 { background-color: rgb(153, 204, 102); }
+.background_151, .b151 { background-color: rgb(153, 204, 153); }
+.background_152, .b152 { background-color: rgb(153, 204, 204); }
+.background_153, .b153 { background-color: rgb(153, 204, 255); }
+.background_154, .b154 { background-color: rgb(153, 255, 0); }
+.background_155, .b155 { background-color: rgb(153, 255, 51); }
+.background_156, .b156 { background-color: rgb(153, 255, 102); }
+.background_157, .b157 { background-color: rgb(153, 255, 153); }
+.background_158, .b158 { background-color: rgb(153, 255, 204); }
+.background_159, .b159 { background-color: rgb(153, 255, 255); }
+.background_160, .b160 { background-color: rgb(204, 0, 0); }
+.background_161, .b161 { background-color: rgb(204, 0, 51); }
+.background_162, .b162 { background-color: rgb(204, 0, 102); }
+.background_163, .b163 { background-color: rgb(204, 0, 153); }
+.background_164, .b164 { background-color: rgb(204, 0, 204); }
+.background_165, .b165 { background-color: rgb(204, 0, 255); }
+.background_166, .b166 { background-color: rgb(204, 51, 0); }
+.background_167, .b167 { background-color: rgb(204, 51, 51); }
+.background_168, .b168 { background-color: rgb(204, 51, 102); }
+.background_169, .b169 { background-color: rgb(204, 51, 153); }
+.background_170, .b170 { background-color: rgb(204, 51, 204); }
+.background_171, .b171 { background-color: rgb(204, 51, 255); }
+.background_172, .b172 { background-color: rgb(204, 102, 0); }
+.background_173, .b173 { background-color: rgb(204, 102, 51); }
+.background_174, .b174 { background-color: rgb(204, 102, 102); }
+.background_175, .b175 { background-color: rgb(204, 102, 153); }
+.background_176, .b176 { background-color: rgb(204, 102, 204); }
+.background_177, .b177 { background-color: rgb(204, 102, 255); }
+.background_178, .b178 { background-color: rgb(204, 153, 0); }
+.background_179, .b179 { background-color: rgb(204, 153, 51); }
+.background_180, .b180 { background-color: rgb(204, 153, 102); }
+.background_181, .b181 { background-color: rgb(204, 153, 153); }
+.background_182, .b182 { background-color: rgb(204, 153, 204); }
+.background_183, .b183 { background-color: rgb(204, 153, 255); }
+.background_184, .b184 { background-color: rgb(204, 204, 0); }
+.background_185, .b185 { background-color: rgb(204, 204, 51); }
+.background_186, .b186 { background-color: rgb(204, 204, 102); }
+.background_187, .b187 { background-color: rgb(204, 204, 153); }
+.background_188, .b188 { background-color: rgb(204, 204, 204); }
+.background_189, .b189 { background-color: rgb(204, 204, 255); }
+.background_190, .b190 { background-color: rgb(204, 255, 0); }
+.background_191, .b191 { background-color: rgb(204, 255, 51); }
+.background_192, .b192 { background-color: rgb(204, 255, 102); }
+.background_193, .b193 { background-color: rgb(204, 255, 153); }
+.background_194, .b194 { background-color: rgb(204, 255, 204); }
+.background_195, .b195 { background-color: rgb(204, 255, 255); }
+.background_196, .b196 { background-color: rgb(255, 0, 0); }
+.background_197, .b197 { background-color: rgb(255, 0, 51); }
+.background_198, .b198 { background-color: rgb(255, 0, 102); }
+.background_199, .b199 { background-color: rgb(255, 0, 153); }
+.background_200, .b200 { background-color: rgb(255, 0, 204); }
+.background_201, .b201 { background-color: rgb(255, 0, 255); }
+.background_202, .b202 { background-color: rgb(255, 51, 0); }
+.background_203, .b203 { background-color: rgb(255, 51, 51); }
+.background_204, .b204 { background-color: rgb(255, 51, 102); }
+.background_205, .b205 { background-color: rgb(255, 51, 153); }
+.background_206, .b206 { background-color: rgb(255, 51, 204); }
+.background_207, .b207 { background-color: rgb(255, 51, 255); }
+.background_208, .b208 { background-color: rgb(255, 102, 0); }
+.background_209, .b209 { background-color: rgb(255, 102, 51); }
+.background_210, .b210 { background-color: rgb(255, 102, 102); }
+.background_211, .b211 { background-color: rgb(255, 102, 153); }
+.background_212, .b212 { background-color: rgb(255, 102, 204); }
+.background_213, .b213 { background-color: rgb(255, 102, 255); }
+.background_214, .b214 { background-color: rgb(255, 153, 0); }
+.background_215, .b215 { background-color: rgb(255, 153, 51); }
+.background_216, .b216 { background-color: rgb(255, 153, 102); }
+.background_217, .b217 { background-color: rgb(255, 153, 153); }
+.background_218, .b218 { background-color: rgb(255, 153, 204); }
+.background_219, .b219 { background-color: rgb(255, 153, 255); }
+.background_220, .b220 { background-color: rgb(255, 204, 0); }
+.background_221, .b221 { background-color: rgb(255, 204, 51); }
+.background_222, .b222 { background-color: rgb(255, 204, 102); }
+.background_223, .b223 { background-color: rgb(255, 204, 153); }
+.background_224, .b224 { background-color: rgb(255, 204, 204); }
+.background_225, .b225 { background-color: rgb(255, 204, 255); }
+.background_226, .b226 { background-color: rgb(255, 255, 0); }
+.background_227, .b227 { background-color: rgb(255, 255, 51); }
+.background_228, .b228 { background-color: rgb(255, 255, 102); }
+.background_229, .b229 { background-color: rgb(255, 255, 153); }
+.background_230, .b230 { background-color: rgb(255, 255, 204); }
+.background_231, .b231 { background-color: rgb(255, 255, 255); }
 
-.foreground_8, .f8   { color: #002b36; }
-.foreground_9, .f9   { color: #cb4b16; }
-.foreground_10, .f10   { color: #586e75; }
-.foreground_11, .f11   { color: #657b83; }
-.foreground_12, .f12   { color: #839496; }
-.foreground_13, .f13   { color: #6c71c4; }
-.foreground_14, .f14   { color: #93a1a1; }
-.foreground_15, .f15   { color: #fdf6e3; }
+.background_232, .b232 { background-color: rgb(0, 0, 0); }
+.background_233, .b233 { background-color: rgb(11, 11, 11); }
+.background_234, .b234 { background-color: rgb(22, 22, 22); }
+.background_235, .b235 { background-color: rgb(33, 33, 33); }
+.background_236, .b236 { background-color: rgb(44, 44, 44); }
+.background_237, .b237 { background-color: rgb(55, 55, 55); }
+.background_238, .b238 { background-color: rgb(66, 66, 66); }
+.background_239, .b239 { background-color: rgb(77, 77, 77); }
+.background_240, .b240 { background-color: rgb(88, 88, 88); }
+.background_241, .b241 { background-color: rgb(99, 99, 99); }
+.background_242, .b242 { background-color: rgb(110, 110, 110); }
+.background_243, .b243 { background-color: rgb(121, 121, 121); }
+.background_244, .b244 { background-color: rgb(132, 132, 132); }
+.background_245, .b245 { background-color: rgb(143, 143, 143); }
+.background_246, .b246 { background-color: rgb(154, 154, 154); }
+.background_247, .b247 { background-color: rgb(165, 165, 165); }
+.background_248, .b248 { background-color: rgb(176, 176, 176); }
+.background_249, .b249 { background-color: rgb(187, 187, 187); }
+.background_250, .b250 { background-color: rgb(198, 198, 198); }
+.background_251, .b251 { background-color: rgb(209, 209, 209); }
+.background_252, .b252 { background-color: rgb(220, 220, 220); }
+.background_253, .b253 { background-color: rgb(231, 231, 231); }
+.background_254, .b254 { background-color: rgb(242, 242, 242); }
+.background_255, .b255 { background-color: rgb(253, 253, 253); }
 
+.foreground_d,  .fd  { color: #839496; }
+.foreground_0,  .f0  { color: #073642; }
+.foreground_1,  .f1  { color: #dc322f; }
+.foreground_2,  .f2  { color: #859900; }
+.foreground_3,  .f3  { color: #b58900; }
+.foreground_4,  .f4  { color: #268bd2; }
+.foreground_5,  .f5  { color: #d33682; }
+.foreground_6,  .f6  { color: #2aa198; }
+.foreground_7,  .f7  { color: #eee8d5; }
+
+.foreground_8,  .f8  { color: #002b36; }
+.foreground_9,  .f9  { color: #cb4b16; }
+.foreground_10, .f10 { color: #586e75; }
+.foreground_11, .f11 { color: #657b83; }
+.foreground_12, .f12 { color: #839496; }
+.foreground_13, .f13 { color: #6c71c4; }
+.foreground_14, .f14 { color: #93a1a1; }
+.foreground_15, .f15 { color: #fdf6e3; }
+
+.foreground_16, .f16 { color: rgb(0, 0, 0); }
+.foreground_17, .f17 { color: rgb(0, 0, 51); }
+.foreground_18, .f18 { color: rgb(0, 0, 102); }
+.foreground_19, .f19 { color: rgb(0, 0, 153); }
+.foreground_20, .f20 { color: rgb(0, 0, 204); }
+.foreground_21, .f21 { color: rgb(0, 0, 255); }
+.foreground_22, .f22 { color: rgb(0, 51, 0); }
+.foreground_23, .f23 { color: rgb(0, 51, 51); }
+.foreground_24, .f24 { color: rgb(0, 51, 102); }
+.foreground_25, .f25 { color: rgb(0, 51, 153); }
+.foreground_26, .f26 { color: rgb(0, 51, 204); }
+.foreground_27, .f27 { color: rgb(0, 51, 255); }
+.foreground_28, .f28 { color: rgb(0, 102, 0); }
+.foreground_29, .f29 { color: rgb(0, 102, 51); }
+.foreground_30, .f30 { color: rgb(0, 102, 102); }
+.foreground_31, .f31 { color: rgb(0, 102, 153); }
+.foreground_32, .f32 { color: rgb(0, 102, 204); }
+.foreground_33, .f33 { color: rgb(0, 102, 255); }
+.foreground_34, .f34 { color: rgb(0, 153, 0); }
+.foreground_35, .f35 { color: rgb(0, 153, 51); }
+.foreground_36, .f36 { color: rgb(0, 153, 102); }
+.foreground_37, .f37 { color: rgb(0, 153, 153); }
+.foreground_38, .f38 { color: rgb(0, 153, 204); }
+.foreground_39, .f39 { color: rgb(0, 153, 255); }
+.foreground_40, .f40 { color: rgb(0, 204, 0); }
+.foreground_41, .f41 { color: rgb(0, 204, 51); }
+.foreground_42, .f42 { color: rgb(0, 204, 102); }
+.foreground_43, .f43 { color: rgb(0, 204, 153); }
+.foreground_44, .f44 { color: rgb(0, 204, 204); }
+.foreground_45, .f45 { color: rgb(0, 204, 255); }
+.foreground_46, .f46 { color: rgb(0, 255, 0); }
+.foreground_47, .f47 { color: rgb(0, 255, 51); }
+.foreground_48, .f48 { color: rgb(0, 255, 102); }
+.foreground_49, .f49 { color: rgb(0, 255, 153); }
+.foreground_50, .f50 { color: rgb(0, 255, 204); }
+.foreground_51, .f51 { color: rgb(0, 255, 255); }
+.foreground_52, .f52 { color: rgb(51, 0, 0); }
+.foreground_53, .f53 { color: rgb(51, 0, 51); }
+.foreground_54, .f54 { color: rgb(51, 0, 102); }
+.foreground_55, .f55 { color: rgb(51, 0, 153); }
+.foreground_56, .f56 { color: rgb(51, 0, 204); }
+.foreground_57, .f57 { color: rgb(51, 0, 255); }
+.foreground_58, .f58 { color: rgb(51, 51, 0); }
+.foreground_59, .f59 { color: rgb(51, 51, 51); }
+.foreground_60, .f60 { color: rgb(51, 51, 102); }
+.foreground_61, .f61 { color: rgb(51, 51, 153); }
+.foreground_62, .f62 { color: rgb(51, 51, 204); }
+.foreground_63, .f63 { color: rgb(51, 51, 255); }
+.foreground_64, .f64 { color: rgb(51, 102, 0); }
+.foreground_65, .f65 { color: rgb(51, 102, 51); }
+.foreground_66, .f66 { color: rgb(51, 102, 102); }
+.foreground_67, .f67 { color: rgb(51, 102, 153); }
+.foreground_68, .f68 { color: rgb(51, 102, 204); }
+.foreground_69, .f69 { color: rgb(51, 102, 255); }
+.foreground_70, .f70 { color: rgb(51, 153, 0); }
+.foreground_71, .f71 { color: rgb(51, 153, 51); }
+.foreground_72, .f72 { color: rgb(51, 153, 102); }
+.foreground_73, .f73 { color: rgb(51, 153, 153); }
+.foreground_74, .f74 { color: rgb(51, 153, 204); }
+.foreground_75, .f75 { color: rgb(51, 153, 255); }
+.foreground_76, .f76 { color: rgb(51, 204, 0); }
+.foreground_77, .f77 { color: rgb(51, 204, 51); }
+.foreground_78, .f78 { color: rgb(51, 204, 102); }
+.foreground_79, .f79 { color: rgb(51, 204, 153); }
+.foreground_80, .f80 { color: rgb(51, 204, 204); }
+.foreground_81, .f81 { color: rgb(51, 204, 255); }
+.foreground_82, .f82 { color: rgb(51, 255, 0); }
+.foreground_83, .f83 { color: rgb(51, 255, 51); }
+.foreground_84, .f84 { color: rgb(51, 255, 102); }
+.foreground_85, .f85 { color: rgb(51, 255, 153); }
+.foreground_86, .f86 { color: rgb(51, 255, 204); }
+.foreground_87, .f87 { color: rgb(51, 255, 255); }
+.foreground_88, .f88 { color: rgb(102, 0, 0); }
+.foreground_89, .f89 { color: rgb(102, 0, 51); }
+.foreground_90, .f90 { color: rgb(102, 0, 102); }
+.foreground_91, .f91 { color: rgb(102, 0, 153); }
+.foreground_92, .f92 { color: rgb(102, 0, 204); }
+.foreground_93, .f93 { color: rgb(102, 0, 255); }
+.foreground_94, .f94 { color: rgb(102, 51, 0); }
+.foreground_95, .f95 { color: rgb(102, 51, 51); }
+.foreground_96, .f96 { color: rgb(102, 51, 102); }
+.foreground_97, .f97 { color: rgb(102, 51, 153); }
+.foreground_98, .f98 { color: rgb(102, 51, 204); }
+.foreground_99, .f99 { color: rgb(102, 51, 255); }
+.foreground_100, .f100 { color: rgb(102, 102, 0); }
+.foreground_101, .f101 { color: rgb(102, 102, 51); }
+.foreground_102, .f102 { color: rgb(102, 102, 102); }
+.foreground_103, .f103 { color: rgb(102, 102, 153); }
+.foreground_104, .f104 { color: rgb(102, 102, 204); }
+.foreground_105, .f105 { color: rgb(102, 102, 255); }
+.foreground_106, .f106 { color: rgb(102, 153, 0); }
+.foreground_107, .f107 { color: rgb(102, 153, 51); }
+.foreground_108, .f108 { color: rgb(102, 153, 102); }
+.foreground_109, .f109 { color: rgb(102, 153, 153); }
+.foreground_110, .f110 { color: rgb(102, 153, 204); }
+.foreground_111, .f111 { color: rgb(102, 153, 255); }
+.foreground_112, .f112 { color: rgb(102, 204, 0); }
+.foreground_113, .f113 { color: rgb(102, 204, 51); }
+.foreground_114, .f114 { color: rgb(102, 204, 102); }
+.foreground_115, .f115 { color: rgb(102, 204, 153); }
+.foreground_116, .f116 { color: rgb(102, 204, 204); }
+.foreground_117, .f117 { color: rgb(102, 204, 255); }
+.foreground_118, .f118 { color: rgb(102, 255, 0); }
+.foreground_119, .f119 { color: rgb(102, 255, 51); }
+.foreground_120, .f120 { color: rgb(102, 255, 102); }
+.foreground_121, .f121 { color: rgb(102, 255, 153); }
+.foreground_122, .f122 { color: rgb(102, 255, 204); }
+.foreground_123, .f123 { color: rgb(102, 255, 255); }
+.foreground_124, .f124 { color: rgb(153, 0, 0); }
+.foreground_125, .f125 { color: rgb(153, 0, 51); }
+.foreground_126, .f126 { color: rgb(153, 0, 102); }
+.foreground_127, .f127 { color: rgb(153, 0, 153); }
+.foreground_128, .f128 { color: rgb(153, 0, 204); }
+.foreground_129, .f129 { color: rgb(153, 0, 255); }
+.foreground_130, .f130 { color: rgb(153, 51, 0); }
+.foreground_131, .f131 { color: rgb(153, 51, 51); }
+.foreground_132, .f132 { color: rgb(153, 51, 102); }
+.foreground_133, .f133 { color: rgb(153, 51, 153); }
+.foreground_134, .f134 { color: rgb(153, 51, 204); }
+.foreground_135, .f135 { color: rgb(153, 51, 255); }
+.foreground_136, .f136 { color: rgb(153, 102, 0); }
+.foreground_137, .f137 { color: rgb(153, 102, 51); }
+.foreground_138, .f138 { color: rgb(153, 102, 102); }
+.foreground_139, .f139 { color: rgb(153, 102, 153); }
+.foreground_140, .f140 { color: rgb(153, 102, 204); }
+.foreground_141, .f141 { color: rgb(153, 102, 255); }
+.foreground_142, .f142 { color: rgb(153, 153, 0); }
+.foreground_143, .f143 { color: rgb(153, 153, 51); }
+.foreground_144, .f144 { color: rgb(153, 153, 102); }
+.foreground_145, .f145 { color: rgb(153, 153, 153); }
+.foreground_146, .f146 { color: rgb(153, 153, 204); }
+.foreground_147, .f147 { color: rgb(153, 153, 255); }
+.foreground_148, .f148 { color: rgb(153, 204, 0); }
+.foreground_149, .f149 { color: rgb(153, 204, 51); }
+.foreground_150, .f150 { color: rgb(153, 204, 102); }
+.foreground_151, .f151 { color: rgb(153, 204, 153); }
+.foreground_152, .f152 { color: rgb(153, 204, 204); }
+.foreground_153, .f153 { color: rgb(153, 204, 255); }
+.foreground_154, .f154 { color: rgb(153, 255, 0); }
+.foreground_155, .f155 { color: rgb(153, 255, 51); }
+.foreground_156, .f156 { color: rgb(153, 255, 102); }
+.foreground_157, .f157 { color: rgb(153, 255, 153); }
+.foreground_158, .f158 { color: rgb(153, 255, 204); }
+.foreground_159, .f159 { color: rgb(153, 255, 255); }
+.foreground_160, .f160 { color: rgb(204, 0, 0); }
+.foreground_161, .f161 { color: rgb(204, 0, 51); }
+.foreground_162, .f162 { color: rgb(204, 0, 102); }
+.foreground_163, .f163 { color: rgb(204, 0, 153); }
+.foreground_164, .f164 { color: rgb(204, 0, 204); }
+.foreground_165, .f165 { color: rgb(204, 0, 255); }
+.foreground_166, .f166 { color: rgb(204, 51, 0); }
+.foreground_167, .f167 { color: rgb(204, 51, 51); }
+.foreground_168, .f168 { color: rgb(204, 51, 102); }
+.foreground_169, .f169 { color: rgb(204, 51, 153); }
+.foreground_170, .f170 { color: rgb(204, 51, 204); }
+.foreground_171, .f171 { color: rgb(204, 51, 255); }
+.foreground_172, .f172 { color: rgb(204, 102, 0); }
+.foreground_173, .f173 { color: rgb(204, 102, 51); }
+.foreground_174, .f174 { color: rgb(204, 102, 102); }
+.foreground_175, .f175 { color: rgb(204, 102, 153); }
+.foreground_176, .f176 { color: rgb(204, 102, 204); }
+.foreground_177, .f177 { color: rgb(204, 102, 255); }
+.foreground_178, .f178 { color: rgb(204, 153, 0); }
+.foreground_179, .f179 { color: rgb(204, 153, 51); }
+.foreground_180, .f180 { color: rgb(204, 153, 102); }
+.foreground_181, .f181 { color: rgb(204, 153, 153); }
+.foreground_182, .f182 { color: rgb(204, 153, 204); }
+.foreground_183, .f183 { color: rgb(204, 153, 255); }
+.foreground_184, .f184 { color: rgb(204, 204, 0); }
+.foreground_185, .f185 { color: rgb(204, 204, 51); }
+.foreground_186, .f186 { color: rgb(204, 204, 102); }
+.foreground_187, .f187 { color: rgb(204, 204, 153); }
+.foreground_188, .f188 { color: rgb(204, 204, 204); }
+.foreground_189, .f189 { color: rgb(204, 204, 255); }
+.foreground_190, .f190 { color: rgb(204, 255, 0); }
+.foreground_191, .f191 { color: rgb(204, 255, 51); }
+.foreground_192, .f192 { color: rgb(204, 255, 102); }
+.foreground_193, .f193 { color: rgb(204, 255, 153); }
+.foreground_194, .f194 { color: rgb(204, 255, 204); }
+.foreground_195, .f195 { color: rgb(204, 255, 255); }
+.foreground_196, .f196 { color: rgb(255, 0, 0); }
+.foreground_197, .f197 { color: rgb(255, 0, 51); }
+.foreground_198, .f198 { color: rgb(255, 0, 102); }
+.foreground_199, .f199 { color: rgb(255, 0, 153); }
+.foreground_200, .f200 { color: rgb(255, 0, 204); }
+.foreground_201, .f201 { color: rgb(255, 0, 255); }
+.foreground_202, .f202 { color: rgb(255, 51, 0); }
+.foreground_203, .f203 { color: rgb(255, 51, 51); }
+.foreground_204, .f204 { color: rgb(255, 51, 102); }
+.foreground_205, .f205 { color: rgb(255, 51, 153); }
+.foreground_206, .f206 { color: rgb(255, 51, 204); }
+.foreground_207, .f207 { color: rgb(255, 51, 255); }
+.foreground_208, .f208 { color: rgb(255, 102, 0); }
+.foreground_209, .f209 { color: rgb(255, 102, 51); }
+.foreground_210, .f210 { color: rgb(255, 102, 102); }
+.foreground_211, .f211 { color: rgb(255, 102, 153); }
+.foreground_212, .f212 { color: rgb(255, 102, 204); }
+.foreground_213, .f213 { color: rgb(255, 102, 255); }
+.foreground_214, .f214 { color: rgb(255, 153, 0); }
+.foreground_215, .f215 { color: rgb(255, 153, 51); }
+.foreground_216, .f216 { color: rgb(255, 153, 102); }
+.foreground_217, .f217 { color: rgb(255, 153, 153); }
+.foreground_218, .f218 { color: rgb(255, 153, 204); }
+.foreground_219, .f219 { color: rgb(255, 153, 255); }
+.foreground_220, .f220 { color: rgb(255, 204, 0); }
+.foreground_221, .f221 { color: rgb(255, 204, 51); }
+.foreground_222, .f222 { color: rgb(255, 204, 102); }
+.foreground_223, .f223 { color: rgb(255, 204, 153); }
+.foreground_224, .f224 { color: rgb(255, 204, 204); }
+.foreground_225, .f225 { color: rgb(255, 204, 255); }
+.foreground_226, .f226 { color: rgb(255, 255, 0); }
+.foreground_227, .f227 { color: rgb(255, 255, 51); }
+.foreground_228, .f228 { color: rgb(255, 255, 102); }
+.foreground_229, .f229 { color: rgb(255, 255, 153); }
+.foreground_230, .f230 { color: rgb(255, 255, 204); }
+.foreground_231, .f231 { color: rgb(255, 255, 255); }
+
+.foreground_232, .f232 { color: rgb(0, 0, 0); }
+.foreground_233, .f233 { color: rgb(11, 11, 11); }
+.foreground_234, .f234 { color: rgb(22, 22, 22); }
+.foreground_235, .f235 { color: rgb(33, 33, 33); }
+.foreground_236, .f236 { color: rgb(44, 44, 44); }
+.foreground_237, .f237 { color: rgb(55, 55, 55); }
+.foreground_238, .f238 { color: rgb(66, 66, 66); }
+.foreground_239, .f239 { color: rgb(77, 77, 77); }
+.foreground_240, .f240 { color: rgb(88, 88, 88); }
+.foreground_241, .f241 { color: rgb(99, 99, 99); }
+.foreground_242, .f242 { color: rgb(110, 110, 110); }
+.foreground_243, .f243 { color: rgb(121, 121, 121); }
+.foreground_244, .f244 { color: rgb(132, 132, 132); }
+.foreground_245, .f245 { color: rgb(143, 143, 143); }
+.foreground_246, .f246 { color: rgb(154, 154, 154); }
+.foreground_247, .f247 { color: rgb(165, 165, 165); }
+.foreground_248, .f248 { color: rgb(176, 176, 176); }
+.foreground_249, .f249 { color: rgb(187, 187, 187); }
+.foreground_250, .f250 { color: rgb(198, 198, 198); }
+.foreground_251, .f251 { color: rgb(209, 209, 209); }
+.foreground_252, .f252 { color: rgb(220, 220, 220); }
+.foreground_253, .f253 { color: rgb(231, 231, 231); }
+.foreground_254, .f254 { color: rgb(242, 242, 242); }
+.foreground_255, .f255 { color: rgb(253, 253, 253); }

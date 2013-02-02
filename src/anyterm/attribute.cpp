@@ -9,32 +9,38 @@
 
 namespace anyterm {
 
+  char const attribute::default_foreground[] = "d";
+  char const attribute::default_background[] = "D";
+  char const attribute::default_bold[]       = "db";
+  char const attribute::default_faint[]      = "dh";
+  char const attribute::default_bright[]     = "di";
+  char const attribute::default_cursor[]     = "dc";
+  char const attribute::unkonwn[]            = "u";
+
 #ifdef ANYTERM_BUILD_DEBUG
   attribute::attribute() :
-    foreground("def_fg"),
-    background("def_bg"),
+    foreground(attribute::default_foreground),
+    background(attribute::default_background),
     underlined(false),
     strikethrough(false),
-    cursor(false)
-
-    // , halfbright(false)
-    // , bold(false)
-    // , blink(false)
-    // , inverse(false)
+    cursor(false),
+    bold(false),
+    faint(false),
+    bright(false),
+    blink(false)
   {}
 
 #else // ifdef ANYTERM_BUILD_DEBUG
   attribute::attribute() :
-    foreground("d"),
-    background("d"),
+    foreground(attribute::default_foreground),
+    background(attribute::default_background),
     underlined(false),
     strikethrough(false),
-    cursor(false)
-
-    // , halfbright(false)
-    // , bold(false)
-    // , blink(false)
-    // , inverse(false)
+    cursor(false),
+    bold(false),
+    faint(false),
+    bright(false),
+    blink(false)
   {}
 
 #endif // ifdef ANYTERM_BUILD_DEBUG
@@ -44,12 +50,11 @@ namespace anyterm {
            && this->background == o.background
            && underlined == o.underlined
            && strikethrough == o.strikethrough
-           && cursor == o.cursor;
-
-    // && halfbright == o.halfbright
-    // && bold == o.bold
-    // && blink == o.blink
-    // && inverse == o.inverse
+           && cursor == o.cursor
+           && bold == o.bold
+           && faint == o.faint
+           && bright == o.bright
+           && blink == o.blink;
   }
 
   bool attribute::operator!=(attribute const& o) const {
@@ -100,21 +105,21 @@ namespace anyterm {
     this->cursor = cursor;
   }
 
-  // void attribute::set_halfbright(bool const halfbright) {
-  // this->halfbright = halfbright;
-  // }
-  // void attribute::set_bold(bool const bold) {
-  // this->bold = bold;
-  // }
-  // void attribute::set_blink(bool const blink) {
-  // this->blink = blink;
-  // }
-  // void attribute::setverse(bool const inverse) {
-  // this->inverse = inverse;
-  // }
-  // void attribute::set_cursor(bool const cursor) {
-  // this->cursor = cursor;
-  // }
+  void attribute::set_bold(bool const bold) {
+    this->bold = bold;
+  }
+
+  void attribute::set_faint(bool const faint) {
+    this->faint = faint;
+  }
+
+  void attribute::set_bright(bool const bright) {
+    this->bright = bright;
+  }
+
+  void attribute::set_blink(bool const blink) {
+    this->blink = blink;
+  }
 
   std::uint32_t attribute::get_row() const {
     return this->row;
@@ -128,32 +133,46 @@ namespace anyterm {
     std::string css_classes;
 
 #ifdef ANYTERM_BUILD_DEBUG
-    css_classes += "attributes ";
-    css_classes += "foreground_" + this->foreground + " ";
-    css_classes += "background_" + this->background + " ";
-    css_classes += std::string("underlined_") + (this->underlined ? "yes" : "no") + " ";
-    css_classes += std::string("strikethrough_") + (this->strikethrough ? "yes" : "no") + " ";
-    css_classes += std::string("cursor_") + (this->cursor ? "yes" : "no") + " ";
-
-    // css_classes += std::string("halfbright_") + (this->halfbright ? "yes" : "no");
-    // css_classes += std::string("bold_") + (this->bold ? "yes" : "no");
-    // css_classes += std::string("blink_") + (this->blink ? "yes" : "no");
-    // css_classes += std::string("inverse_") + (this->inverse ? "yes" : "no");
+    if (this->foreground != attribute::default_foreground)
+      css_classes += "foreground_" + this->foreground + " ";
+    if (this->background != attribute::default_background)
+      css_classes += "background_" + this->background + " ";
+    if (this->underlined)
+      css_classes += "underlined_yes ";
+    if (this->strikethrough)
+      css_classes += "strikethrough_yes ";
+    if (this->cursor)
+      css_classes += "cursor_yes ";
+    if (this->bold)
+      css_classes += "bold_yes ";
+    if (this->faint)
+      css_classes += "faint_yes ";
+    if (this->bright)
+      css_classes += "bright_yes ";
+    if (this->blink)
+      css_classes += "blink_yes ";
 #else // ifdef ANYTERM_BUILD_DEBUG
-    css_classes += "a ";
-    css_classes += "f" + this->foreground + " ";
-    css_classes += "b" + this->background + " ";
-    css_classes += std::string("u") + (this->underlined ? "y" : "n") + " ";
-    css_classes += std::string("s") + (this->strikethrough ? "y" : "n") + " ";
-    css_classes += std::string("c") + (this->cursor ? "y" : "n") + " ";
-
-    // css_classes += std::string("h") + (this->halfbright ? "y" : "n");
-    // css_classes += std::string("b") + (this->bold ? "y" : "n");
-    // css_classes += std::string("l") + (this->blink ? "y" : "n");
-    // css_classes += std::string("i") + (this->inverse ? "y" : "n");
+    if (this->foreground != attribute::default_foreground)
+      css_classes += "f" + this->foreground + " ";
+    if (this->background != attribute::default_background)
+      css_classes += "b" + this->background + " ";
+    if (this->underlined)
+      css_classes += "uy ";
+    if (this->strikethrough)
+      css_classes += "sy ";
+    if (this->cursor)
+      css_classes += "cy ";
+    if (this->bold)
+      css_classes += "by ";
+    if (this->faint)
+      css_classes += "hy ";
+    if (this->bright)
+      css_classes += "iy ";
+    if (this->blink)
+      css_classes += "ly ";
 #endif // ifdef ANYTERM_BUILD_DEBUG
 
     return css_classes;
-  }
+  } // to_css
 
 } // namespace anyterm
