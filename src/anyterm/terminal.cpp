@@ -230,7 +230,7 @@ namespace anyterm {
         screen.set_attribute(current_row, last_column, attribute());
       }
 
-      current_row    = std::min(vte_attributes.row - first_row, vte_attributes.row);
+      current_row    = std::min(static_cast< std::uint32_t >(vte_attributes.row - first_row), static_cast< std::uint32_t >(vte_attributes.row));
       current_column = vte_attributes.column;
 
       cell_attributes.set_background(palette.get_color(vte_attributes.back));
