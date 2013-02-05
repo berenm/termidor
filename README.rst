@@ -64,7 +64,7 @@ Then, interface can be accessed at http://127.0.0.1:8000. Chrome and Firefox bro
 
 CONFIGURATION
 ````````````````````````````
-For now, there is none, ``anytermd`` spanws a ``/bin/bash -l`` instance, started with the same user as the ``anytermd`` process. Might be possible later on.
+For now, there is none, ``anytermd`` spawns a ``/bin/bash -l`` instance, started with the same user as the ``anytermd`` process. Might be possible later on.
 
 
 COPYING INFORMATION
