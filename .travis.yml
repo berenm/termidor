@@ -2,7 +2,7 @@ language: cpp
 script:
   - mkdir build
   - cd build
-  - cmake -DBUILD_TESTS=1 .. && make && make test
+  - cmake -DBUILD_TESTS=1 .. && make && ctest -R anyterm
 compiler:
   - gcc
   - clang
