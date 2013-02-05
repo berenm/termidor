@@ -4,3 +4,6 @@
 [submodule "lib/cpp-netlib"]
 	path = lib/cpp-netlib
 	url = git://github.com/cpp-netlib/cpp-netlib.git
+[submodule "lib/vte"]
+	path = lib/vte
+	url = git://github.com/berenm/gnome-vte.git

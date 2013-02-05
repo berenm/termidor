@@ -11,7 +11,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/regex/pending/unicode_iterator.hpp>
 
-#include <vte/vte.h>
+#include <vte.h>
 
 namespace anyterm {
 
