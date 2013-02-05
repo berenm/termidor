@@ -62,3 +62,9 @@ install(TARGETS anytermd anyterm
 install(DIRECTORY include
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+# -------------------------------------------------------------------------
+# tests
+if(BUILD_TESTS)
+  enable_testing()
+endif()
