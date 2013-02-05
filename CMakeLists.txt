@@ -15,7 +15,7 @@ add_submodule(cpp-netlib git://github.com/cpp-netlib/cpp-netlib.git lib/cpp-netl
 
 find_package(Boost COMPONENTS thread program_options filesystem regex iostreams date_time system serialization REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(VTE REQUIRED vte)
+pkg_check_modules(VTE REQUIRED vte-2.90)
 
 include_directories(
   ${VTE_INCLUDE_DIRS}
