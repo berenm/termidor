@@ -1,9 +1,12 @@
-============================
 Javascript-C++ Terminal
 ============================
 .. image:: https://secure.travis-ci.org/berenm/anyterm.png?branch=master
     :alt: Build Status
     :target: https://travis-ci.org/berenm/anyterm
+
+.. image:: http://stillmaintained.com/berenm/anyterm.png
+    :alt: Still Maintained?
+    :target: http://stillmaintained.com/berenm/anyterm
 
 
 INTRO
