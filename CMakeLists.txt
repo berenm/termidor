@@ -68,3 +68,8 @@ install(DIRECTORY include
 if(BUILD_TESTS)
   enable_testing()
 endif()
+
+if(ENABLE_GCOVERALLS)
+  include(GCoveralls)
+  enable_gcoveralls()
+endif()

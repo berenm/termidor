@@ -4,6 +4,10 @@ Javascript-C++ Terminal
     :alt: Build Status
     :target: https://travis-ci.org/berenm/anyterm
 
+.. image:: https://coveralls.io/repos/berenm/anyterm/badge.png?branch=master
+    :alt: Coverage Status
+    :target: https://coveralls.io/r/berenm/anyterm
+
 .. image:: http://stillmaintained.com/berenm/anyterm.png
     :alt: Still Maintained?
     :target: http://stillmaintained.com/berenm/anyterm
