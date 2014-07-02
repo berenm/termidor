@@ -1,6 +1,7 @@
 [submodule "cmake/extra"]
 	path = cmake/extra
 	url = git://github.com/berenm/cmake-extra.git
+	branch = master
 [submodule "lib/cpp-netlib"]
 	path = lib/cpp-netlib
 	url = git://github.com/cpp-netlib/cpp-netlib.git
