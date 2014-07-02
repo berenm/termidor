@@ -21,7 +21,6 @@ namespace termidor {
     generate_uuid(generate_random) {
     g_timeout_add(100, work_static, this);
     background_worker = boost::thread([] {
-                                        g_type_init();
                                         gtk_main();
                                       });
   }
