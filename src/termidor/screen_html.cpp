@@ -5,12 +5,12 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#include "anyterm/screen.hpp"
+#include "termidor/screen.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/regex/pending/unicode_iterator.hpp>
 
-namespace anyterm {
+namespace termidor {
 
   std::string screen::to_html() const {
     typedef boost::u32_to_u8_iterator< std::wstring::iterator > to_utf8;
@@ -18,21 +18,21 @@ namespace anyterm {
     screen::text_lines const& lines = this->lines;
 
     std::string        html;
-    anyterm::attribute last_attribute = anyterm::attribute();
+    termidor::attribute last_attribute = termidor::attribute();
     std::uint32_t      row_number     = 0;
     std::uint32_t      column_number  = 0;
 
     html += "<span class='" + last_attribute.to_css() + "'>";
 
     auto const attrib_to_html = [&]() {
-                                  anyterm::attribute const& attribute = this->get_attribute(row_number, column_number);
+                                  termidor::attribute const& attribute = this->get_attribute(row_number, column_number);
                                   if (attribute == last_attribute)
                                     return;
 
-                                  if (last_attribute != anyterm::attribute())
+                                  if (last_attribute != termidor::attribute())
                                     html += "</span>";
 
-                                  if (attribute != anyterm::attribute())
+                                  if (attribute != termidor::attribute())
                                     html += "<span class='" + attribute.to_css() + "'>";
 
                                   last_attribute = attribute;

@@ -8,9 +8,9 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include "anyterm/session_manager.hpp"
+#include "termidor/session_manager.hpp"
 
-namespace anyterm {
+namespace termidor {
   namespace http = boost::network::http;
   namespace uri  = boost::network::uri;
 
@@ -18,7 +18,7 @@ namespace anyterm {
   typedef http::server< handler > server;
 
   struct handler {
-    anyterm::session_manager session_manager;
+    termidor::session_manager session_manager;
 
     struct parse {
       typedef std::unordered_map< std::string, std::vector< std::string > > string_map;
@@ -139,7 +139,7 @@ namespace anyterm {
       if (parsed.session_id.empty())
         { this->log("No session id"); return; }
 
-      anyterm::session_ptr const& session = this->session_manager.get_session(parsed.session_id);
+      termidor::session_ptr const& session = this->session_manager.get_session(parsed.session_id);
       if (action == "resize")
         session->resize(boost::lexical_cast< std::uint16_t >(row_count), boost::lexical_cast< std::uint16_t >(column_count));
       else if (action == "write")
@@ -164,8 +164,8 @@ namespace anyterm {
   extern "C" int main(int const arg, char const* argv[]) {
     std::setlocale(LC_ALL, "utf8");
 
-    anyterm::handler handler;
-    anyterm::server  server("0.0.0.0", "8088", handler);
+    termidor::handler handler;
+    termidor::server  server("0.0.0.0", "8088", handler);
 
     server.run();
   }

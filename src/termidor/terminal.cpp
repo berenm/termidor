@@ -5,7 +5,7 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#include "anyterm/terminal.hpp"
+#include "termidor/terminal.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -13,7 +13,7 @@
 
 #include <vte/vte.h>
 
-namespace anyterm {
+namespace termidor {
 
   namespace {
 
@@ -80,15 +80,15 @@ namespace anyterm {
     };
 
     static void set_dirty_callback(VteTerminal*, void* data) {
-      static_cast< anyterm::terminal* >(data)->set_dirty(true);
+      static_cast< termidor::terminal* >(data)->set_dirty(true);
     }
 
     static void set_dirty_callback_i(VteTerminal*, int, void* data) {
-      static_cast< anyterm::terminal* >(data)->set_dirty(true);
+      static_cast< termidor::terminal* >(data)->set_dirty(true);
     }
 
     static void set_killed_callback(VteTerminal*, void* data) {
-      static_cast< anyterm::terminal* >(data)->set_alive(false);
+      static_cast< termidor::terminal* >(data)->set_alive(false);
     }
 
   }
@@ -197,7 +197,7 @@ namespace anyterm {
   }
 
   screen terminal::read() {
-    anyterm::palette const palette;
+    termidor::palette const palette;
 
     palette.apply(GTK_WIDGET(this->widget));
 
@@ -260,4 +260,4 @@ namespace anyterm {
     return screen;
   } // read
 
-} // namespace anyterm
+} // namespace termidor

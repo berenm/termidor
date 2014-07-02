@@ -1,8 +1,8 @@
-var Anyterm = function() {
+var Termidor = function() {
   this.init();
 }
 
-Anyterm.prototype = {
+Termidor.prototype = {
   init: function() {
     $.ajaxSetup({
       ifModified: true,
@@ -19,10 +19,10 @@ Anyterm.prototype = {
   writing: false,
 
   resetTimeout: function() {
-    Anyterm.timeout = Anyterm.initialTimeout;
+    Termidor.timeout = Termidor.initialTimeout;
   },
   increaseTimeout: function() {
-    Anyterm.timeout *= Anyterm.timeoutFactor;
+    Termidor.timeout *= Termidor.timeoutFactor;
   },
 
   getRowCount: function() {
@@ -33,84 +33,84 @@ Anyterm.prototype = {
   },
 
   onOpened: function(data) {
-    Anyterm.read();
+    Termidor.read();
   },
 
   open: function(username) {
-    $.post('anytermd', { action: 'open', row_count: Anyterm.getRowCount(), column_count: Anyterm.getColumnCount(), username: username, dummy: '' }, Anyterm.onOpened);
+    $.post('termidor', { action: 'open', row_count: Termidor.getRowCount(), column_count: Termidor.getColumnCount(), username: username, dummy: '' }, Termidor.onOpened);
   },
 
   resize: function() {
-    $.post('anytermd', { action: 'resize', row_count: Anyterm.getRowCount(), column_count: Anyterm.getColumnCount(), dummy: '' });
+    $.post('termidor', { action: 'resize', row_count: Termidor.getRowCount(), column_count: Termidor.getColumnCount(), dummy: '' });
   },
 
   onRead: function(text, status, request) {
     if(status == "notmodified") {
-      $('#terminal').html(Anyterm.terminalContents);
-      Anyterm.increaseTimeout();
+      $('#terminal').html(Termidor.terminalContents);
+      Termidor.increaseTimeout();
     } else if(status == "success") {
-      Anyterm.terminalContents = text;
-      Anyterm.resetTimeout();
+      Termidor.terminalContents = text;
+      Termidor.resetTimeout();
     } else if(status == "error") {
       $('#terminal').html(text);
-      Anyterm.increaseTimeout();
+      Termidor.increaseTimeout();
     } 
 
-    if(Anyterm.timeoutId == 0) {
-      Anyterm.timeoutId = window.setTimeout(Anyterm.read, Anyterm.timeout);
+    if(Termidor.timeoutId == 0) {
+      Termidor.timeoutId = window.setTimeout(Termidor.read, Termidor.timeout);
     }
   },
 
   read: function() {
-    if(Anyterm.timeoutId > 0) {
-      window.clearTimeout(Anyterm.timeoutId);
-      Anyterm.timeoutId = 0;
+    if(Termidor.timeoutId > 0) {
+      window.clearTimeout(Termidor.timeoutId);
+      Termidor.timeoutId = 0;
     }
 
-    $('#terminal').load('anytermd?action=read&dummy=', Anyterm.onRead);
+    $('#terminal').load('termid?action=read&dummy=', Termidor.onRead);
   },
 
   onWrite: function(data) {
-    if(Anyterm.timeoutId > 0) {
-      window.clearTimeout(Anyterm.timeoutId);
-      Anyterm.timeoutId = 0;
+    if(Termidor.timeoutId > 0) {
+      window.clearTimeout(Termidor.timeoutId);
+      Termidor.timeoutId = 0;
     }
 
-    Anyterm.timeoutId = window.setTimeout(Anyterm.read, Anyterm.initialTimeout);
+    Termidor.timeoutId = window.setTimeout(Termidor.read, Termidor.initialTimeout);
 
-    if(Anyterm.writeBuffer == '') {
-      Anyterm.writing = false;
+    if(Termidor.writeBuffer == '') {
+      Termidor.writing = false;
     } else {
-      Anyterm.flushWriteBuffer();
+      Termidor.flushWriteBuffer();
     }
   },
 
   flushWriteBuffer: function() {
-    var value = Anyterm.writeBuffer;
-    Anyterm.writeBuffer = '';
-    Anyterm.writing = true;
-    $.post('anytermd', { action: 'write', data: value, dummy: '' }, Anyterm.onWrite);
+    var value = Termidor.writeBuffer;
+    Termidor.writeBuffer = '';
+    Termidor.writing = true;
+    $.post('termid', { action: 'write', data: value, dummy: '' }, Termidor.onWrite);
   },
 
   write: function(value) {
-    Anyterm.writeBuffer += value;
-    if(!Anyterm.writing) {
-      Anyterm.flushWriteBuffer();
+    Termidor.writeBuffer += value;
+    if(!Termidor.writing) {
+      Termidor.flushWriteBuffer();
     }
   }
 };
 
 $(document).ready(function() {
-  Anyterm = new Anyterm();
+  Termidor = new Termidor();
 });
 
 $(window).resize(function() {
-  Anyterm.resize();
+  Termidor.resize();
 });
 
 $(document).keypress(function(event) {
   if(!(event.ctrlKey || event.altKey)) {
-    Anyterm.write(String.fromCharCode(event.which));
+    Termidor.write(String.fromCharCode(event.which));
   }
 });
 
@@ -238,7 +238,7 @@ $(document).keydown(function(event) {
   }
 
   if(keyMapping[event.which] != undefined) {
-    Anyterm.write(getModified(event, keyMapping[event.which]));
+    Termidor.write(getModified(event, keyMapping[event.which]));
     return false;
   }
 
@@ -246,150 +246,150 @@ $(document).keydown(function(event) {
     switch(event.which) {
       case 50:
       case '@':
-        Anyterm.write(codes.NUL);
+        Termidor.write(codes.NUL);
         return false;
       case 65:
       case 'A':
-        Anyterm.write(codes.SOH);
+        Termidor.write(codes.SOH);
         return false;
       case 66:
       case 'B':
-        Anyterm.write(codes.STX);
+        Termidor.write(codes.STX);
         return false;
       case 67:
       case 'C':
-        Anyterm.write(codes.ETX);
+        Termidor.write(codes.ETX);
         return false;
       case 68:
       case 'D':
-        Anyterm.write(codes.EOT);
+        Termidor.write(codes.EOT);
         return false;
       case 69:
       case 'E':
-        Anyterm.write(codes.ENQ);
+        Termidor.write(codes.ENQ);
         return false;
       case 70:
       case 'F':
-        Anyterm.write(codes.ACK);
+        Termidor.write(codes.ACK);
         return false;
       case 71:
       case 'G':
-        Anyterm.write(codes.BEL);
+        Termidor.write(codes.BEL);
         return false;
       case 72:
       case 'H':
-        Anyterm.write(codes.BS);
+        Termidor.write(codes.BS);
         return false;
       case 73:
       case 'I':
-        Anyterm.write(codes.HT);
+        Termidor.write(codes.HT);
         return false;
       case 74:
       case 'J':
-        Anyterm.write(codes.LF);
+        Termidor.write(codes.LF);
         return false;
       case 75:
       case 'K':
-        Anyterm.write(codes.VT);
+        Termidor.write(codes.VT);
         return false;
       case 76:
       case 'L':
-        Anyterm.write(codes.FF);
+        Termidor.write(codes.FF);
         return false;
       case 77:
       case 'M':
-        Anyterm.write(codes.CR);
+        Termidor.write(codes.CR);
         return false;
       case 78:
       case 'N':
-        Anyterm.write(codes.SO);
+        Termidor.write(codes.SO);
         return false;
       case 79:
       case 'O':
-        Anyterm.write(codes.SI);
+        Termidor.write(codes.SI);
         return false;
       case 80:
       case 'P':
-        Anyterm.write(codes.DLE);
+        Termidor.write(codes.DLE);
         return false;
       case 81:
       case 'Q':
-        Anyterm.write(codes.DC1);
+        Termidor.write(codes.DC1);
         return false;
       case 82:
       case 'R':
-        Anyterm.write(codes.DC2);
+        Termidor.write(codes.DC2);
         return false;
       case 83:
       case 'S':
-        Anyterm.write(codes.DC3);
+        Termidor.write(codes.DC3);
         return false;
       case 84:
       case 'T':
-        Anyterm.write(codes.DC4);
+        Termidor.write(codes.DC4);
         return false;
       case 85:
       case 'U':
-        Anyterm.write(codes.NAK);
+        Termidor.write(codes.NAK);
         return false;
       case 86:
       case 'V':
-        Anyterm.write(codes.SYN);
+        Termidor.write(codes.SYN);
         return false;
       case 87:
       case 'W':
-        Anyterm.write(codes.ETB);
+        Termidor.write(codes.ETB);
         return false;
       case 88:
       case 'X':
-        Anyterm.write(codes.CAN);
+        Termidor.write(codes.CAN);
         return false;
       case 89:
       case 'Y':
-        Anyterm.write(codes.EM);
+        Termidor.write(codes.EM);
         return false;
       case 90:
       case 'Z':
-        Anyterm.write(codes.SUB);
+        Termidor.write(codes.SUB);
         return false;
       case 219:
       case '[':
-        Anyterm.write(codes.ESC);
+        Termidor.write(codes.ESC);
         return false;
       case 220:
       case '\\':
-        Anyterm.write(codes.FS);
+        Termidor.write(codes.FS);
         return false;
       case 221:
       case ']':
-        Anyterm.write(codes.GS);
+        Termidor.write(codes.GS);
         return false;
       case 222:
       case '^':
-        Anyterm.write(codes.RS);
+        Termidor.write(codes.RS);
         return false;
       case 189:
       case '_':
-        Anyterm.write(codes.US);
+        Termidor.write(codes.US);
         return false;
       case 188:
       case '?':
-        Anyterm.write(codes.DEL);
+        Termidor.write(codes.DEL);
         return false;
     }
   } else if(event.shiftKey) {
     switch(event.which) {
       case 9:
-        Anyterm.write(codes.ESC + '[Z');
+        Termidor.write(codes.ESC + '[Z');
         return false;
     }
   } else {
     switch(event.which) {
       case 8:
-        Anyterm.write(codes.BS);
+        Termidor.write(codes.BS);
         return false;
       case 9:
-        Anyterm.write(codes.HT);
+        Termidor.write(codes.HT);
         return false;
     }
   }

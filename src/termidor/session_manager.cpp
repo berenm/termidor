@@ -1,14 +1,14 @@
-#include "anyterm/session_manager.hpp"
+#include "termidor/session_manager.hpp"
 
 #include <boost/uuid/uuid_io.hpp>
 
 #include <gtk/gtk.h>
 
-namespace anyterm {
+namespace termidor {
   namespace {
 
     static gboolean work_static(void* data) {
-      static_cast< anyterm::session_manager* >(data)->work();
+      static_cast< termidor::session_manager* >(data)->work();
 
       return true;
     }
@@ -17,7 +17,7 @@ namespace anyterm {
 
   session_manager::session_manager() :
     terminated(false),
-    generate_random(std::mt19937(anyterm::clock::now().time_since_epoch().count()) ()),
+    generate_random(std::mt19937(termidor::clock::now().time_since_epoch().count()) ()),
     generate_uuid(generate_random) {
     g_timeout_add(100, work_static, this);
     background_worker = boost::thread([] {

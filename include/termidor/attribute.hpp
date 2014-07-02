@@ -5,13 +5,13 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef __ANYTERM_ATTRIBUTE_HPP__
-#define __ANYTERM_ATTRIBUTE_HPP__
+#ifndef __TERMIDOR_ATTRIBUTE_HPP__
+#define __TERMIDOR_ATTRIBUTE_HPP__
 
 #include <cstdint>
 #include <string>
 
-namespace anyterm {
+namespace termidor {
 
   struct attribute {
     public:
@@ -59,6 +59,6 @@ namespace anyterm {
       // bool cursor;
   };
 
-} // namespace anyterm
+} // namespace termidor
 
-#endif // ifndef __ANYTERM_ATTRIBUTE_HPP__
+#endif // ifndef __TERMIDOR_ATTRIBUTE_HPP__

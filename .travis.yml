@@ -2,7 +2,7 @@ language: cpp
 script:
   - mkdir build
   - cd build
-  - cmake -DBUILD_TESTS=1 -DENABLE_GCOVERALLS=1 .. && make && ctest -R anyterm && ./coveralls-upload
+  - cmake -DBUILD_TESTS=1 -DENABLE_GCOVERALLS=1 .. && make && ctest -R termidor && ./coveralls-upload
 compiler:
   - gcc
 #  - clang

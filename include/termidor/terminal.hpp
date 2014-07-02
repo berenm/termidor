@@ -5,15 +5,15 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef __ANYTERM_TERMINAL_HPP__
-#define __ANYTERM_TERMINAL_HPP__
+#ifndef __TERMIDOR_TERMINAL_HPP__
+#define __TERMIDOR_TERMINAL_HPP__
 
 #include <cstdint>
 #include <string>
 
-#include "anyterm/screen.hpp"
+#include "termidor/screen.hpp"
 
-namespace anyterm {
+namespace termidor {
 
   class terminal {
     public:
@@ -47,6 +47,6 @@ namespace anyterm {
       void* widget;
   };
 
-} // namespace anyterm
+} // namespace termidor
 
-#endif // ifndef __ANYTERM_TERMINAL_HPP__
+#endif // ifndef __TERMIDOR_TERMINAL_HPP__

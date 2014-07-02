@@ -5,15 +5,15 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef __ANYTERM_ERROR_HPP__
-#define __ANYTERM_ERROR_HPP__
+#ifndef __TERMIDOR_ERROR_HPP__
+#define __TERMIDOR_ERROR_HPP__
 
 #include <boost/exception/all.hpp>
 
-namespace anyterm {
+namespace termidor {
 
   struct error : virtual std::exception, virtual boost::exception {};
 
-} // namespace anyterm
+} // namespace termidor
 
-#endif // ifndef __ANYTERM_ERROR_HPP__
+#endif // ifndef __TERMIDOR_ERROR_HPP__

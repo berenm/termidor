@@ -5,9 +5,9 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#include "anyterm/session.hpp"
+#include "termidor/session.hpp"
 
-namespace anyterm {
+namespace termidor {
 
   session::session(std::string const& username, std::uint16_t const row_count, std::uint16_t const column_count, std::uint16_t const scrollback_count, std::chrono::seconds const timeout) :
     username(username), timeout(timeout), terminal() {
@@ -43,11 +43,11 @@ namespace anyterm {
   }
 
   void session::touch() {
-    this->last_access = anyterm::clock::now();
+    this->last_access = termidor::clock::now();
   }
 
   bool session::timed_out() {
-    return anyterm::clock::now() - this->last_access > timeout;
+    return termidor::clock::now() - this->last_access > timeout;
   }
 
-} // namespace anyterm
+} // namespace termidor

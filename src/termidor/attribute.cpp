@@ -5,11 +5,11 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#include "anyterm/attribute.hpp"
+#include "termidor/attribute.hpp"
 
-namespace anyterm {
+namespace termidor {
 
-#ifdef ANYTERM_BUILD_DEBUG
+#ifdef TERMIDOR_BUILD_DEBUG
   attribute::attribute() :
     foreground("def_fg"),
     background("def_bg"),
@@ -23,7 +23,7 @@ namespace anyterm {
     // , inverse(false)
   {}
 
-#else // ifdef ANYTERM_BUILD_DEBUG
+#else // ifdef TERMIDOR_BUILD_DEBUG
   attribute::attribute() :
     foreground("d"),
     background("d"),
@@ -37,7 +37,7 @@ namespace anyterm {
     // , inverse(false)
   {}
 
-#endif // ifdef ANYTERM_BUILD_DEBUG
+#endif // ifdef TERMIDOR_BUILD_DEBUG
 
   bool attribute::operator==(attribute const& o) const {
     return this->foreground == o.foreground
@@ -127,7 +127,7 @@ namespace anyterm {
   std::string attribute::to_css() const {
     std::string css_classes;
 
-#ifdef ANYTERM_BUILD_DEBUG
+#ifdef TERMIDOR_BUILD_DEBUG
     css_classes += "attributes ";
     css_classes += "foreground_" + this->foreground + " ";
     css_classes += "background_" + this->background + " ";
@@ -139,7 +139,7 @@ namespace anyterm {
     // css_classes += std::string("bold_") + (this->bold ? "yes" : "no");
     // css_classes += std::string("blink_") + (this->blink ? "yes" : "no");
     // css_classes += std::string("inverse_") + (this->inverse ? "yes" : "no");
-#else // ifdef ANYTERM_BUILD_DEBUG
+#else // ifdef TERMIDOR_BUILD_DEBUG
     css_classes += "a ";
     css_classes += "f" + this->foreground + " ";
     css_classes += "b" + this->background + " ";
@@ -151,9 +151,9 @@ namespace anyterm {
     // css_classes += std::string("b") + (this->bold ? "y" : "n");
     // css_classes += std::string("l") + (this->blink ? "y" : "n");
     // css_classes += std::string("i") + (this->inverse ? "y" : "n");
-#endif // ifdef ANYTERM_BUILD_DEBUG
+#endif // ifdef TERMIDOR_BUILD_DEBUG
 
     return css_classes;
   }
 
-} // namespace anyterm
+} // namespace termidor

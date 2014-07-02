@@ -5,8 +5,8 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef __ANYTERM_SESSION_MANAGER_HPP__
-#define __ANYTERM_SESSION_MANAGER_HPP__
+#ifndef __TERMIDOR_SESSION_MANAGER_HPP__
+#define __TERMIDOR_SESSION_MANAGER_HPP__
 
 #include <cstdint>
 #include <string>
@@ -16,9 +16,9 @@
 #include <boost/uuid/random_generator.hpp>
 #include <random>
 
-#include "anyterm/session.hpp"
+#include "termidor/session.hpp"
 
-namespace anyterm {
+namespace termidor {
 
   struct session_manager {
     public:
@@ -29,7 +29,7 @@ namespace anyterm {
       void        work();
 
     private:
-      typedef std::unordered_map< std::string, anyterm::session_ptr > sessions_map;
+      typedef std::unordered_map< std::string, termidor::session_ptr > sessions_map;
 
       sessions_map  sessions;
       volatile bool terminated;
@@ -39,6 +39,6 @@ namespace anyterm {
       boost::uuids::basic_random_generator< std::mt19937 > generate_uuid;
   };
 
-} // namespace anyterm
+} // namespace termidor
 
-#endif // ifndef __ANYTERM_SESSION_MANAGER_HPP__
+#endif // ifndef __TERMIDOR_SESSION_MANAGER_HPP__

@@ -9,7 +9,7 @@ include(FixCCache)
 include(FixStaticLink)
 
 
-project(anyterm CXX)
+project(termidor CXX)
 
 add_submodule(cpp-netlib git://github.com/cpp-netlib/cpp-netlib.git lib/cpp-netlib TAG 0.9.4 INCLUDE_DIRS .)
 
@@ -28,9 +28,9 @@ link_directories(
 
 # -------------------------------------------------------------------------
 # project version
-file(READ version ANYTERM_VERSION)
-string(STRIP "${ANYTERM_VERSION}" ANYTERM_VERSION)
-string(REGEX REPLACE "\\..*$" "" ANYTERM_SOVERSION "${ANYTERM_VERSION}")
+file(READ version TERMIDOR_VERSION)
+string(STRIP "${TERMIDOR_VERSION}" TERMIDOR_VERSION)
+string(REGEX REPLACE "\\..*$" "" TERMIDOR_SOVERSION "${TERMIDOR_VERSION}")
 
 include_directories(
   include
@@ -38,24 +38,24 @@ include_directories(
 )
 
 # -------------------------------------------------------------------------
-# anyterm
-file(GLOB_RECURSE ANYTERM_SOURCES src/anyterm/*.cpp)
-add_library(anyterm SHARED ${ANYTERM_SOURCES})
-set_target_properties(anyterm PROPERTIES
-  VERSION   "${ANYTERM_VERSION}"
-  SOVERSION "${ANYTERM_SOVERSION}"
-  SONAME    "anyterm${ANYTERM_SOVERSION}"
+# termidor
+file(GLOB_RECURSE TERMIDOR_SOURCES src/termidor/*.cpp)
+add_library(termidor SHARED ${TERMIDOR_SOURCES})
+set_target_properties(termidor PROPERTIES
+  VERSION   "${TERMIDOR_VERSION}"
+  SOVERSION "${TERMIDOR_SOVERSION}"
+  SONAME    "termidor${TERMIDOR_SOVERSION}"
 )
-target_link_libraries(anyterm ${VTE_LIBRARIES} ${Boost_LIBRARIES})
+target_link_libraries(termidor ${VTE_LIBRARIES} ${Boost_LIBRARIES})
 
 # -------------------------------------------------------------------------
-# anytermd
-add_executable(anytermd src/anytermd.cpp)
-target_link_libraries(anytermd anyterm ${Boost_LIBRARIES} cppnetlib-uri)
+# termidord
+add_executable(termidord src/termidord.cpp)
+target_link_libraries(termidord termidor ${Boost_LIBRARIES} cppnetlib-uri)
 
 # -------------------------------------------------------------------------
 # installation
-install(TARGETS anytermd anyterm
+install(TARGETS termidord termidor
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )

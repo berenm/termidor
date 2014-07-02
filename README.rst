@@ -1,39 +1,35 @@
-Javascript-C++ Terminal
-============================
-.. image:: https://secure.travis-ci.org/berenm/anyterm.png?branch=master
+Termidor: a door to your home terminal
+=======================================
+.. image:: https://secure.travis-ci.org/berenm/termidor.png?branch=master
     :alt: Build Status
-    :target: https://travis-ci.org/berenm/anyterm
+    :target: https://travis-ci.org/berenm/termidor
 
-.. image:: https://coveralls.io/repos/berenm/anyterm/badge.png?branch=master
+.. image:: https://coveralls.io/repos/berenm/termidor/badge.png?branch=master
     :alt: Coverage Status
-    :target: https://coveralls.io/r/berenm/anyterm
+    :target: https://coveralls.io/r/berenm/termidor
 
-.. image:: http://stillmaintained.com/berenm/anyterm.png
+.. image:: http://stillmaintained.com/berenm/termidor.png
     :alt: Still Maintained?
-    :target: http://stillmaintained.com/berenm/anyterm
+    :target: http://stillmaintained.com/berenm/termidor
 
 
 INTRO
 ````````````````````````````
 
-Anyterm is a HTML5/Javascript interface communicating remotely via HTTP(S) protocol with a server-side bash (or similar) process.
+Termidor is a HTML5/Javascript interface communicating remotely via HTTP(S) protocol with a server-side bash (or similar) process.
 It is meant to be used for remote access from a restricted environment, where HTTP is the only allowed protocol.
-
-I originally forked the project from Phil Endecott's source code (http://anyterm.org), available under GPL license, but I finally rewrote the majority of the source code.
-Therefore I think I should change the name of this project, at some point.
-
 
 USAGE
 ````````````````````````````
 
-Anyterm comes in two part:
+Termidor comes in two part:
 
-- A server-side process, ``anytermd``, in charge of managing user-sessions and running the shell child processes and the wrapping terminal emulation layer (implemented using the awesome GNOME's libvte).
-- An HTML page, with JQuery javascript code, in charge of capturing key inputs and translating them to ANSI control sequences that will be fed to the ``anytermd`` child processes. 
+- A server-side process, ``termidord``, in charge of managing user-sessions and running the shell child processes and the wrapping terminal emulation layer (implemented using the awesome GNOME's libvte).
+- An HTML page, with JQuery javascript code, in charge of capturing key inputs and translating them to ANSI control sequences that will be fed to the ``termidord`` child processes. 
 
-``Anytermd`` is not meant to be accessed directly from the network. The server does not support any kind of authentication or security enforcement.
+``termidord`` is not meant to be accessed directly from the network. The server does not support any kind of authentication or security enforcement.
 It is focused exclusively on session managment and interface with the terminal emulator.
-Instead, ``anytermd`` should be used behind a full-featured web server such as nginx, which will be configured to serve the static content (html page, css, and javascript), handle encryption (with HTTPS), and handle user authentication.
+Instead, ``termidord`` should be used behind a full-featured web server such as nginx, which will be configured to serve the static content (html page, css, and javascript), handle encryption (with HTTPS), and handle user authentication.
 
 Current implementation can be tested with the following nginx configuration (It's a simple proxy, apache can do the same):
 
@@ -42,20 +38,20 @@ Current implementation can be tested with the following nginx configuration (It'
   server {
     listen 127.0.0.1:8000;
 
-    root <path-to-anyterm-source>/anyterm/www;
-    index anyterm.html;
+    root <path-to-termidor-source>/termidor/www;
+    index termidor.html;
 
     location / {
-      try_files $uri $uri/ anyterm.html;
+      try_files $uri $uri/ termidor.html;
     }
 
-    location /anytermd {
+    location /termidor {
       proxy_pass http://localhost:8088;
     }
   }
 
 
-Running ``anytermd`` is easy (for dependencies, look at the installed packages in .travis.yml):
+Running ``termidord`` is easy (for dependencies, look at the installed packages in .travis.yml):
 
 .. code:: bash
 
@@ -63,7 +59,7 @@ Running ``anytermd`` is easy (for dependencies, look at the installed packages i
   cd build
   cmake ..
   make
-  ./anytermd
+  ./termidord
 
 
 Then, interface can be accessed at http://127.0.0.1:8000. Chrome and Firefox browsers should be supported.
@@ -71,7 +67,7 @@ Then, interface can be accessed at http://127.0.0.1:8000. Chrome and Firefox bro
 
 CONFIGURATION
 ````````````````````````````
-For now, there is none, ``anytermd`` spawns a ``/bin/bash -l`` instance, started with the same user as the ``anytermd`` process. Might be possible later on.
+For now, there is none, ``termidord`` spawns a ``/bin/bash -l`` instance, started with the same user as the ``termidord`` process. Might be possible later on.
 
 
 COPYING INFORMATION

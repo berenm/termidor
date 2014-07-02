@@ -5,16 +5,16 @@
  * See accompanying file LICENSE or copy at http://www.boost.org/LICENSE
  */
 
-#ifndef __ANYTERM_SCREEN_HPP__
-#define __ANYTERM_SCREEN_HPP__
+#ifndef __TERMIDOR_SCREEN_HPP__
+#define __TERMIDOR_SCREEN_HPP__
 
 #include <cstdint>
 #include <string>
 #include <vector>
 
-#include "anyterm/attribute.hpp"
+#include "termidor/attribute.hpp"
 
-namespace anyterm {
+namespace termidor {
 
   struct screen {
     public:
@@ -29,14 +29,14 @@ namespace anyterm {
       text_attributes get_attributes() const;
       std::string     to_html() const;
 
-      anyterm::attribute get_attribute(std::uint32_t const row, std::uint32_t const column) const;
-      void               set_attribute(std::uint32_t const row, std::uint32_t const column, anyterm::attribute const& attribute);
+      termidor::attribute get_attribute(std::uint32_t const row, std::uint32_t const column) const;
+      void               set_attribute(std::uint32_t const row, std::uint32_t const column, termidor::attribute const& attribute);
 
     private:
       text_lines      lines;
       text_attributes attributes;
   };
 
-} // namespace anyterm
+} // namespace termidor
 
-#endif // ifndef __ANYTERM_SCREEN_HPP__
+#endif // ifndef __TERMIDOR_SCREEN_HPP__
