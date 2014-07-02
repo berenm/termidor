@@ -11,7 +11,7 @@ include(FixStaticLink)
 
 project(termidor CXX)
 
-add_submodule(cpp-netlib git://github.com/cpp-netlib/cpp-netlib.git lib/cpp-netlib TAG 0.9.4 INCLUDE_DIRS .)
+add_submodule(cpp-netlib git://github.com/cpp-netlib/cpp-netlib.git lib/cpp-netlib TAG cpp-netlib-0.11.0-final INCLUDE_DIRS .)
 
 find_package(Boost COMPONENTS thread program_options filesystem regex iostreams date_time system serialization REQUIRED)
 find_package(PkgConfig REQUIRED)

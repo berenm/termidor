@@ -1,4 +1,4 @@
-#include <boost/network/protocol/http/server.hpp>
+#include <boost/network/include/http/server.hpp>
 #include <boost/network/uri.hpp>
 #include <boost/network/uri/uri_io.hpp>
 
@@ -165,9 +165,13 @@ namespace termidor {
     std::setlocale(LC_ALL, "utf8");
 
     termidor::handler handler;
-    termidor::server  server("0.0.0.0", "8088", handler);
+    termidor::server::options options(handler);
 
-    server.run();
+    options.address("127.0.0.1")
+           .port("8088")
+           .reuse_address(true);
+
+    termidor::server(options).run();
   }
 
 }
